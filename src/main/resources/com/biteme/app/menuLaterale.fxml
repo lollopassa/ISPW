@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.biteme.app.boundary.MenuLateraleBoundary">
+    <children>
+
+        <!-- Rettangolo Grigio (Header Superiore) -->
+        <Rectangle fill="#D9D9D9" height="106.0" layoutX="302.0" layoutY="-3.0" stroke="BLACK" strokeType="OUTSIDE" width="1139.0" />
+
+        <!-- Rettangolo Blu (Sfondo del Menu Laterale) -->
+        <Rectangle fill="#303d68" height="800.0" layoutX="-1.0" layoutY="-1.0" stroke="BLACK" strokeType="OUTSIDE" width="302.0" />
+
+        <!-- Rettangolo Grigio (Header Superiore) -->
+        <Rectangle fill="#D9D9D9" height="106.0" layoutX="302.0" layoutY="-3.0" stroke="BLACK" strokeType="OUTSIDE" width="1139.0" />
+
+        <!-- Immagine Coltello e Forchetta -->
+        <ImageView fx:id="colEforImagine" fitHeight="100.0" fitWidth="100.0" layoutX="100.0" layoutY="30.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../../images/coltelloeforchetta.png" />
+            </image>
+        </ImageView>
+
+        <!-- Etichetta (Centro Gestione) -->
+        <Label fx:id="cgrLabel" layoutX="61.0" layoutY="150.0" text="Centro Gestione &#10;del Ristorante" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+            <font>
+                <Font size="24.0" />
+            </font>
+        </Label>
+
+        <!-- Menu Laterale -->
+        <VBox alignment="TOP_CENTER" layoutX="0.0" layoutY="283.0" prefWidth="302.0" spacing="15.0">
+            <!-- Bottone Home -->
+            <StackPane fx:id="homeButton" prefHeight="52.0" prefWidth="302.0" style="-fx-cursor: hand;">
+                <Rectangle fill="#303d68" height="52.0" width="302.0" />
+                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 0 15;">
+                    <ImageView fx:id="homeImage" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                            <Image url="@../../../images/home.png" />
+                        </image>
+                    </ImageView>
+                    <Label fx:id="homeLabel" style="-fx-font-size: 18;" text="Home" textFill="WHITE" />
+                </HBox>
+            </StackPane>
+
+            <!-- Bottone Prenotazioni -->
+            <StackPane fx:id="prenotazioniButton" prefHeight="52.0" prefWidth="302.0" style="-fx-cursor: hand;">
+                <Rectangle fill="#303d68" height="52.0" width="302.0" />
+                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 0 15;">
+                    <ImageView fx:id="prenotazioniImage" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                            <Image url="@../../../images/prenotazioni.png" />
+                        </image>
+                    </ImageView>
+                    <Label fx:id="prenotazioniLabel" style="-fx-font-size: 18;" text="Prenotazioni" textFill="WHITE" />
+                </HBox>
+            </StackPane>
+
+            <!-- Bottone Ordini -->
+            <StackPane fx:id="ordiniButton" prefHeight="52.0" prefWidth="302.0" style="-fx-cursor: hand;">
+                <Rectangle fill="#303d68" height="52.0" width="302.0" />
+                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 0 15;">
+                    <ImageView fx:id="ordiniImage" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                            <Image url="@../../../images/ordini.png" />
+                        </image>
+                    </ImageView>
+                    <Label fx:id="ordiniLabel" style="-fx-font-size: 18;" text="Ordini" textFill="WHITE" />
+                </HBox>
+            </StackPane>
+
+            <!-- Bottone Cucina -->
+            <StackPane fx:id="cucinaButton" prefHeight="52.0" prefWidth="302.0" style="-fx-cursor: hand;">
+                <Rectangle fill="#303d68" height="52.0" width="302.0" />
+                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 0 15;">
+                    <ImageView fx:id="cucinaImage" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                            <Image url="@../../../images/cucina.png" />
+                        </image>
+                    </ImageView>
+                    <Label fx:id="cucinaLabel" style="-fx-font-size: 18;" text="Cucina" textFill="WHITE" />
+                </HBox>
+            </StackPane>
+
+            <!-- Bottone Magazzino -->
+            <StackPane fx:id="magazzinoButton" prefHeight="52.0" prefWidth="302.0" style="-fx-cursor: hand;">
+                <Rectangle fill="#303d68" height="52.0" width="302.0" />
+                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 0 15;">
+                    <ImageView fx:id="magazzinoImage" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                            <Image url="@../../../images/magazzino.png" />
+                        </image>
+                    </ImageView>
+                    <Label fx:id="magazzinoLabel" style="-fx-font-size: 18;" text="Magazzino" textFill="WHITE" />
+                </HBox>
+            </StackPane>
+
+            <!-- Bottone Logout -->
+            <StackPane fx:id="logoutButton" prefHeight="52.0" prefWidth="302.0" style="-fx-cursor: hand;">
+                <Rectangle fill="#303d68" height="52.0" width="302.0" />
+                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 0 15;">
+                    <ImageView fx:id="logoutImage" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                            <Image url="@../../../images/logout.png" />
+                        </image>
+                    </ImageView>
+                    <Label fx:id="logoutLabel" style="-fx-font-size: 18;" text="Logout" textFill="WHITE" />
+                </HBox>
+            </StackPane>
+        </VBox>
+    </children>
+</AnchorPane>

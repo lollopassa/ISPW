@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.SignupBoundary">
+
+   <!-- Contenuto della scena -->
+   <children>
+      <!-- Rettangolo blu sulla sinistra -->
+      <Rectangle fill="#303d68" height="800.0" layoutX="705.0" stroke="BLACK" strokeType="OUTSIDE" width="734.0" />
+      <ImageView fx:id="iconaImage" fitHeight="250.0" fitWidth="250.0" layoutX="936.0" layoutY="147.0">
+         <image>
+            <Image url="@../../../images/icona.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="766.0" layoutY="421.0" text="Sistema di Gestione del Ristorante" textFill="#e02189">
+         <font>
+            <Font size="40.0" />
+         </font>
+      </Label>
+
+      <!-- Titolo - Benvenuto -->
+      <Label fx:id="titoloLabel" layoutX="209.0" layoutY="54.0" style="-fx-font-size: 48; -fx-font-weight: bold;" text="Benvenuto 👋" textFill="#3D55A1" />
+
+      <!-- Messaggio registrazione -->
+      <Label fx:id="googleMessageLabel" layoutX="197.0" layoutY="147.0" prefHeight="70.0" prefWidth="333.0" style="-fx-font-size: 24; -fx-font-weight: bold;" text="Registrati rapidamente con &#10;la tua email!" textAlignment="CENTER" textFill="#555555" wrapText="true" />
+
+      <!-- Campo email -->
+      <Label layoutX="131.0" layoutY="250.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Email:" textFill="#3D55A1" />
+      <TextField fx:id="emailTextField" layoutX="131.0" layoutY="278.0" prefHeight="50.0" prefWidth="460.0" style="-fx-font-size: 16;" promptText="Inserisci il tuo indirizzo email" />
+
+      <!-- Campo Nome Utente -->
+      <Label layoutX="131.0" layoutY="340.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Nome Utente:" textFill="#3D55A1" />
+      <TextField fx:id="nomeUtenteTextField" layoutX="131.0" layoutY="368.0" prefHeight="50.0" prefWidth="460.0" style="-fx-font-size: 16;" promptText="Inserisci il tuo nome utente" />
+
+      <!-- Campo password -->
+      <Label layoutX="131.0" layoutY="430.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Password:" textFill="#3D55A1" />
+      <PasswordField fx:id="passwordTextField" layoutX="131.0" layoutY="458.0" prefHeight="50.0" prefWidth="460.0" style="-fx-font-size: 16;" promptText="Inserisci la tua password" />
+
+      <!-- Campo conferma password -->
+      <Label layoutX="131.0" layoutY="520.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Conferma Password:" textFill="#3D55A1" />
+      <PasswordField fx:id="confirmPasswordTextField" layoutX="131.0" layoutY="548.0" prefHeight="50.0" prefWidth="460.0" style="-fx-font-size: 16;" promptText="Conferma la tua password" />
+
+      <!-- Bottone Registrati -->
+      <Button fx:id="signupButton" layoutX="131.0" layoutY="618.0" prefHeight="50.0" prefWidth="460.0" style="-fx-background-color: #3D55A1; -fx-text-fill: WHITE; -fx-font-size: 20; -fx-font-weight: bold; -fx-cursor: hand;" text="Registrati" onAction="#onRegistratiButtonClick" />
+
+      <!-- Torna al Login -->
+      <Label fx:id="loginMessage" layoutX="211.0" layoutY="678.0" style="-fx-font-size: 18;" text="Hai già un account?" textFill="#A1A1A1" />
+      <Button fx:id="loginButton" layoutX="361.0" layoutY="671.0" style="-fx-font-size: 18; -fx-background-color: transparent; -fx-text-fill: #3D55A1; -fx-border-color: transparent; -fx-cursor: hand;" text="Accedi" onAction="#onAccediButtonClick" underline="true" />
+   </children>
+</Pane>

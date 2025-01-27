@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.LoginBoundary">
+
+   <children>
+      <!-- Rettangolo blu sulla sinistra -->
+      <Rectangle fill="#303d68" height="802.0" layoutX="-4.0" stroke="BLACK" strokeType="OUTSIDE" width="734.0" />
+      <ImageView fx:id="iconaImage" fitHeight="250.0" fitWidth="250.0" layoutX="239.0" layoutY="151.0">
+         <image>
+            <Image url="@../../../images/icona.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="63.0" layoutY="419.0" text="Sistema di Gestione del Ristorante" textFill="#e02189">
+         <font>
+            <Font size="40.0" />
+         </font>
+      </Label>
+
+      <!-- Titolo - Bentornato -->
+      <Label fx:id="bentornatoLabel" layoutX="936.0" layoutY="55.0" style="-fx-font-size: 48; -fx-font-weight: bold;" text="Bentornato 👋" textFill="#3D55A1" />
+
+      <!-- Messaggio login -->
+      <Label fx:id="googleMessageLabel" layoutX="949.0" layoutY="144.0" prefHeight="70.0" prefWidth="292.0" style="-fx-font-size: 24; -fx-font-weight: bold;" text="Inserisci le tue credenziali per accedere." textAlignment="CENTER" textFill="#555555" wrapText="true" />
+
+      <!-- Campo email o nome utente -->
+      <Label layoutX="866.0" layoutY="276.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Email o Nome Utente:" textFill="#3D55A1" />
+      <TextField fx:id="emailOrUsernameTextField" layoutX="866.0" layoutY="306.0" prefHeight="50.0" prefWidth="460.0" style="-fx-font-size: 16;" promptText="Inserisci qui la tua email o nome utente" />
+
+      <!-- Campo password -->
+      <Label layoutX="866.0" layoutY="378.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Password:" textFill="#3D55A1" />
+      <PasswordField fx:id="passwordTextField" layoutX="866.0" layoutY="408.0" prefHeight="50.0" prefWidth="460.0" style="-fx-font-size: 16;" promptText="Inserisci la tua password" />
+
+      <!-- Bottone Accedi -->
+      <Button fx:id="loginButton" layoutX="865.0" layoutY="502.0" prefHeight="50.0" prefWidth="460.0" style="-fx-background-color: #3D55A1; -fx-text-fill: WHITE; -fx-font-size: 20; -fx-font-weight: bold; -fx-cursor: hand;" text="Accedi" onAction="#onLoginButtonClick" />
+
+      <!-- Non hai un account -->
+      <Label fx:id="createAccountMessage" layoutX="931.0" layoutY="564.0" style="-fx-font-size: 18;" text="Non hai un account?" textFill="#A1A1A1" />
+      <Button fx:id="signupButton" layoutX="1097.0" layoutY="557.0" style="-fx-font-size: 18; -fx-background-color: transparent; -fx-text-fill: #3D55A1; -fx-border-color: transparent; -fx-cursor: hand;" text="Registrati" onAction="#onSignupButtonClick" underline="true" />
+
+
+   </children>
+</Pane>
