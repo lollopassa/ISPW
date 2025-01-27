@@ -1,0 +1,8 @@
+# ide
+.idea
+
+# target
+target/
+
+# config
+src/main/resources/config.properties
