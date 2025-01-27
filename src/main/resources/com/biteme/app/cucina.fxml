@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.controller.CucinaController">
+    <children>
+
+
+
+        <!-- Inclusione del Menu Laterale -->
+        <fx:include source="menuLaterale.fxml" />
+
+
+
+        <!-- Etichetta "Cucina" nel Header -->
+        <Label fx:id="cucinaLabelG" layoutX="349.0" layoutY="24.0" text="Cucina" textAlignment="CENTER" textFill="BLACK" wrapText="true">
+            <font>
+                <Font size="32.0" />
+            </font>
+        </Label>
+
+
+
+    </children>
+</Pane>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.controller.HomeController">
+   <children>
+
+      <!-- Inclusione del Menu Laterale -->
+      <fx:include source="menuLaterale.fxml" />
+
+      <!-- Etichetta "Home" nel Header -->
+      <Label fx:id="homeLabelG" layoutX="349.0" layoutY="24.0" text="Home" textAlignment="CENTER" textFill="BLACK" wrapText="true">
+         <font>
+            <Font size="32.0" />
+         </font>
+      </Label>
+
+      <!-- Immagine Cameriere (Centrale) -->
+      <ImageView fx:id="cameriereImagine" fitHeight="256.0" fitWidth="256.0" layoutX="744.0" layoutY="229.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../images/cameriere.png" />
+         </image>
+      </ImageView>
+
+      <!-- Nome dell'App -->
+      <Label fx:id="nomeAppLabel" layoutX="600.0" layoutY="518.0" text="Sistema di Gestione del Ristorante" textAlignment="CENTER" textFill="BLACK" wrapText="true">
+         <font>
+            <Font size="36.0" />
+         </font>
+      </Label>
+
+
+
+   </children>
+</Pane>
