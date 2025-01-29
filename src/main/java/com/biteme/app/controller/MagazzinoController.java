@@ -3,7 +3,7 @@ package com.biteme.app.controller;
 import com.biteme.app.bean.MagazzinoBean;
 import com.biteme.app.entity.Prodotto;
 import com.biteme.app.persistence.ProdottoDao;
-import com.biteme.app.persistence.database.DatabaseProdottoDao;
+import com.biteme.app.util.Configuration;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public class MagazzinoController {
     private final ProdottoDao prodottoDao;
 
     public MagazzinoController() {
-        this.prodottoDao = new DatabaseProdottoDao();
+        this.prodottoDao = Configuration.getPersistenceProvider().getDaoFactory().getProdottoDao();
     }
 
     public void aggiungiProdotto(MagazzinoBean magazzinoBean) {
