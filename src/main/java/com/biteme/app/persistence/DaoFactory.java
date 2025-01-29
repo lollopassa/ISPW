@@ -6,4 +6,7 @@ public abstract class DaoFactory {
     public abstract UserDao getUserDao();
 
     public abstract PrenotazioneDao getPrenotazioneDao();
+
+    public abstract OrdinazioneDao getOrdinazioneDao();
+
 }

@@ -9,7 +9,7 @@ import java.util.Properties;
 public class Configuration {
 
     // Scegli il provider di persistenza (es. "in memory" o "database")
-    private static final String PERSISTENCE_MODE = "in memory";
+    private static final String PERSISTENCE_MODE = "database";
 
     private static final Properties properties = new Properties();
 
