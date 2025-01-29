@@ -8,21 +8,21 @@ import java.util.Properties;
 
 public class Configuration {
 
-    // Scegli il provider di persistenza (es. "in memory" o "database")
-    private static final String PERSISTENCE_MODE = "database";
-
     private static final Properties properties = new Properties();
+    private static String persistenceMode; // Modalità di persistenza letta da config.properties
 
     // Caricamento delle proprietà dal file config.properties
     static {
         try (InputStream input = Configuration.class.getClassLoader().getResourceAsStream("config.properties")) {
             if (input != null) {
                 properties.load(input);
+
+                // Leggere la modalità di persistenza dal file config.properties
+                persistenceMode = properties.getProperty("persistence.mode", "inmemory").toLowerCase(); // Predefinito "inmemory"
             } else {
                 throw new IllegalStateException("Impossibile trovare il file config.properties");
             }
         } catch (IOException e) {
-            e.printStackTrace();
             throw new IllegalStateException("Errore durante il caricamento del file di configurazione", e);
         }
     }
@@ -34,7 +34,7 @@ public class Configuration {
 
     // Metodo per ottenere il provider di persistenza configurato.
     public static PersistenceProvider getPersistenceProvider() {
-        return PersistenceProvider.getProviderByName(PERSISTENCE_MODE);
+        return PersistenceProvider.getProviderByName(persistenceMode);
     }
 
     // Metodo per ottenere una proprietà configurata (es. App ID di Facebook)
