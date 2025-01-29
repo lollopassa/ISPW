@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.PrenotazioniBoundary">
+<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.OrdinazioneBoundary">
    <children>
 
       <!-- Inclusione del Menu Laterale -->
@@ -17,17 +17,17 @@
          </font>
       </Label>
 
-      <!-- Tabella delle Prenotazioni con Icona Elimina -->
-      <VBox layoutX="600.0" layoutY="490.0" prefHeight="350.0" prefWidth="800.0" spacing="10" />
-      <TableView fx:id="prenotazioniTableView" layoutX="370.0" layoutY="141.0" prefHeight="300.0" prefWidth="700.0">
+      <!-- Tabella delle ordinazioni con Icona Elimina -->
+      <VBox layoutX="600.0" layoutY="490.0" prefHeight="350.0" prefWidth="1000.0" spacing="10" />
+      <TableView fx:id="ordinazioniTableView" layoutX="370.0" layoutY="141.0" prefHeight="250.0" prefWidth="750.0">
          <columns>
             <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
             <TableColumn fx:id="nomeColumn" prefWidth="100.0" text="Nome Cliente" />
-            <TableColumn fx:id="dataColumn" prefWidth="100.0" text="Data" />
+            <TableColumn fx:id="copertiColumn" prefWidth="100.0" text="Numero Coperti" />
+            <TableColumn fx:id="tipoOrdineColumn" prefWidth="100.0" text="Tipo Ordine" />
+            <TableColumn fx:id="infoTavoloColumn" prefWidth="100.0" text="Tavolo" />
+            <TableColumn fx:id="statoOrdineColumn" prefWidth="100.0" text="Stato Ordine" />
             <TableColumn fx:id="orarioColumn" prefWidth="100.0" text="Orario" />
-            <TableColumn fx:id="copertiColumn" prefWidth="100.0" text="Coperti" />
-            <TableColumn fx:id="telefonoColumn" prefWidth="100.0" text="Telefono" />
-            <TableColumn fx:id="noteColumn" prefWidth="150.0" text="Note" />
             <TableColumn fx:id="azioniColumn" prefWidth="100.0" text="Azioni" />
          </columns>
       </TableView>
@@ -35,7 +35,7 @@
       
       
             <!-- Modulo per Aggiungere Ordinazione -->
-      <VBox alignment="TOP_CENTER" layoutX="370.0" layoutY="460.0" spacing="15.0" style="-fx-padding: 15px; -fx-border-color: lightgray; -fx-border-width: 1.5px; -fx-background-color: #f9f9f9; -fx-border-radius: 8px;">
+      <VBox alignment="TOP_CENTER" layoutX="370.0" layoutY="415.0" spacing="15.0" style="-fx-padding: 15px; -fx-border-color: lightgray; -fx-border-width: 1.5px; -fx-background-color: #f9f9f9; -fx-border-radius: 8px;">
          <!-- Titolo della sezione -->
          <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Nuova Ordinazione" />
 
@@ -43,20 +43,20 @@
                <!-- Campo Nome Cliente -->
          <TextField fx:id="nomeClienteField" prefHeight="35.0" prefWidth="300.0" promptText="Nome Cliente" style="-fx-font-size: 14px;" />
 
-               <!-- Campo Orario Prenotazione -->
+               <!-- Campo Tipo Ordine -->
+         <TextField fx:id="tipoOrdineField" prefHeight="35.0" prefWidth="300.0" promptText="Asporto o Al Tavolo?" style="-fx-font-size: 14px;" />
+
+               <!-- Campo Orario Ordinazione -->
          <TextField fx:id="orarioField" prefHeight="35.0" prefWidth="300.0" promptText="Orario (hh:mm)" style="-fx-font-size: 14px;" />
 
                <!-- Campo Numero Coperti -->
          <TextField fx:id="copertiField" prefHeight="35.0" prefWidth="300.0" promptText="Numero Coperti" style="-fx-font-size: 14px;" />
 
-               <!-- Campo Note Prenotazione -->
-         <TextField fx:id="noteField" prefHeight="35.0" prefWidth="300.0" promptText="Note" style="-fx-font-size: 14px;" />
-
                <!-- Campo Info Tavolo -->
          <TextField fx:id="tavoloField" prefHeight="35.0" prefWidth="300.0" promptText="Tavolo" style="-fx-font-size: 14px;" />
 
-               <!-- Pulsante per aggiungere una prenotazione -->
-         <Button onAction="#createBooking" prefHeight="40.0" prefWidth="300.0" style="-fx-background-color: #303d68; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;" text="Aggiungi Prenotazione" />
+               <!-- Pulsante per aggiungere un'ordinazione -->
+         <Button onAction="#createOrdine" prefHeight="40.0" prefWidth="300.0" style="-fx-background-color: #303d68; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;" text="Aggiungi Ordinazione" />
       </VBox>
 
    </children>

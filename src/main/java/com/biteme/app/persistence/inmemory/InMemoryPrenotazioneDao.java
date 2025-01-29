@@ -2,15 +2,11 @@ package com.biteme.app.persistence.inmemory;
 
 import com.biteme.app.entity.Prenotazione;
 import com.biteme.app.persistence.PrenotazioneDao;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Implementazione in memoria di PrenotazioneDao.
- */
 public class InMemoryPrenotazioneDao implements PrenotazioneDao {
 
     private final List<Prenotazione> prenotazioni = Storage.getInstance().getPrenotazioni(); // Usa lo storage condiviso
@@ -45,6 +41,7 @@ public class InMemoryPrenotazioneDao implements PrenotazioneDao {
         // Verifica se esiste una prenotazione con un ID specifico
         return prenotazioni.stream().anyMatch(p -> p.getId() == key);
     }
+
 
     @Override
     public List<Prenotazione> getByOrario(LocalTime orario) {
