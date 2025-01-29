@@ -30,9 +30,6 @@ public class MenuLateraleBoundary {
     @FXML
     private StackPane logoutButton;
 
-    @FXML
-    private Label nomeUtenteLabelG;
-
 
     private void onLogout() {
         if (LOGGER.isLoggable(Level.INFO)) {

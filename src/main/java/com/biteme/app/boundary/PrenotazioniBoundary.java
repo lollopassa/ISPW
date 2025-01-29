@@ -111,8 +111,8 @@ public class PrenotazioniBoundary {
         // Carica dati iniziali nella tabella
         refreshTable(LocalDate.now());
 
-        frecciaIndietro.setOnMouseClicked(event -> mesePrecedente());
-        frecciaAvanti.setOnMouseClicked(event -> meseSuccessivo());
+        frecciaIndietro.setOnMouseClicked(_ -> mesePrecedente());
+        frecciaAvanti.setOnMouseClicked(_ -> meseSuccessivo());
 
         addDeleteButtonToTable();
     }
@@ -225,30 +225,33 @@ public class PrenotazioniBoundary {
         int giornoCorrente = 1;
 
         // Aggiunge i giorni del mese alla griglia
-        for (int riga = 1; giornoCorrente <= giorniDelMese; riga++) { // Limitiamo il ciclo alle righe dove sono necessari giorni
+        for (int riga = 1; giornoCorrente <= giorniDelMese; riga++) {
             for (int colonna = 0; colonna < 7; colonna++) {
                 if (riga == 1 && colonna < giornoInizioSettimana) {
-                    // Salta le celle vuote solo nella prima riga
-                    continue;
+                    continue; // Salta le celle vuote nella prima riga
                 }
 
                 if (giornoCorrente > giorniDelMese) {
-                    // Uscita dal ciclo: non ci sono più giorni da aggiungere
-                    return;
+                    return; // Non ci sono più giorni da aggiungere
                 }
 
                 // Crea un'etichetta per il giorno
                 Label giornoLabel = new Label(String.valueOf(giornoCorrente));
                 giornoLabel.setMinSize(40.0, 40.0); // Dimensioni minime
                 giornoLabel.setStyle(DAY_LABEL_DEFAULT_STYLE);
-                // Imposta il giorno come dato associato al nodo
-                giornoLabel.setUserData(giornoCorrente);
-                // Aggiunge evento per gestire il click sui giorni
-                int giornoDelMese = giornoCorrente; // Variabile finale per lambda
-                giornoLabel.setOnMouseClicked(event -> gestisciClickGiorno(LocalDate.of(mese.getYear(), mese.getMonth(), giornoDelMese)));
+
+                // Memorizza la data del giorno corrente come associata al nodo
+                LocalDate dataDelGiorno = LocalDate.of(mese.getYear(), mese.getMonth(), giornoCorrente);
+                giornoLabel.setOnMouseClicked(_ -> gestisciClickGiorno(dataDelGiorno));
 
                 // Aggiunge il nodo alla griglia
                 calendarioGrid.add(giornoLabel, colonna, riga);
+
+                // Evidenzia il giorno selezionato
+                if (dataDelGiorno.equals(giornoSelezionato)) {
+                    giornoLabel.setStyle(DAY_LABEL_SELECTED_STYLE);
+                    casellaSelezionata = giornoLabel;
+                }
 
                 // Incrementa il giorno corrente
                 giornoCorrente++;
@@ -257,23 +260,21 @@ public class PrenotazioniBoundary {
     }
 
     private void gestisciClickGiorno(LocalDate data) {
+        // Aggiorna il giorno selezionato
         giornoSelezionato = data;
         isGiornoSelezionato = true;
 
-        // Resetta il colore del giorno precedente selezionato
+        // Resetta il colore del giorno precedentemente selezionato
         if (casellaSelezionata != null && casellaSelezionata instanceof Label labelPrecedente) {
             labelPrecedente.setStyle(DAY_LABEL_DEFAULT_STYLE); // Stile predefinito
         }
 
-        // Aggiorna il giorno selezionato
+        // Cerca la nuova casella corrispondente al giorno selezionato e aggiorna lo stile
         for (Node node : calendarioGrid.getChildren()) {
-            if (node instanceof Label giornoLabel && giornoLabel.getUserData() instanceof Integer giornoDelMese && data.getDayOfMonth() == giornoDelMese) {
-                // Verifica se il nodo corrisponde al giorno cliccato
-                if (data.getDayOfMonth() == giornoDelMese) {
-                    giornoLabel.setStyle(DAY_LABEL_SELECTED_STYLE); // Cambia stile per selezionato
-                    casellaSelezionata = giornoLabel; // Salva il nodo selezionato
-                    break;
-                }
+            if (node instanceof Label giornoLabel && giornoLabel.getText().equals(String.valueOf(data.getDayOfMonth()))) {
+                giornoLabel.setStyle(DAY_LABEL_SELECTED_STYLE);
+                casellaSelezionata = giornoLabel; // Aggiorna la casella selezionata
+                break;
             }
         }
 

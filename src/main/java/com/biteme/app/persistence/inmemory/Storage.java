@@ -1,5 +1,6 @@
 package com.biteme.app.persistence.inmemory;
 
+import com.biteme.app.entity.Prodotto;
 import com.biteme.app.entity.Prenotazione;
 import com.biteme.app.entity.Ordine;
 import com.biteme.app.entity.User;
@@ -19,6 +20,9 @@ public class Storage {
 
     // Lista sincronizzata per le ordinazioni
     private final List<Ordine> ordinazioni = Collections.synchronizedList(new ArrayList<>());
+
+    // Lista sincronizzata per i prodotti
+    private final List<Prodotto> prodotti = Collections.synchronizedList(new ArrayList<>());
 
     // Mappa per memorizzare gli utenti
     private final Map<String, User> users = new HashMap<>();
@@ -42,6 +46,11 @@ public class Storage {
     // Accesso alla lista delle ordinazioni
     public List<Ordine> getOrdinazioni() {
         return ordinazioni;
+    }
+
+    // Accesso alla lista dei prodotti
+    public List<Prodotto> getProdotti() {
+        return prodotti;
     }
 
     // Accesso alla mappa degli utenti

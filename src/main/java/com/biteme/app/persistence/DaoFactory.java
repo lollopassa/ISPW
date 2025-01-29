@@ -9,4 +9,5 @@ public abstract class DaoFactory {
 
     public abstract OrdinazioneDao getOrdinazioneDao();
 
+    public abstract ProdottoDao getProdottoDao();
 }
