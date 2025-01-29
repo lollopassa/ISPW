@@ -13,5 +13,9 @@ public class InMemoryDaoFactory extends DaoFactory {
     public PrenotazioneDao getPrenotazioneDao() {
         return new InMemoryPrenotazioneDao();
     }
-    // Puoi aggiungere altri metodi specifici per differenti entità, se necessario.
+
+    public  OrdinazioneDao getOrdinazioneDao() {
+        return new InMemoryOrdinazioneDao();
+    }
+
 }
