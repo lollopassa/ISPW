@@ -1,27 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.controller.MagazzinoController">
+<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.MagazzinoBoundary">
     <children>
 
         <!-- Inclusione del Menu Laterale -->
         <fx:include source="menuLaterale.fxml" />
 
-
-
-        <!-- Etichetta "Magazzino" nel Header -->
-        <Label fx:id="magazzinoLabelG" layoutX="349.0" layoutY="24.0" text="Magazzino" textAlignment="CENTER" textFill="BLACK" wrapText="true">
+        <!-- Etichetta "Magazzino" -->
+        <Label fx:id="magazzinoLabelG" layoutX="349.0" layoutY="24.0" text="Magazzino" textAlignment="CENTER" textFill="BLACK">
             <font>
                 <Font size="32.0" />
             </font>
         </Label>
 
+        <!-- Tabella del Magazzino -->
+        <VBox layoutX="350.0" layoutY="150.0" prefHeight="500.0" prefWidth="670.0" spacing="10">
+            <TableView fx:id="prodottiTableView" prefHeight="450.0" prefWidth="750.0">
+                <columns>
+                    <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
+                    <TableColumn fx:id="nomeColumn" text="Prodotto" prefWidth="100.0" />
+                    <TableColumn fx:id="categoriaColumn" prefWidth="100.0" text="Categoria" />
+                    <TableColumn fx:id="quantitaColumn" text="Quantità" />
+                    <TableColumn fx:id="prezzoColumn" text="Prezzo (€)" />
+                    <TableColumn fx:id="dataScadenzaColumn" text="Scadenza" />
+                    <TableColumn fx:id="disponibileColumn" text="Disponibile" />
+                    <TableColumn fx:id="azioniColumn" prefWidth="100.0" text="Azioni" />
+                </columns>
+            </TableView>
+        </VBox>
 
+        <!-- Modulo per aggiungere nuovi prodotti -->
+        <VBox alignment="TOP_CENTER" layoutX="1070.0" layoutY="150.0" spacing="15.0" style="-fx-padding: 15px; -fx-border-color: lightgray; -fx-border-width: 1.5px; -fx-background-color: #f9f9f9; -fx-border-radius: 8px;">
+            <!-- Titolo del modulo -->
+            <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Aggiungi Prodotto" />
+
+            <!-- Campo Nome Prodotto -->
+            <TextField fx:id="nomeProdottoField" prefHeight="35.0" prefWidth="250.0" promptText="Nome Prodotto" style="-fx-font-size: 14px;" />
+
+            <!-- Campo Categoria -->
+            <TextField fx:id="categoriaField" prefHeight="35.0" prefWidth="250.0" promptText="Categoria" style="-fx-font-size: 14px;" />
+
+            <!-- Campo Prezzo -->
+            <TextField fx:id="prezzoField" prefHeight="35.0" prefWidth="250.0" promptText="Prezzo (€)" style="-fx-font-size: 14px;" />
+
+            <!-- Campo Data di Scadenza -->
+            <TextField fx:id="dataScadenzaField" prefHeight="35.0" prefWidth="250.0" promptText="Scadenza (dd-MM-yyyy)" style="-fx-font-size: 14px;" />
+
+            <!-- Campo Quantità -->
+            <TextField fx:id="quantitaField" prefHeight="35.0" prefWidth="250.0" promptText="Quantità" style="-fx-font-size: 14px;" />
+
+            <!-- Pulsante Aggiungi -->
+            <Button onAction="#aggiungiProdotto" prefHeight="40.0" prefWidth="250.0" style="-fx-background-color: #303d68; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;" text="Aggiungi Prodotto" />
+        </VBox>
 
     </children>
 </Pane>

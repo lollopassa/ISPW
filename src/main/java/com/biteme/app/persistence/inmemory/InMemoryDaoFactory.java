@@ -14,8 +14,14 @@ public class InMemoryDaoFactory extends DaoFactory {
         return new InMemoryPrenotazioneDao();
     }
 
+    @Override
     public  OrdinazioneDao getOrdinazioneDao() {
         return new InMemoryOrdinazioneDao();
+    }
+
+    @Override
+    public  ProdottoDao getProdottoDao() {
+        return new InMemoryProdottoDao();
     }
 
 }
