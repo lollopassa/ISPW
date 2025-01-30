@@ -29,4 +29,6 @@ module demo {
     opens com.biteme.app.persistence.database to javafx.fxml;
     exports com.biteme.app.boundary;
     opens com.biteme.app.boundary to javafx.fxml;
+    exports com.biteme.app.bean;
+    opens com.biteme.app.bean to javafx.fxml;
 }

@@ -5,7 +5,7 @@ import com.biteme.app.persistence.ProdottoDao;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 public class InMemoryProdottoDao implements ProdottoDao {
 
@@ -15,7 +15,9 @@ public class InMemoryProdottoDao implements ProdottoDao {
     @Override
     public Optional<Prodotto> load(Integer key) {
         // Ritorna un prodotto dato un ID
-        return prodotti.stream().filter(p -> p.getId() == key).findFirst();
+        return prodotti.stream()
+                .filter(p -> p.getId() == key)
+                .findFirst();
     }
 
     @Override
@@ -39,15 +41,16 @@ public class InMemoryProdottoDao implements ProdottoDao {
     @Override
     public boolean exists(Integer key) {
         // Verifica se esiste un prodotto con un ID specifico
-        return prodotti.stream().anyMatch(p -> p.getId() == key);
+        return prodotti.stream()
+                .anyMatch(p -> p.getId() == key);
     }
 
     @Override
     public List<Prodotto> getByCategoria(String categoria) {
         // Filtra i prodotti in base alla categoria
         return prodotti.stream()
-                .filter(p -> p.getCategoria().equalsIgnoreCase(categoria))
-                .collect(Collectors.toList());
+                .filter(p -> p.getCategoria().name().equalsIgnoreCase(categoria))
+                .toList(); // Metodo introdotto in Java 16 che restituisce una lista immutabile
     }
 
     @Override
@@ -55,6 +58,19 @@ public class InMemoryProdottoDao implements ProdottoDao {
         // Filtra i prodotti per disponibilità
         return prodotti.stream()
                 .filter(p -> p.isDisponibile() == disponibilita)
-                .collect(Collectors.toList());
+                .toList(); // Metodo introdotto in Java 16 che restituisce una lista immutabile
+    }
+
+    @Override
+    public void update(Prodotto prodotto) {
+        prodotti.stream()
+                .filter(p -> p.getId() == prodotto.getId())
+                .findFirst()
+                .ifPresent(existingProdotto -> {
+                    existingProdotto.setNome(prodotto.getNome());
+                    existingProdotto.setCategoria(prodotto.getCategoria());
+                    existingProdotto.setPrezzo(prodotto.getPrezzo());
+                    existingProdotto.setDisponibile(prodotto.isDisponibile());
+                });
     }
 }

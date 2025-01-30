@@ -4,6 +4,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
 <Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.MagazzinoBoundary">
     <children>
 
@@ -18,17 +20,15 @@
         </Label>
 
         <!-- Tabella del Magazzino -->
-        <VBox layoutX="350.0" layoutY="150.0" prefHeight="500.0" prefWidth="670.0" spacing="10">
+        <VBox layoutX="350.0" layoutY="150.0" prefHeight="500.0" prefWidth="600.0" spacing="10">
             <TableView fx:id="prodottiTableView" prefHeight="450.0" prefWidth="750.0">
                 <columns>
                     <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
                     <TableColumn fx:id="nomeColumn" text="Prodotto" prefWidth="100.0" />
                     <TableColumn fx:id="categoriaColumn" prefWidth="100.0" text="Categoria" />
-                    <TableColumn fx:id="quantitaColumn" text="Quantità" />
-                    <TableColumn fx:id="prezzoColumn" text="Prezzo (€)" />
-                    <TableColumn fx:id="dataScadenzaColumn" text="Scadenza" />
-                    <TableColumn fx:id="disponibileColumn" text="Disponibile" />
-                    <TableColumn fx:id="azioniColumn" prefWidth="100.0" text="Azioni" />
+                    <TableColumn fx:id="prezzoColumn" prefWidth="100.0" text="Prezzo (€)" />
+                    <TableColumn fx:id="disponibileColumn" prefWidth="100.0" text="Disponibile" />
+                    <TableColumn fx:id="azioniColumn" prefWidth="150.0" text="Azioni" />
                 </columns>
             </TableView>
         </VBox>
@@ -42,16 +42,11 @@
             <TextField fx:id="nomeProdottoField" prefHeight="35.0" prefWidth="250.0" promptText="Nome Prodotto" style="-fx-font-size: 14px;" />
 
             <!-- Campo Categoria -->
-            <TextField fx:id="categoriaField" prefHeight="35.0" prefWidth="250.0" promptText="Categoria" style="-fx-font-size: 14px;" />
+            <ComboBox fx:id="categoriaComboBox" prefHeight="35.0" prefWidth="250.0" style="-fx-font-size: 14px;" promptText="Categoria">
+            </ComboBox>
 
             <!-- Campo Prezzo -->
             <TextField fx:id="prezzoField" prefHeight="35.0" prefWidth="250.0" promptText="Prezzo (€)" style="-fx-font-size: 14px;" />
-
-            <!-- Campo Data di Scadenza -->
-            <TextField fx:id="dataScadenzaField" prefHeight="35.0" prefWidth="250.0" promptText="Scadenza (dd-MM-yyyy)" style="-fx-font-size: 14px;" />
-
-            <!-- Campo Quantità -->
-            <TextField fx:id="quantitaField" prefHeight="35.0" prefWidth="250.0" promptText="Quantità" style="-fx-font-size: 14px;" />
 
             <!-- Pulsante Aggiungi -->
             <Button onAction="#aggiungiProdotto" prefHeight="40.0" prefWidth="250.0" style="-fx-background-color: #303d68; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;" text="Aggiungi Prodotto" />

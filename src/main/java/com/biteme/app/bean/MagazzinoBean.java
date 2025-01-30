@@ -1,15 +1,14 @@
 package com.biteme.app.bean;
 
+import com.biteme.app.entity.Categoria;
+
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 public class MagazzinoBean {
     private Integer id;
-    private String nomeProdotto;
-    private Integer quantita;
+    private String nome;
+    private Categoria categoria;
     private BigDecimal prezzo;
-    private String categoria;
-    private LocalDate dataScadenza;
     private Boolean disponibile;
 
     // Getter e Setter
@@ -21,20 +20,20 @@ public class MagazzinoBean {
         this.id = id;
     }
 
-    public String getNomeProdotto() {
-        return nomeProdotto;
+    public String getNome() {
+        return nome;
     }
 
-    public void setNomeProdotto(String nomeProdotto) {
-        this.nomeProdotto = nomeProdotto;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
-    public Integer getQuantita() {
-        return quantita;
+    public Categoria getCategoria() {
+        return categoria;
     }
 
-    public void setQuantita(Integer quantita) {
-        this.quantita = quantita;
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
     }
 
     public BigDecimal getPrezzo() {
@@ -43,22 +42,6 @@ public class MagazzinoBean {
 
     public void setPrezzo(BigDecimal prezzo) {
         this.prezzo = prezzo;
-    }
-
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
-    }
-
-    public LocalDate getDataScadenza() {
-        return dataScadenza;
-    }
-
-    public void setDataScadenza(LocalDate dataScadenza) {
-        this.dataScadenza = dataScadenza;
     }
 
     public Boolean getDisponibile() {

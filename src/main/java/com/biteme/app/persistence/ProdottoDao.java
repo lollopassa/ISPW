@@ -6,4 +6,5 @@ import java.util.List;
 public interface ProdottoDao extends Dao<Integer, Prodotto> {
     List<Prodotto> getByCategoria(String categoria);
     List<Prodotto> getByDisponibilita(boolean disponibilita);
+    void update(Prodotto prodotto); // Nuovo metodo per aggiornare
 }

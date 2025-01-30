@@ -1,28 +1,21 @@
 package com.biteme.app.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 public class Prodotto {
 
     private int id;
     private String nome;
-    private int quantita;
     private BigDecimal prezzo;
-    private String categoria;
-    private LocalDate dataScadenza;
+    private Categoria categoria;
     private boolean disponibile;
 
-    public Prodotto() {
-    }
-
-    public Prodotto(int id, String nome, int quantita, BigDecimal prezzo, String categoria, LocalDate dataScadenza, boolean disponibile) {
+    // Costruttore
+    public Prodotto(int id, String nome, BigDecimal prezzo, Categoria categoria, boolean disponibile) {
         this.id = id;
         this.nome = nome;
-        this.quantita = quantita;
         this.prezzo = prezzo;
         this.categoria = categoria;
-        this.dataScadenza = dataScadenza;
         this.disponibile = disponibile;
     }
 
@@ -43,14 +36,6 @@ public class Prodotto {
         this.nome = nome;
     }
 
-    public int getQuantita() {
-        return quantita;
-    }
-
-    public void setQuantita(int quantita) {
-        this.quantita = quantita;
-    }
-
     public BigDecimal getPrezzo() {
         return prezzo;
     }
@@ -59,20 +44,12 @@ public class Prodotto {
         this.prezzo = prezzo;
     }
 
-    public String getCategoria() {
+    public Categoria getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(String categoria) {
+    public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
-    }
-
-    public LocalDate getDataScadenza() {
-        return dataScadenza;
-    }
-
-    public void setDataScadenza(LocalDate dataScadenza) {
-        this.dataScadenza = dataScadenza;
     }
 
     public boolean isDisponibile() {

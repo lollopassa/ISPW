@@ -19,9 +19,7 @@ public class PrenotazioniController {
                 .getPrenotazioneDao();
     }
 
-    /**
-     * Crea una prenotazione utilizzando i dati forniti tramite il bean.
-     */
+
     public void creaPrenotazione(PrenotazioniBean prenotazioniBean) {
         // Controlla se la data è specificata, altrimenti usa la data corrente
         LocalDate dataPrenotazione = prenotazioniBean.getData() != null

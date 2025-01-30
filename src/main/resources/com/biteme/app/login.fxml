@@ -25,8 +25,6 @@
       <!-- Titolo - Bentornato -->
       <Label fx:id="bentornatoLabel" layoutX="936.0" layoutY="55.0" style="-fx-font-size: 48; -fx-font-weight: bold;" text="Bentornato 👋" textFill="#3D55A1" />
 
-      <!-- Messaggio login -->
-      <Label fx:id="googleMessageLabel" layoutX="949.0" layoutY="144.0" prefHeight="70.0" prefWidth="292.0" style="-fx-font-size: 24; -fx-font-weight: bold;" text="Inserisci le tue credenziali per accedere." textAlignment="CENTER" textFill="#555555" wrapText="true" />
 
       <!-- Campo email o nome utente -->
       <Label layoutX="866.0" layoutY="276.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Email o Nome Utente:" textFill="#3D55A1" />
