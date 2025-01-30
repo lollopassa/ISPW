@@ -50,7 +50,7 @@ public class InMemoryProdottoDao implements ProdottoDao {
         // Filtra i prodotti in base alla categoria
         return prodotti.stream()
                 .filter(p -> p.getCategoria().name().equalsIgnoreCase(categoria))
-                .toList(); // Metodo introdotto in Java 16 che restituisce una lista immutabile
+                .toList();
     }
 
     @Override
@@ -58,7 +58,7 @@ public class InMemoryProdottoDao implements ProdottoDao {
         // Filtra i prodotti per disponibilità
         return prodotti.stream()
                 .filter(p -> p.isDisponibile() == disponibilita)
-                .toList(); // Metodo introdotto in Java 16 che restituisce una lista immutabile
+                .toList();
     }
 
     @Override

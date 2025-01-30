@@ -1,11 +1,13 @@
 package com.biteme.app.bean;
 
+import com.biteme.app.entity.TipoOrdine;
+
 public class OrdinazioneBean {
 
     private int id; // BIGINT
     private String nomeCliente; // VARCHAR
     private String numeroClienti; // VARCHAR
-    private String tipoOrdine; // VARCHAR
+    private TipoOrdine tipoOrdine; // VARCHAR
     private String infoTavolo; // VARCHAR
     private String statoOrdine; // VARCHAR
     private String orarioCreazione; // VARCHAR
@@ -35,11 +37,11 @@ public class OrdinazioneBean {
         this.numeroClienti = numeroClienti;
     }
 
-    public String getTipoOrdine() {
+    public TipoOrdine getTipoOrdine() {
         return tipoOrdine;
     }
 
-    public void setTipoOrdine(String tipoOrdine) {
+    public void setTipoOrdine(TipoOrdine tipoOrdine) {
         this.tipoOrdine = tipoOrdine;
     }
 

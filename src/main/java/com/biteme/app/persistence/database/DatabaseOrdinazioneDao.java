@@ -3,13 +3,14 @@ package com.biteme.app.persistence.database;
 import com.biteme.app.entity.Ordine;
 import com.biteme.app.exception.DatabaseConfigurationException;
 import com.biteme.app.persistence.OrdinazioneDao;
-
+import com.biteme.app.entity.TipoOrdine;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 public class DatabaseOrdinazioneDao implements OrdinazioneDao {
 
@@ -46,7 +47,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, ordine.getNomeCliente());
             stmt.setString(2, ordine.getNumeroClienti() == null ? null : ordine.getNumeroClienti());
-            stmt.setString(3, ordine.getTipoOrdine());
+            stmt.setString(3, ordine.getTipoOrdine().name());
             stmt.setString(4, ordine.getInfoTavolo() == null ? null : ordine.getInfoTavolo());
             stmt.setString(5, ordine.getStatoOrdine() == null ? null : ordine.getStatoOrdine());
             stmt.setString(6, ordine.getOrarioCreazione() == null ? null : ordine.getOrarioCreazione());
@@ -119,7 +120,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
                 rs.getInt("id"),
                 rs.getString("nomeCliente"),
                 rs.getString("numeroClienti"),
-                rs.getString("tipoOrdine"),
+                TipoOrdine.valueOf(rs.getString("tipoOrdine").toUpperCase()),
                 rs.getString("infoTavolo"),
                 rs.getString("statoOrdine"),
                 rs.getString("orarioCreazione") // Ora Ã¨ gestito come String

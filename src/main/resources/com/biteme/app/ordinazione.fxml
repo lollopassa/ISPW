@@ -32,12 +32,12 @@
 
       <!-- Pulsanti fuori dalla tabella -->
       <HBox alignment="CENTER" layoutX="1028.0" layoutY="410.0" spacing="20">
-         <Button fx:id="modificaButton" text="Modifica" style="-fx-font-weight: bold; -fx-padding: 8px; -fx-background-color: #303d68; -fx-text-fill: white; -fx-cursor: hand;" onAction="#modificaOrdine" />
-         <Button fx:id="eliminaButton" text="Elimina" style="-fx-font-weight: bold; -fx-padding: 8px;-fx-background-color: #E0218A; -fx-text-fill: white; -fx-cursor: hand; " onAction="#eliminaOrdine" />
+         <Button fx:id="modificaButton" onAction="#modificaOrdine" style="-fx-font-weight: bold; -fx-padding: 8px; -fx-background-color: #303d68; -fx-text-fill: white; -fx-cursor: hand;" text="Modifica" />
+         <Button fx:id="eliminaButton" onAction="#eliminaOrdine" style="-fx-font-weight: bold; -fx-padding: 8px;-fx-background-color: #E0218A; -fx-text-fill: white; -fx-cursor: hand; " text="Elimina" />
       </HBox>
 
       <!-- Modulo per Aggiungere Ordinazione -->
-      <VBox alignment="TOP_CENTER" layoutX="370.0" layoutY="475.0" spacing="15.0" style="-fx-padding: 15px; -fx-border-color: lightgray; -fx-border-width: 1.5px; -fx-background-color: #f9f9f9; -fx-border-radius: 8px;">
+      <VBox alignment="TOP_CENTER" layoutX="370.0" layoutY="414.0" spacing="15.0" style="-fx-padding: 15px; -fx-border-color: lightgray; -fx-border-width: 1.5px; -fx-background-color: #f9f9f9; -fx-border-radius: 8px;">
          <!-- Titolo della sezione -->
          <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Nuova Ordinazione" />
 
@@ -45,7 +45,8 @@
          <TextField fx:id="nomeClienteField" prefHeight="35.0" prefWidth="300.0" promptText="Nome Cliente" style="-fx-font-size: 14px;" />
 
          <!-- Campo Tipo Ordine -->
-         <TextField fx:id="tipoOrdineField" prefHeight="35.0" prefWidth="300.0" promptText="Asporto o Al Tavolo?" style="-fx-font-size: 14px;" />
+         <ComboBox fx:id="tipoOrdineComboBox" prefHeight="35.0" prefWidth="300.0" style="-fx-font-size: 14px;" promptText="Asporto o Al Tavolo?">
+         </ComboBox>
 
          <!-- Campo Orario Ordinazione -->
          <TextField fx:id="orarioField" prefHeight="35.0" prefWidth="300.0" promptText="Orario (hh:mm)" style="-fx-font-size: 14px;" />

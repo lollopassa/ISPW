@@ -1,11 +1,22 @@
 package com.biteme.app.entity;
 
 public enum Categoria {
-    ANTIPASTI,
-    PRIMI,
-    SECONDI,
-    PIZZE,
-    CONTORNI,
-    BEVANDE,
-    DOLCI
+    ANTIPASTI("Antipasti"),
+    PRIMI("Primi"),
+    SECONDI("Secondi"),
+    PIZZE("Pizze"),
+    CONTORNI("Contorni"),
+    BEVANDE("Bevande"),
+    DOLCI("Dolci");
+
+    private final String displayName;
+
+    Categoria(String displayName) {
+        this.displayName = displayName;
+    }
+
+    @Override
+    public String toString() {
+        return displayName;
+    }
 }

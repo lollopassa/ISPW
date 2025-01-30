@@ -1,14 +1,20 @@
 package com.biteme.app.boundary;
 
 import com.biteme.app.controller.OrdinazioneController;
+import com.biteme.app.entity.Categoria;
 import com.biteme.app.entity.Ordine;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.util.SceneLoader;
+
 import java.util.List;
-import com.biteme.app.boundary.OrdineBoundary;
+
+import java.time.LocalTime;
+import com.biteme.app.entity.TipoOrdine;
+
 
 public class OrdinazioneBoundary {
 
@@ -17,7 +23,8 @@ public class OrdinazioneBoundary {
     private TextField nomeClienteField;
 
     @FXML
-    private TextField tipoOrdineField;
+    private ComboBox<TipoOrdine> tipoOrdineComboBox;
+
 
     @FXML
     private TextField orarioField;
@@ -61,8 +68,12 @@ public class OrdinazioneBoundary {
     private static OrdinazioneBean ordineSelezionato; // Variabile statica per mantenere l'ordine selezionato
     private final OrdinazioneController ordinazioneController = new OrdinazioneController();
 
+
+
     @FXML
     public void initialize() {
+
+        configureComboBox();
         // Inizializza le colonne della tabella
         initTableColumns();
 
@@ -81,6 +92,12 @@ public class OrdinazioneBoundary {
         });
     }
 
+    private void configureComboBox() {
+        // Configuriamo il ComboBox per la selezione della categoria
+        tipoOrdineComboBox.setItems(FXCollections.observableArrayList(TipoOrdine.values()));
+        tipoOrdineComboBox.setPromptText("Al Tavolo o Asporto?"); // Mostra l'indicazione iniziale
+    }
+
     private void initTableColumns() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         nomeColumn.setCellValueFactory(new PropertyValueFactory<>("nomeCliente"));
@@ -91,35 +108,33 @@ public class OrdinazioneBoundary {
         statoOrdineColumn.setCellValueFactory(new PropertyValueFactory<>("statoOrdine"));
     }
 
-    // Metodo per creare un ordine
     @FXML
     public void createOrdine() {
         // Estrai i dati dai campi di input
         String nomeCliente = nomeClienteField.getText();
-        String tipoOrdine = tipoOrdineField.getText();
+        TipoOrdine tipoOrdine = tipoOrdineComboBox.getValue();
         String orario = orarioField.getText();
         String coperti = copertiField.getText();
         String tavolo = tavoloField.getText();
 
-        // Controlla che tipoOrdine sia valido
-        if (!tipoOrdine.equalsIgnoreCase("Al Tavolo") && !tipoOrdine.equalsIgnoreCase("Asporto")) {
-            showAlert("Tipo Ordine Invalido",
-                    "Il campo 'Tipo Ordine' deve essere solo 'Al Tavolo' o 'Asporto'.",
+        // Controlla che il tipo ordine sia stato selezionato
+        if (tipoOrdine == null) {
+            showAlert("Tipo Ordine Mancante",
+                    "Seleziona un tipo di ordine: 'Al Tavolo' o 'Asporto'.",
                     Alert.AlertType.WARNING);
             return;
         }
 
-        // Imposta automaticamente l'orario se il tipo ordine è "Al Tavolo"
-        if (tipoOrdine.equalsIgnoreCase("Al Tavolo")) {
-            orario = java.time.LocalTime.now().toString().substring(0, 5); // Prende l'ora attuale nel formato HH:mm
-        }
-
-        // Imposta campi a null se il tipo ordine è "Asporto"
-        if (tipoOrdine.equalsIgnoreCase("Asporto")) {
+        // Gestisci i casi specifici per il tipo di ordine
+        if (tipoOrdine == TipoOrdine.AL_TAVOLO) {
+            // Assegna l'orario corrente se il tipo è "Al Tavolo"
+            orario = LocalTime.now().toString().substring(0, 5); // HH:mm
+        } else if (tipoOrdine == TipoOrdine.ASPORTO) {
+            // Imposta campi specifici come null per "Asporto"
             coperti = null;
             tavolo = null;
 
-            // Esegui la validazione dell'orario di input
+            // Valida l'orario per l'Asporto
             if (orario.isEmpty()) {
                 showAlert("Campi Mancanti",
                         "Il campo Orario deve essere compilato in caso di Asporto.",
@@ -135,11 +150,15 @@ public class OrdinazioneBoundary {
             }
         }
 
-        // Esegui la validazione dei campi obbligatori
-        if (nomeCliente.isEmpty() || tipoOrdine.isEmpty()) {
-            showAlert("Campi Mancanti",
-                    "I campi Nome Cliente e Tipo Ordine devono essere compilati.",
-                    Alert.AlertType.WARNING);
+        // Controllo che il ComboBox TipoOrdine abbia una selezione valida
+        if (tipoOrdineComboBox.getValue() == null) {
+            showAlert("Errore", "Seleziona un tipo di ordine valido (Al Tavolo o Asporto)!", Alert.AlertType.ERROR);
+            return;
+        }
+
+        // Esegui la validazione degli altri campi obbligatori
+        if (nomeCliente.isEmpty()) {
+            showAlert("Campi Mancanti", "Il campo Nome Cliente deve essere compilato.", Alert.AlertType.WARNING);
             return;
         }
 
@@ -177,16 +196,30 @@ public class OrdinazioneBoundary {
             ordineSelezionato.setId(ordine.getId());
             ordineSelezionato.setNomeCliente(ordine.getNomeCliente());
             ordineSelezionato.setNumeroClienti(ordine.getNumeroClienti());
-            ordineSelezionato.setTipoOrdine(ordine.getTipoOrdine());
-            ordineSelezionato.setInfoTavolo(ordine.getTipoOrdine().equalsIgnoreCase("asporto")
-                    ? "Asporto"
-                    : ordine.getInfoTavolo());
+
+            // Utilizza il valore TipoOrdine correttamente
+            TipoOrdine tipoOrdine = ordine.getTipoOrdine(); // Assume che sia un enum
+            if (tipoOrdine == null) {
+                throw new IllegalArgumentException("Tipo ordine nullo!");
+            }
+            ordineSelezionato.setTipoOrdine(tipoOrdine);
+
+            // Gestione campo InfoTavolo basata sul tipo ordine
+            ordineSelezionato.setInfoTavolo(
+                    ordineSelezionato.getTipoOrdine() == TipoOrdine.ASPORTO
+                            ? "Asporto"
+                            : ordine.getInfoTavolo()
+            );
+
             ordineSelezionato.setStatoOrdine(ordine.getStatoOrdine());
             ordineSelezionato.setOrarioCreazione(ordine.getOrarioCreazione());
 
             // Carica la scena con SceneLoader
             SceneLoader.loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
 
+        } catch (IllegalArgumentException e) {
+            showAlert("Errore", "Il tipo ordine selezionato non è valido: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace();
         } catch (Exception e) {
             showAlert("Errore", "Errore durante il caricamento della schermata di modifica.", Alert.AlertType.ERROR);
             e.printStackTrace();

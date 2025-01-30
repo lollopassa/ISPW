@@ -5,13 +5,13 @@ public class Ordine {
     private int id; // INT nel database
     private String nomeCliente; // VARCHAR
     private String numeroClienti; // VARCHAR (lasciato così com'è)
-    private String tipoOrdine; // VARCHAR
+    private TipoOrdine tipoOrdine; // VARCHAR
     private String infoTavolo; // VARCHAR
     private String statoOrdine; // VARCHAR
     private String orarioCreazione; // VARCHAR
 
     // Costruttore completo
-    public Ordine(int id, String nomeCliente, String numeroClienti, String tipoOrdine,
+    public Ordine(int id, String nomeCliente, String numeroClienti, TipoOrdine tipoOrdine,
                   String infoTavolo, String statoOrdine, String orarioCreazione) {
         this.id = id;
         this.nomeCliente = nomeCliente;
@@ -47,11 +47,11 @@ public class Ordine {
         this.numeroClienti = numeroClienti;
     }
 
-    public String getTipoOrdine() {
+    public TipoOrdine getTipoOrdine() {
         return tipoOrdine;
     }
 
-    public void setTipoOrdine(String tipoOrdine) {
+    public void setTipoOrdine(TipoOrdine tipoOrdine) {
         this.tipoOrdine = tipoOrdine;
     }
 
