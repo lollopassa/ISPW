@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.OrdineBoundary">
+
+    <!-- Rettangolo superiore -->
+    <top>
+        <Rectangle height="120" width="1440" fill="#303d68" />
+    </top>
+
+    <!-- Rettangolo inferiore -->
+    <bottom>
+        <Rectangle height="120" width="1440" fill="#303d68" />
+    </bottom>
+
+    <!-- Colonna Sinistra con i Pulsanti delle Categorie -->
+    <left>
+        <VBox spacing="10" alignment="CENTER" prefWidth="200" style="-fx-background-color: #f4f4f4;">
+            <!-- Pulsanti delle categorie con azioni associate -->
+            <Button text="Bevande" onAction="#handleCategoriaBevande" prefWidth="180" prefHeight="60" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" />
+            <Button text="Antipasti" onAction="#handleCategoriaAntipasti" prefWidth="180" prefHeight="60" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" />
+            <Button text="Pizze" onAction="#handleCategoriaPizze" prefWidth="180" prefHeight="60" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" />
+            <Button text="Primi Piatti" onAction="#handleCategoriaPrimiPiatti" prefWidth="180" prefHeight="60" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" />
+            <Button text="Secondi Piatti" onAction="#handleCategoriaSecondiPiatti" prefWidth="180" prefHeight="60" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" />
+            <Button text="Contorni" onAction="#handleCategoriaContorni" prefWidth="180" prefHeight="60" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" />
+            <Button text="Dolci" onAction="#handleCategoriaDolci" prefWidth="180" prefHeight="60" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" />
+        </VBox>
+    </left>
+
+
+
+    <!-- Parte Centrale con i Prodotti -->
+    <center>
+        <!-- Uso ScrollPane per rendere la sezione scorrevole -->
+        <ScrollPane fitToWidth="true" fitToHeight="true">
+            <!-- Contenitore HBox per spostare gli elementi verso destra -->
+            <HBox>
+                <!-- Spaziatura verso destra tramite un Region -->
+                <Region prefWidth="20" /> <!-- Spostamento verso destra -->
+                <VBox>
+                    <!-- Spaziatura in alto tramite un altro Region -->
+                    <Region prefHeight="20" /> <!-- Spostamento verso il basso -->
+                    <FlowPane hgap="20" vgap="20"> <!-- FlowPane senza "alignment" -->
+                        <!-- Esempio di prodotto -->
+                        <VBox alignment="CENTER" spacing="10" prefWidth="150" prefHeight="150"
+                              style="-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, lightgray, 10, 0, 3, 3);">
+                            <Label text="Prodotto 1" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                            <Label text="Quantità" style="-fx-font-size: 14px; -fx-text-fill: gray;" />
+                            <HBox alignment="CENTER" spacing="10">
+                                <Button text="-" prefWidth="30" prefHeight="30" />
+                                <Label text="0" fx:id="quantitaProdotto1" style="-fx-font-size: 14px;" />
+                                <Button text="+" prefWidth="30" prefHeight="30" />
+                            </HBox>
+                        </VBox>
+
+                        <!-- Esempio di prodotto aggiuntivo -->
+                        <VBox alignment="CENTER" spacing="10" prefWidth="150" prefHeight="150"
+                              style="-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, lightgray, 10, 0, 3, 3);">
+                            <Label text="Prodotto 2" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                            <Label text="Quantità" style="-fx-font-size: 14px; -fx-text-fill: gray;" />
+                            <HBox alignment="CENTER" spacing="10">
+                                <Button text="-" prefWidth="30" prefHeight="30" />
+                                <Label text="0" fx:id="quantitaProdotto2" style="-fx-font-size: 14px;" />
+                                <Button text="+" prefWidth="30" prefHeight="30" />
+                            </HBox>
+                        </VBox>
+
+                        <!-- Aggiungere altri rettangoli come necessario -->
+                    </FlowPane>
+                </VBox>
+            </HBox>
+        </ScrollPane>
+    </center>
+
+
+    <!-- Colonna Destra per il Riepilogo -->
+    <right>
+        <VBox spacing="10" alignment="TOP_CENTER" prefWidth="400" style="-fx-background-color: #e8e8e8;">
+            <!-- Nome Tavolo in alto al centro -->
+            <Label fx:id="nomeTavolo" text="Tavolo 1" style="-fx-font-size: 22px; -fx-font-weight: bold;" />
+
+            <!-- Titolo delle colonne -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="DESCRIZIONE" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                <Pane HBox.hgrow="ALWAYS" /> <!-- Spazio flessibile -->
+                <Label text="EURO" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+            </HBox>
+
+            <Separator />
+
+            <!-- Scorrimento per il contenuto dinamico -->
+            <ScrollPane fitToWidth="true" fitToHeight="true">
+                <VBox fx:id="riepilogoContenuto" spacing="10">
+                    <!-- Esempio di elemento del riepilogo -->
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <!-- Colonna della descrizione -->
+                        <Label text="x2 Pizza Margherita" style="-fx-font-size: 14px;" />
+                        <Pane HBox.hgrow="ALWAYS" /> <!-- Spazio flessibile -->
+                        <!-- Colonna del prezzo -->
+                        <Label text="€21,00" style="-fx-font-size: 14px;" />
+                    </HBox>
+
+                    <!-- Altro prodotto -->
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="x1 Bibita" style="-fx-font-size: 14px;" />
+                        <Pane HBox.hgrow="ALWAYS" /> <!-- Spazio flessibile -->
+                        <Label text="€3,50" style="-fx-font-size: 14px;" />
+                    </HBox>
+                </VBox>
+            </ScrollPane>
+
+            <Separator />
+
+            <!-- Totale in fondo: TOTALE EURO -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <!-- Colonna Descrizione per la scritta 'Totale' -->
+                <Label text="TOTALE EURO" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                <Pane HBox.hgrow="ALWAYS" /> <!-- Spazio flessibile -->
+                <!-- Colonna Euro per il totale -->
+                <Label fx:id="totaleOrdine" text="€24,50" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+            </HBox>
+        </VBox>
+    </right>
+
+</BorderPane>

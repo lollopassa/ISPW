@@ -1,27 +1,27 @@
 package com.biteme.app.controller;
 
-import com.biteme.app.bean.MagazzinoBean;
+import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.entity.Prodotto;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.util.Configuration;
 
 import java.util.List;
 
-public class MagazzinoController {
+public class ProdottoController {
 
     private final ProdottoDao prodottoDao;
 
-    public MagazzinoController() {
+    public ProdottoController() {
         this.prodottoDao = Configuration.getPersistenceProvider().getDaoFactory().getProdottoDao();
     }
 
-    public void aggiungiProdotto(MagazzinoBean magazzinoBean) {
+    public void aggiungiProdotto(ProdottoBean prodottoBean) {
         Prodotto prodotto = new Prodotto(
-                magazzinoBean.getId() != null ? magazzinoBean.getId() : 0,
-                magazzinoBean.getNome(),
-                magazzinoBean.getPrezzo(),
-                magazzinoBean.getCategoria(),
-                magazzinoBean.getDisponibile() != null && magazzinoBean.getDisponibile()
+                prodottoBean.getId() != null ? prodottoBean.getId() : 0,
+                prodottoBean.getNome(),
+                prodottoBean.getPrezzo(),
+                prodottoBean.getCategoria(),
+                prodottoBean.getDisponibile() != null && prodottoBean.getDisponibile()
         );
         prodottoDao.store(prodotto);
     }

@@ -6,7 +6,7 @@
 
 <?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
-<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.MagazzinoBoundary">
+<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.ProdottoBoundary">
     <children>
 
         <!-- Inclusione del Menu Laterale -->
@@ -20,7 +20,7 @@
         </Label>
 
         <!-- Tabella del Magazzino -->
-        <VBox layoutX="350.0" layoutY="150.0" prefHeight="500.0" prefWidth="600.0" spacing="10">
+        <VBox layoutX="350.0" layoutY="150.0" prefHeight="500.0" prefWidth="602.0">
             <TableView fx:id="prodottiTableView" prefHeight="450.0" prefWidth="750.0">
                 <columns>
                     <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />

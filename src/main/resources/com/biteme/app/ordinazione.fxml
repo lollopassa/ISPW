@@ -19,7 +19,7 @@
 
       <!-- Tabella delle ordinazioni con Icona Elimina -->
       <VBox layoutX="600.0" layoutY="490.0" prefHeight="350.0" prefWidth="1000.0" spacing="10" />
-      <TableView fx:id="ordinazioniTableView" layoutX="370.0" layoutY="141.0" prefHeight="250.0" prefWidth="750.0">
+      <TableView fx:id="ordinazioniTableView" layoutX="370.0" layoutY="141.0" prefHeight="250.0" prefWidth="752.0">
          <columns>
             <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
             <TableColumn fx:id="nomeColumn" prefWidth="100.0" text="Nome Cliente" />

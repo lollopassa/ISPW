@@ -4,7 +4,7 @@ import com.biteme.app.entity.Categoria;
 
 import java.math.BigDecimal;
 
-public class MagazzinoBean {
+public class ProdottoBean {
     private Integer id;
     private String nome;
     private Categoria categoria;

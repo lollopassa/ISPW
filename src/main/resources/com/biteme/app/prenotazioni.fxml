@@ -40,18 +40,6 @@
                 <Label style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #303d68;" text="Ven" GridPane.columnIndex="4" GridPane.rowIndex="0" />
                 <Label style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #303d68;" text="Sab" GridPane.columnIndex="5" GridPane.rowIndex="0" />
                 <Label style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #ff5c5c;" text="Dom" GridPane.columnIndex="6" GridPane.rowIndex="0" />
-            <columnConstraints>
-               <ColumnConstraints />
-               <ColumnConstraints />
-               <ColumnConstraints />
-               <ColumnConstraints />
-               <ColumnConstraints />
-               <ColumnConstraints />
-               <ColumnConstraints />
-            </columnConstraints>
-            <rowConstraints>
-               <RowConstraints />
-            </rowConstraints>
             </GridPane>
         </VBox>
 
@@ -80,8 +68,8 @@
         </VBox>
 
         <!-- Tabella delle Prenotazioni con Icona Elimina -->
-        <VBox layoutX="600.0" layoutY="490.0" prefHeight="350.0" prefWidth="800.0" spacing="10">
-            <TableView fx:id="prenotazioniTableView" prefHeight="300.0" prefWidth="700.0">
+        <VBox layoutX="600.0" layoutY="490.0" prefHeight="350.0" prefWidth="802.0" spacing="10">
+            <TableView fx:id="prenotazioniTableView" prefHeight="300.0" prefWidth="70.0">
                 <columns>
                     <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
                     <TableColumn fx:id="nomeColumn" prefWidth="100.0" text="Nome Cliente" />

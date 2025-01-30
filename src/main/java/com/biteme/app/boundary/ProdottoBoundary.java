@@ -1,7 +1,7 @@
 package com.biteme.app.boundary;
 
-import com.biteme.app.bean.MagazzinoBean;
-import com.biteme.app.controller.MagazzinoController;
+import com.biteme.app.bean.ProdottoBean;
+import com.biteme.app.controller.ProdottoController;
 import com.biteme.app.entity.Categoria;
 import com.biteme.app.entity.Prodotto;
 import javafx.collections.FXCollections;
@@ -14,7 +14,7 @@ import javafx.scene.layout.HBox;
 
 import java.math.BigDecimal;
 
-public class MagazzinoBoundary {
+public class ProdottoBoundary {
     private static final String ALERT_ERROR_TITLE = "Errore";
     private static final String ALERT_SUCCESS_TITLE = "Successo";
     // Stile per i pulsanti
@@ -51,10 +51,10 @@ public class MagazzinoBoundary {
     @FXML
     private TableColumn<Prodotto, Void> azioniColumn;
 
-    private final MagazzinoController magazzinoController;
+    private final ProdottoController prodottoController;
 
-    public MagazzinoBoundary() {
-        this.magazzinoController = new MagazzinoController();
+    public ProdottoBoundary() {
+        this.prodottoController = new ProdottoController();
     }
 
     @FXML
@@ -119,14 +119,14 @@ public class MagazzinoBoundary {
             }
 
             // Creazione del bean e assegnazione dei valori
-            MagazzinoBean magazzinoBean = new MagazzinoBean();
-            magazzinoBean.setNome(nomeProdottoField.getText());
-            magazzinoBean.setCategoria(categoriaComboBox.getValue());
-            magazzinoBean.setPrezzo(new BigDecimal(prezzoField.getText()));
-            magazzinoBean.setDisponibile(true); // Di default, disponibilità impostata a true
+            ProdottoBean prodottoBean = new ProdottoBean();
+            prodottoBean.setNome(nomeProdottoField.getText());
+            prodottoBean.setCategoria(categoriaComboBox.getValue());
+            prodottoBean.setPrezzo(new BigDecimal(prezzoField.getText()));
+            prodottoBean.setDisponibile(true); // Di default, disponibilità impostata a true
 
             // Chiamata al controller per salvare il prodotto
-            magazzinoController.aggiungiProdotto(magazzinoBean);
+            prodottoController.aggiungiProdotto(prodottoBean);
             showAlert(ALERT_SUCCESS_TITLE, "Prodotto aggiunto correttamente!", Alert.AlertType.INFORMATION);
 
             // Ripulire i campi dopo il salvataggio
@@ -138,7 +138,7 @@ public class MagazzinoBoundary {
     }
 
     private void refreshTable() {
-        prodottiTableView.getItems().setAll(magazzinoController.getProdotti());
+        prodottiTableView.getItems().setAll(prodottoController.getProdotti());
     }
 
     private void clearFields() {
@@ -187,7 +187,7 @@ public class MagazzinoBoundary {
                 return;
             }
 
-            magazzinoController.eliminaProdotto(id);
+            prodottoController.eliminaProdotto(id);
             refreshTable();
             showAlert(ALERT_SUCCESS_TITLE, "Prodotto eliminato con successo!", Alert.AlertType.INFORMATION);
         }
@@ -247,7 +247,7 @@ public class MagazzinoBoundary {
 
             // Otteniamo il risultato del dialogo
             dialog.showAndWait().ifPresent(prodottoAggiornato -> {
-                magazzinoController.modificaProdotto(prodottoAggiornato);
+                prodottoController.modificaProdotto(prodottoAggiornato);
                 refreshTable();
                 showAlert(ALERT_SUCCESS_TITLE, "Prodotto aggiornato con successo!", Alert.AlertType.INFORMATION);
             });
