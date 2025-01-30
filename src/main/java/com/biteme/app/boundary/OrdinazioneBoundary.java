@@ -6,8 +6,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import com.biteme.app.bean.OrdinazioneBean;
-
+import com.biteme.app.util.SceneLoader;
 import java.util.List;
+import com.biteme.app.boundary.OrdineBoundary;
 
 public class OrdinazioneBoundary {
 
@@ -52,8 +53,12 @@ public class OrdinazioneBoundary {
     private TableColumn<Ordine, String> statoOrdineColumn;
 
     @FXML
-    private TableColumn<Ordine, Void> azioniColumn;
+    private Button modificaButton; // Pulsante per modificare l'ordine
 
+    @FXML
+    private Button eliminaButton; // Pulsante per eliminare l'ordine
+
+    private static OrdinazioneBean ordineSelezionato; // Variabile statica per mantenere l'ordine selezionato
     private final OrdinazioneController ordinazioneController = new OrdinazioneController();
 
     @FXML
@@ -63,8 +68,18 @@ public class OrdinazioneBoundary {
 
         // Carica i dati nella tabella
         refreshTable();
-    }
 
+        // Disabilita i pulsanti finché non viene selezionata una riga
+        modificaButton.setDisable(true);
+        eliminaButton.setDisable(true);
+
+        // Aggiunge un listener per abilitare/disabilitare i pulsanti in base alla selezione
+        ordinazioniTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            boolean isSelected = (newValue != null);
+            modificaButton.setDisable(!isSelected);
+            eliminaButton.setDisable(!isSelected);
+        });
+    }
 
     private void initTableColumns() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -76,7 +91,7 @@ public class OrdinazioneBoundary {
         statoOrdineColumn.setCellValueFactory(new PropertyValueFactory<>("statoOrdine"));
     }
 
-
+    // Metodo per creare un ordine
     @FXML
     public void createOrdine() {
         // Estrai i dati dai campi di input
@@ -143,6 +158,61 @@ public class OrdinazioneBoundary {
         refreshTable();
     }
 
+    // Metodo Getter per ottenere l'oggetto statico OrdineSelezionato
+    public static OrdinazioneBean getOrdineSelezionato() {
+        return ordineSelezionato;
+    }
+
+    @FXML
+    private void modificaOrdine() {
+        Ordine ordine = ordinazioniTableView.getSelectionModel().getSelectedItem();
+        if (ordine == null) {
+            showAlert("Errore", "Seleziona un ordine da modificare.", Alert.AlertType.ERROR);
+            return;
+        }
+
+        try {
+            // Inizializza OrdinazioneBean con i dettagli dell'ordine selezionato
+            ordineSelezionato = new OrdinazioneBean();
+            ordineSelezionato.setId(ordine.getId());
+            ordineSelezionato.setNomeCliente(ordine.getNomeCliente());
+            ordineSelezionato.setNumeroClienti(ordine.getNumeroClienti());
+            ordineSelezionato.setTipoOrdine(ordine.getTipoOrdine());
+            ordineSelezionato.setInfoTavolo(ordine.getTipoOrdine().equalsIgnoreCase("asporto")
+                    ? "Asporto"
+                    : ordine.getInfoTavolo());
+            ordineSelezionato.setStatoOrdine(ordine.getStatoOrdine());
+            ordineSelezionato.setOrarioCreazione(ordine.getOrarioCreazione());
+
+            // Carica la scena con SceneLoader
+            SceneLoader.loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
+
+        } catch (Exception e) {
+            showAlert("Errore", "Errore durante il caricamento della schermata di modifica.", Alert.AlertType.ERROR);
+            e.printStackTrace();
+        }
+    }
+
+    // Metodo per eliminare l'ordine selezionato
+    @FXML
+    private void eliminaOrdine() {
+        Ordine ordineSelezionato = ordinazioniTableView.getSelectionModel().getSelectedItem();
+        if (ordineSelezionato == null) {
+            showAlert("Errore", "Seleziona un ordine da eliminare.", Alert.AlertType.ERROR);
+            return;
+        }
+
+        boolean conferma = mostraDialogConferma("Sei sicuro di voler eliminare l'ordine " + ordineSelezionato.getId() + "?");
+        if (conferma) {
+            try {
+                ordinazioneController.eliminaOrdine(ordineSelezionato.getId());
+                refreshTable();
+                showAlert("Successo", "Ordine eliminato con successo.", Alert.AlertType.INFORMATION);
+            } catch (Exception e) {
+                showAlert("Errore", "Errore durante l'eliminazione dell'ordine.", Alert.AlertType.ERROR);
+            }
+        }
+    }
 
     private void refreshTable() {
         // Recupera la lista aggiornata di ordini dal controller
@@ -152,6 +222,12 @@ public class OrdinazioneBoundary {
         ordinazioniTableView.getItems().setAll(ordini);
     }
 
+    private boolean mostraDialogConferma(String messaggio) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Conferma");
+        alert.setContentText(messaggio);
+        return alert.showAndWait().filter(response -> response == ButtonType.OK).isPresent();
+    }
 
     private void showAlert(String title, String content, Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
@@ -159,5 +235,4 @@ public class OrdinazioneBoundary {
         alert.setContentText(content);
         alert.showAndWait();
     }
-
 }

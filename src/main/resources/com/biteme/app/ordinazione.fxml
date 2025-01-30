@@ -17,9 +17,8 @@
          </font>
       </Label>
 
-      <!-- Tabella delle ordinazioni con Icona Elimina -->
-      <VBox layoutX="600.0" layoutY="490.0" prefHeight="350.0" prefWidth="1000.0" spacing="10" />
-      <TableView fx:id="ordinazioniTableView" layoutX="370.0" layoutY="141.0" prefHeight="250.0" prefWidth="752.0">
+      <!-- Tabella delle ordinazioni -->
+      <TableView fx:id="ordinazioniTableView" layoutX="370.0" layoutY="141.0" prefHeight="250.0" prefWidth="802.0">
          <columns>
             <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
             <TableColumn fx:id="nomeColumn" prefWidth="100.0" text="Nome Cliente" />
@@ -28,34 +27,36 @@
             <TableColumn fx:id="infoTavoloColumn" prefWidth="100.0" text="Tavolo" />
             <TableColumn fx:id="statoOrdineColumn" prefWidth="100.0" text="Stato Ordine" />
             <TableColumn fx:id="orarioColumn" prefWidth="100.0" text="Orario" />
-            <TableColumn fx:id="azioniColumn" prefWidth="100.0" text="Azioni" />
          </columns>
       </TableView>
 
-      
-      
-            <!-- Modulo per Aggiungere Ordinazione -->
-      <VBox alignment="TOP_CENTER" layoutX="370.0" layoutY="415.0" spacing="15.0" style="-fx-padding: 15px; -fx-border-color: lightgray; -fx-border-width: 1.5px; -fx-background-color: #f9f9f9; -fx-border-radius: 8px;">
+      <!-- Pulsanti fuori dalla tabella -->
+      <HBox alignment="CENTER" layoutX="1028.0" layoutY="410.0" spacing="20">
+         <Button fx:id="modificaButton" text="Modifica" style="-fx-font-weight: bold; -fx-padding: 8px; -fx-background-color: #303d68; -fx-text-fill: white; -fx-cursor: hand;" onAction="#modificaOrdine" />
+         <Button fx:id="eliminaButton" text="Elimina" style="-fx-font-weight: bold; -fx-padding: 8px;-fx-background-color: #E0218A; -fx-text-fill: white; -fx-cursor: hand; " onAction="#eliminaOrdine" />
+      </HBox>
+
+      <!-- Modulo per Aggiungere Ordinazione -->
+      <VBox alignment="TOP_CENTER" layoutX="370.0" layoutY="475.0" spacing="15.0" style="-fx-padding: 15px; -fx-border-color: lightgray; -fx-border-width: 1.5px; -fx-background-color: #f9f9f9; -fx-border-radius: 8px;">
          <!-- Titolo della sezione -->
          <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Nuova Ordinazione" />
 
-      
-               <!-- Campo Nome Cliente -->
+         <!-- Campo Nome Cliente -->
          <TextField fx:id="nomeClienteField" prefHeight="35.0" prefWidth="300.0" promptText="Nome Cliente" style="-fx-font-size: 14px;" />
 
-               <!-- Campo Tipo Ordine -->
+         <!-- Campo Tipo Ordine -->
          <TextField fx:id="tipoOrdineField" prefHeight="35.0" prefWidth="300.0" promptText="Asporto o Al Tavolo?" style="-fx-font-size: 14px;" />
 
-               <!-- Campo Orario Ordinazione -->
+         <!-- Campo Orario Ordinazione -->
          <TextField fx:id="orarioField" prefHeight="35.0" prefWidth="300.0" promptText="Orario (hh:mm)" style="-fx-font-size: 14px;" />
 
-               <!-- Campo Numero Coperti -->
+         <!-- Campo Numero Coperti -->
          <TextField fx:id="copertiField" prefHeight="35.0" prefWidth="300.0" promptText="Numero Coperti" style="-fx-font-size: 14px;" />
 
-               <!-- Campo Info Tavolo -->
+         <!-- Campo Info Tavolo -->
          <TextField fx:id="tavoloField" prefHeight="35.0" prefWidth="300.0" promptText="Tavolo" style="-fx-font-size: 14px;" />
 
-               <!-- Pulsante per aggiungere un'ordinazione -->
+         <!-- Pulsante per aggiungere un'ordinazione -->
          <Button onAction="#createOrdine" prefHeight="40.0" prefWidth="300.0" style="-fx-background-color: #303d68; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;" text="Aggiungi Ordinazione" />
       </VBox>
 

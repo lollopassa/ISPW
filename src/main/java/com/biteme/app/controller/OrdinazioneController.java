@@ -60,4 +60,8 @@ public class OrdinazioneController {
             return false;
         }
     }
+
+    public void eliminaOrdinazione(Integer id) {
+        ordinazioneDao.delete(id);
+    }
 }

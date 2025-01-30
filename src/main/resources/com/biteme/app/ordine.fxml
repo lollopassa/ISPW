@@ -44,8 +44,7 @@
                 <VBox>
                     <!-- Spaziatura in alto tramite un altro Region -->
                     <Region prefHeight="20" /> <!-- Spostamento verso il basso -->
-                    <FlowPane hgap="20" vgap="20"> <!-- FlowPane senza "alignment" -->
-                        <!-- Esempio di prodotto -->
+                    <FlowPane fx:id="flowPaneProdotti" hgap="20" vgap="20">                        <!-- Esempio di prodotto -->
                         <VBox alignment="CENTER" spacing="10" prefWidth="150" prefHeight="150"
                               style="-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, lightgray, 10, 0, 3, 3);">
                             <Label text="Prodotto 1" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
@@ -79,12 +78,13 @@
 
     <!-- Colonna Destra per il Riepilogo -->
     <right>
-        <VBox spacing="10" alignment="TOP_CENTER" prefWidth="400" style="-fx-background-color: #e8e8e8;">
-            <!-- Nome Tavolo in alto al centro -->
+        <VBox spacing="10" alignment="TOP_CENTER" prefWidth="400" style="-fx-background-color: #e8e8e8; -fx-padding: 5;"> <!-- Padding uniforme -->
+
+            <!-- Contenuto -->
             <Label fx:id="nomeTavolo" text="Tavolo 1" style="-fx-font-size: 22px; -fx-font-weight: bold;" />
 
             <!-- Titolo delle colonne -->
-            <HBox spacing="10" alignment="CENTER_LEFT">
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 3;"> <!-- Leggero padding -->
                 <Label text="DESCRIZIONE" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
                 <Pane HBox.hgrow="ALWAYS" /> <!-- Spazio flessibile -->
                 <Label text="EURO" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
@@ -96,17 +96,17 @@
             <ScrollPane fitToWidth="true" fitToHeight="true">
                 <VBox fx:id="riepilogoContenuto" spacing="10">
                     <!-- Esempio di elemento del riepilogo -->
-                    <HBox spacing="10" alignment="CENTER_LEFT">
+                    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 3;"> <!-- Leggero padding -->
                         <!-- Colonna della descrizione -->
-                        <Label text="x2 Pizza Margherita" style="-fx-font-size: 14px;" />
+                        <Label text="2 Pizza Margherita" style="-fx-font-size: 14px;" />
                         <Pane HBox.hgrow="ALWAYS" /> <!-- Spazio flessibile -->
                         <!-- Colonna del prezzo -->
                         <Label text="€21,00" style="-fx-font-size: 14px;" />
                     </HBox>
 
                     <!-- Altro prodotto -->
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <Label text="x1 Bibita" style="-fx-font-size: 14px;" />
+                    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 3;"> <!-- Leggero padding -->
+                        <Label text="1 Bibita" style="-fx-font-size: 14px;" />
                         <Pane HBox.hgrow="ALWAYS" /> <!-- Spazio flessibile -->
                         <Label text="€3,50" style="-fx-font-size: 14px;" />
                     </HBox>
@@ -116,7 +116,7 @@
             <Separator />
 
             <!-- Totale in fondo: TOTALE EURO -->
-            <HBox spacing="10" alignment="CENTER_LEFT">
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 5;"> <!-- Leggero padding -->
                 <!-- Colonna Descrizione per la scritta 'Totale' -->
                 <Label text="TOTALE EURO" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
                 <Pane HBox.hgrow="ALWAYS" /> <!-- Spazio flessibile -->
