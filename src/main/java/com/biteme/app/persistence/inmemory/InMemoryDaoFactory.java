@@ -24,4 +24,9 @@ public class InMemoryDaoFactory extends DaoFactory {
         return new InMemoryProdottoDao();
     }
 
+    @Override
+    public  OrdineDao getOrdineDao() {
+        return new InMemoryOrdineDao();
+    }
+
 }

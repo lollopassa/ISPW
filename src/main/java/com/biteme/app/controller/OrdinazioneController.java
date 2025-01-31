@@ -1,7 +1,7 @@
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.OrdinazioneBean;
-import com.biteme.app.entity.Ordine;
+import com.biteme.app.entity.Ordinazione;
 import com.biteme.app.persistence.OrdinazioneDao;
 import com.biteme.app.util.Configuration;
 
@@ -18,7 +18,7 @@ public class OrdinazioneController {
     }
 
     public void creaOrdine(OrdinazioneBean ordinazioneBean) {
-        Ordine ordine = new Ordine(
+        Ordinazione ordinazione = new Ordinazione(
                 0, // ID sarà generato automaticamente dal DAO
                 ordinazioneBean.getNomeCliente(),
                 ordinazioneBean.getNumeroClienti(),
@@ -28,11 +28,11 @@ public class OrdinazioneController {
                 ordinazioneBean.getOrarioCreazione()
         );
 
-        ordinazioneDao.store(ordine); // Salva l'ordine nel database
+        ordinazioneDao.store(ordinazione); // Salva l'ordine nel database
     }
 
 
-    public List<Ordine> getOrdini() {
+    public List<Ordinazione> getOrdini() {
         return ordinazioneDao.getAll(); // Ritorna tutti gli ordini tramite il DAO
     }
 

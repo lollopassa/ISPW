@@ -25,4 +25,9 @@ public class DatabaseDaoFactory extends DaoFactory {
         return new DatabaseProdottoDao();
     }
 
+    @Override
+    public DatabaseOrdineDao getOrdineDao() {
+        return new DatabaseOrdineDao();
+    }
+
 }

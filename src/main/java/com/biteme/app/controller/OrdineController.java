@@ -1,10 +1,13 @@
 package com.biteme.app.controller;
 
+import com.biteme.app.bean.OrdineBean;
 import com.biteme.app.bean.ProdottoBean;
+import com.biteme.app.entity.Ordine;
 import com.biteme.app.entity.Prodotto;
+import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.util.Configuration;
-
+import com.biteme.app.persistence.OrdineDao;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,19 +15,19 @@ public class OrdineController {
 
     private final ProdottoDao prodottoDao;
 
+    private final OrdineDao ordineDao;
+
     public OrdineController() {
         // Ottenere ProdottoDao usando la configurazione del sistema
         this.prodottoDao = Configuration.getPersistenceProvider()
                 .getDaoFactory()
                 .getProdottoDao();
+
+        this.ordineDao = Configuration.getPersistenceProvider()
+                .getDaoFactory()
+                .getOrdineDao();
     }
 
-    /**
-     * Metodo per ottenere i prodotti filtrati per categoria
-     *
-     * @param categoria la categoria da filtrare
-     * @return una lista di ProdottoBean
-     */
     public List<ProdottoBean> getProdottiByCategoria(String categoria) {
         // Recupera i prodotti dalla DAO in base alla categoria
         List<Prodotto> prodotti = prodottoDao.getByCategoria(categoria);
@@ -43,5 +46,15 @@ public class OrdineController {
                 .collect(Collectors.toList());
     }
 
+    public void salvaOrdine(OrdineBean ordineBean) {
+        // Converti OrdineBean in un oggetto Ordine
+        Ordine nuovoOrdine = new Ordine(
+                0, // ID generato automaticamente dal database
+                ordineBean.getProdotti(), // Lista dei prodotti
+                ordineBean.getQuantita()  // Lista delle quantità
+        );
 
+        // Salva l'oggetto Ordine nel database
+        ordineDao.store(nuovoOrdine);
+    }
 }

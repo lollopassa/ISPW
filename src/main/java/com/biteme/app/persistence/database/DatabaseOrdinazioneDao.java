@@ -1,6 +1,6 @@
 package com.biteme.app.persistence.database;
 
-import com.biteme.app.entity.Ordine;
+import com.biteme.app.entity.Ordinazione;
 import com.biteme.app.exception.DatabaseConfigurationException;
 import com.biteme.app.persistence.OrdinazioneDao;
 import com.biteme.app.entity.TipoOrdine;
@@ -26,97 +26,97 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
     }
 
     @Override
-    public Optional<Ordine> load(Integer id) {
-        String query = "SELECT id, nomeCliente, numeroClienti, tipoOrdine, infoTavolo, statoOrdine, orarioCreazione FROM ordine WHERE id = ?";
+    public Optional<Ordinazione> load(Integer id) {
+        String query = "SELECT id, nomeCliente, numeroClienti, tipoOrdine, infoTavolo, statoOrdine, orarioCreazione FROM ordinazione WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return Optional.of(mapResultSetToOrdine(rs));
+                    return Optional.of(mapResultSetToOrdinazione(rs));
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il caricamento dell'ordine con ID: " + id);
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il caricamento dell'ordinazione con ID: " + id);
         }
         return Optional.empty();
     }
 
     @Override
-    public void store(Ordine ordine) {
-        String query = "INSERT INTO ordine (nomeCliente, numeroClienti, tipoOrdine, infoTavolo, statoOrdine, orarioCreazione) VALUES (?, ?, ?, ?, ?, ?)";
+    public void store(Ordinazione ordinazione) {
+        String query = "INSERT INTO ordinazione (nomeCliente, numeroClienti, tipoOrdine, infoTavolo, statoOrdine, orarioCreazione) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, ordine.getNomeCliente());
-            stmt.setString(2, ordine.getNumeroClienti() == null ? null : ordine.getNumeroClienti());
-            stmt.setString(3, ordine.getTipoOrdine().name());
-            stmt.setString(4, ordine.getInfoTavolo() == null ? null : ordine.getInfoTavolo());
-            stmt.setString(5, ordine.getStatoOrdine() == null ? null : ordine.getStatoOrdine());
-            stmt.setString(6, ordine.getOrarioCreazione() == null ? null : ordine.getOrarioCreazione());
+            stmt.setString(1, ordinazione.getNomeCliente());
+            stmt.setString(2, ordinazione.getNumeroClienti() == null ? null : ordinazione.getNumeroClienti());
+            stmt.setString(3, ordinazione.getTipoOrdine().name());
+            stmt.setString(4, ordinazione.getInfoTavolo() == null ? null : ordinazione.getInfoTavolo());
+            stmt.setString(5, ordinazione.getStatoOrdine() == null ? null : ordinazione.getStatoOrdine());
+            stmt.setString(6, ordinazione.getOrarioCreazione() == null ? null : ordinazione.getOrarioCreazione());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Inserimento dell'ordine fallito, nessuna riga aggiunta.");
+                throw new SQLException("Inserimento dell'ordinazione fallito, nessuna riga aggiunta.");
             }
 
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    ordine.setId(generatedKeys.getInt(1));
+                    ordinazione.setId(generatedKeys.getInt(1));
                 } else {
-                    throw new SQLException("Inserimento dell'ordine fallito, nessun ID generato.");
+                    throw new SQLException("Inserimento dell'ordinazione fallito, nessun ID generato.");
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il salvataggio dell'ordine");
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il salvataggio dell'ordinazione");
         }
     }
 
     @Override
     public void delete(Integer id) {
-        String query = "DELETE FROM ordine WHERE id = ?";
+        String query = "DELETE FROM ordinazione WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
-                LOGGER.log(Level.WARNING, () -> "Nessun ordine trovato con ID: " + id);
+                LOGGER.log(Level.WARNING, () -> "Nessun ordinazione trovato con ID: " + id);
             } else {
                 LOGGER.log(Level.INFO, () -> "Ordine con ID: " + id + " eliminato con successo");
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'eliminazione dell'ordine con ID: " + id);
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'eliminazione dell'ordinazione con ID: " + id);
         }
     }
 
     @Override
     public boolean exists(Integer id) {
-        String query = "SELECT COUNT(*) FROM ordine WHERE id = ?";
+        String query = "SELECT COUNT(*) FROM ordinazione WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante la verifica dell'esistenza dell'ordine con ID: " + id);
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante la verifica dell'esistenza dell'ordinazione con ID: " + id);
             return false;
         }
     }
 
     @Override
-    public List<Ordine> getAll() {
-        String query = "SELECT id, nomeCliente, numeroClienti, tipoOrdine, infoTavolo, statoOrdine, orarioCreazione FROM ordine";
-        List<Ordine> ordini = new ArrayList<>();
+    public List<Ordinazione> getAll() {
+        String query = "SELECT id, nomeCliente, numeroClienti, tipoOrdine, infoTavolo, statoOrdine, orarioCreazione FROM ordinazione";
+        List<Ordinazione> ordini = new ArrayList<>();
         try (PreparedStatement stmt = connection.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                ordini.add(mapResultSetToOrdine(rs));
+                ordini.add(mapResultSetToOrdinazione(rs));
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il recupero di tutti gli ordini.");
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il recupero di tutti le ordinazioni.");
         }
         return ordini;
     }
 
-    private Ordine mapResultSetToOrdine(ResultSet rs) throws SQLException {
-        return new Ordine(
+    private Ordinazione mapResultSetToOrdinazione(ResultSet rs) throws SQLException {
+        return new Ordinazione(
                 rs.getInt("id"),
                 rs.getString("nomeCliente"),
                 rs.getString("numeroClienti"),
