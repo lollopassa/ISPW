@@ -51,7 +51,7 @@ public class OrdineController {
         Ordine nuovoOrdine = new Ordine(
                 0, // ID generato automaticamente dal database
                 ordineBean.getProdotti(), // Lista dei prodotti
-                ordineBean.getQuantita()  // Lista delle quantità
+                ordineBean.getQuantita()  // Lista delle quantitÃ
         );
 
         // Salva l'oggetto Ordine nel database

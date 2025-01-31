@@ -185,7 +185,7 @@ public class OrdinazioneBoundary {
     private void modificaOrdine() {
         Ordinazione ordinazione = ordinazioniTableView.getSelectionModel().getSelectedItem();
         if (ordinazione == null) {
-            showAlert("Errore", "Seleziona un ordinazione da modificare.", Alert.AlertType.ERROR);
+            showAlert("Errore", "Seleziona un ordine da modificare.", Alert.AlertType.ERROR);
             return;
         }
 

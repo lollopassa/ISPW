@@ -18,7 +18,7 @@
       </Label>
 
       <!-- Tabella delle ordinazioni -->
-      <TableView fx:id="ordinazioniTableView" layoutX="370.0" layoutY="141.0" prefHeight="250.0" prefWidth="802.0">
+      <TableView fx:id="ordinazioniTableView" layoutX="376.0" layoutY="138.0" prefHeight="250.0" prefWidth="652.0">
          <columns>
             <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
             <TableColumn fx:id="nomeColumn" prefWidth="100.0" text="Nome Cliente" />
@@ -31,7 +31,7 @@
       </TableView>
 
       <!-- Pulsanti fuori dalla tabella -->
-      <HBox alignment="CENTER" layoutX="1028.0" layoutY="410.0" spacing="20">
+      <HBox alignment="CENTER" layoutX="878.0" layoutY="410.0" spacing="20">
          <Button fx:id="modificaButton" onAction="#modificaOrdine" style="-fx-font-weight: bold; -fx-padding: 8px; -fx-background-color: #303d68; -fx-text-fill: white; -fx-cursor: hand;" text="Modifica" />
          <Button fx:id="eliminaButton" onAction="#eliminaOrdine" style="-fx-font-weight: bold; -fx-padding: 8px;-fx-background-color: #E0218A; -fx-text-fill: white; -fx-cursor: hand; " text="Elimina" />
       </HBox>
@@ -45,7 +45,7 @@
          <TextField fx:id="nomeClienteField" prefHeight="35.0" prefWidth="300.0" promptText="Nome Cliente" style="-fx-font-size: 14px;" />
 
          <!-- Campo Tipo Ordine -->
-         <ComboBox fx:id="tipoOrdineComboBox" prefHeight="35.0" prefWidth="300.0" style="-fx-font-size: 14px;" promptText="Asporto o Al Tavolo?">
+         <ComboBox fx:id="tipoOrdineComboBox" prefHeight="35.0" prefWidth="300.0" promptText="Asporto o Al Tavolo?" style="-fx-font-size: 14px;">
          </ComboBox>
 
          <!-- Campo Orario Ordinazione -->

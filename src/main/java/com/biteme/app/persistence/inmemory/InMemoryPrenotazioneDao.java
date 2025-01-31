@@ -58,4 +58,12 @@ public class InMemoryPrenotazioneDao implements PrenotazioneDao {
                 .filter(p -> p.getData().equals(data))
                 .toList(); // Sostituito "collect(Collectors.toList())" con "toList()"
     }
+
+    @Override
+    public void update(Prenotazione prenotazione) {
+        // Trova la prenotazione con l'ID specificato e rimuovila
+        delete(prenotazione.getId());
+        // Aggiungi la versione aggiornata
+        prenotazioni.add(prenotazione);
+    }
 }

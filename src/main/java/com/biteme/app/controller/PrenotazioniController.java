@@ -21,16 +21,12 @@ public class PrenotazioniController {
 
 
     public void creaPrenotazione(PrenotazioniBean prenotazioniBean) {
-        // Controlla se la data è specificata, altrimenti usa la data corrente
-        LocalDate dataPrenotazione = prenotazioniBean.getData() != null
-                ? prenotazioniBean.getData()
-                : LocalDate.now();
 
         Prenotazione prenotazione = new Prenotazione(
                 0, // ID sarà generato automaticamente
                 prenotazioniBean.getNomeCliente(),
                 prenotazioniBean.getOrario(),    // Orario della prenotazione
-                dataPrenotazione,               // Aggiunto il campo data
+                prenotazioniBean.getData(),               // Aggiunto il campo data
                 prenotazioniBean.getNote(),     // Note (sostituisce dettagli)
                 prenotazioniBean.getTelefono(), // Numero di telefono del cliente
                 prenotazioniBean.getCoperti()   // Nuovo campo: numero coperti
@@ -62,5 +58,10 @@ public class PrenotazioniController {
         } else {
             throw new IllegalArgumentException("La prenotazione con ID " + id + " non esiste.");
         }
+    }
+
+    public void modificaPrenotazione(Prenotazione prenotazione) {
+        // Logica per aggiornare la prenotazione nel database
+        prenotazioneDao.update(prenotazione);
     }
 }

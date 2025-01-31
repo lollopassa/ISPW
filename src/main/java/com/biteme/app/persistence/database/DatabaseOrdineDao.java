@@ -96,7 +96,7 @@ public class DatabaseOrdineDao implements OrdineDao {
     }
 
     private Ordine mapResultSetToOrdine(ResultSet rs) throws SQLException {
-        // Ricostruisce i prodotti e le quantità dalle stringhe serializzate (consulta un eventuale specifico separatore)
+        // Ricostruisce i prodotti e le quantitÃ  dalle stringhe serializzate (consulta un eventuale specifico separatore)
         List<String> prodotti = List.of(rs.getString("prodotti").split(","));
         List<Integer> quantita = new ArrayList<>();
         for (String q : rs.getString("quantita").replace("[", "").replace("]", "").split(", ")) {
