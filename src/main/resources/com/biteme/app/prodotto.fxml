@@ -20,8 +20,8 @@
         </Label>
 
         <!-- Tabella del Magazzino -->
-        <VBox layoutX="350.0" layoutY="150.0" prefHeight="450.0" prefWidth="452.0">
-            <TableView fx:id="prodottiTableView" prefHeight="450.0" prefWidth="452.0">
+        <VBox layoutX="350.0" layoutY="150.0" prefHeight="450.0" prefWidth="465.0">
+            <TableView fx:id="prodottiTableView" prefHeight="450.0" prefWidth="450.0">
                 <columns>
                     <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
                     <TableColumn fx:id="nomeColumn" text="Prodotto" prefWidth="100.0" />

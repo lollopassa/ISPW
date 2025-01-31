@@ -73,41 +73,24 @@ public class ProdottoBoundary {
     }
 
     private void configureComboBox() {
-        // Creiamo una lista con un messaggio iniziale come 'placeholder'
-        categoriaComboBox.setItems(FXCollections.observableArrayList(Categoria.values()));
-        categoriaComboBox.getItems().add(0, null); // Aggiunge un 'null' iniziale che funge da placeholder
+        categoriaComboBox.setItems(FXCollections.observableArrayList());
+        categoriaComboBox.getItems().add(null); // Placeholder
+        categoriaComboBox.getItems().addAll(Categoria.values());
         categoriaComboBox.setPromptText("Seleziona una categoria");
+        categoriaComboBox.setValue(null); // Imposta il valore iniziale al placeholder
+        categoriaComboBox.setCellFactory(lv -> createCategoryCell());
+        categoriaComboBox.setButtonCell(createCategoryCell());
+    }
 
-        // Assegniamo un prompt come valore predefinito non selezionabile
-        categoriaComboBox.setValue(null);
-
-        // Aggiungiamo un "cell factory" per mostrare il placeholder con nome personalizzato
-        categoriaComboBox.setCellFactory(lv -> new ListCell<>() {
+    // Metodo per creare una ListCell personalizzata
+    private ListCell<Categoria> createCategoryCell() {
+        return new ListCell<>() {
             @Override
             protected void updateItem(Categoria item, boolean empty) {
                 super.updateItem(item, empty);
-
-                if (empty || item == null) { // 'null' è il placeholder
-                    setText("Seleziona una categoria");
-                } else {
-                    setText(item.name()); // Chiama `name()` o un metodo per mostrare il nome delle categorie.
-                }
+                setText((empty || item == null) ? "Seleziona una categoria" : item.name());
             }
-        });
-
-        // Aggiungiamo un `button cell` per modificare la cella visibile quando il valore è nullo o selezionato
-        categoriaComboBox.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(Categoria item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || item == null) { // Mostriamo il placeholder
-                    setText("Seleziona una categoria");
-                } else {
-                    setText(item.name());
-                }
-            }
-        });
+        };
     }
 
     private void configureTableColumns() {

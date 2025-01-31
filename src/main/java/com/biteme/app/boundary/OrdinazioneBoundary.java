@@ -1,6 +1,7 @@
 package com.biteme.app.boundary;
 
 import com.biteme.app.controller.OrdinazioneController;
+import com.biteme.app.entity.Categoria;
 import com.biteme.app.entity.Ordinazione;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -71,19 +72,13 @@ public class OrdinazioneBoundary {
 
     @FXML
     public void initialize() {
-
         configureComboBox();
-        // Inizializza le colonne della tabella
         initTableColumns();
-
-        // Carica i dati nella tabella
         refreshTable();
 
-        // Disabilita i pulsanti finché non viene selezionata una riga
         modificaButton.setDisable(true);
         eliminaButton.setDisable(true);
 
-        // Aggiunge un listener per abilitare/disabilitare i pulsanti in base alla selezione
         ordinazioniTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             boolean isSelected = (newValue != null);
             modificaButton.setDisable(!isSelected);
@@ -92,10 +87,28 @@ public class OrdinazioneBoundary {
     }
 
     private void configureComboBox() {
-        // Configuriamo il ComboBox per la selezione della categoria
-        tipoOrdineComboBox.setItems(FXCollections.observableArrayList(TipoOrdine.values()));
-        tipoOrdineComboBox.setPromptText("Al Tavolo o Asporto?"); // Mostra l'indicazione iniziale
+        tipoOrdineComboBox.setItems(FXCollections.observableArrayList());
+        tipoOrdineComboBox.getItems().add(null);
+        tipoOrdineComboBox.getItems().addAll(TipoOrdine.values());
+        tipoOrdineComboBox.setPromptText("Al Tavolo o Asporto?");
+        tipoOrdineComboBox.setValue(null);
+        tipoOrdineComboBox.setCellFactory(lv -> createOrderCell());
+        tipoOrdineComboBox.setButtonCell(createOrderCell());
     }
+
+    // Metodo per creare una ListCell personalizzata
+    private ListCell<TipoOrdine> createOrderCell() {
+        return new ListCell<>() {
+            @Override
+            protected void updateItem(TipoOrdine item, boolean empty) {
+                super.updateItem(item, empty);
+                setText((empty || item == null) ? "Al Tavolo o Asporto?" : item.name().replace("_", " "));
+            }
+        };
+    }
+
+
+
 
     private void initTableColumns() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -109,14 +122,12 @@ public class OrdinazioneBoundary {
 
     @FXML
     public void createOrdine() {
-        // Estrai i dati dai campi di input
         String nomeCliente = nomeClienteField.getText();
         TipoOrdine tipoOrdine = tipoOrdineComboBox.getValue();
         String orario = orarioField.getText();
         String coperti = copertiField.getText();
         String tavolo = tavoloField.getText();
 
-        // Controlla che il tipo ordine sia stato selezionato
         if (tipoOrdine == null) {
             showAlert("Tipo Ordine Mancante",
                     "Seleziona un tipo di ordine: 'Al Tavolo' o 'Asporto'.",
@@ -124,16 +135,12 @@ public class OrdinazioneBoundary {
             return;
         }
 
-        // Gestisci i casi specifici per il tipo di ordine
         if (tipoOrdine == TipoOrdine.AL_TAVOLO) {
-            // Assegna l'orario corrente se il tipo è "Al Tavolo"
-            orario = LocalTime.now().toString().substring(0, 5); // HH:mm
+            orario = LocalTime.now().toString().substring(0, 5);
         } else if (tipoOrdine == TipoOrdine.ASPORTO) {
-            // Imposta campi specifici come null per "Asporto"
             coperti = null;
             tavolo = null;
 
-            // Valida l'orario per l'Asporto
             if (orario.isEmpty()) {
                 showAlert("Campi Mancanti",
                         "Il campo Orario deve essere compilato in caso di Asporto.",
@@ -149,30 +156,25 @@ public class OrdinazioneBoundary {
             }
         }
 
-        // Controllo che il ComboBox TipoOrdine abbia una selezione valida
-        if (tipoOrdineComboBox.getValue() == null) {
-            showAlert("Errore", "Seleziona un tipo di ordine valido (Al Tavolo o Asporto)!", Alert.AlertType.ERROR);
-            return;
-        }
-
-        // Esegui la validazione degli altri campi obbligatori
         if (nomeCliente.isEmpty()) {
             showAlert("Campi Mancanti", "Il campo Nome Cliente deve essere compilato.", Alert.AlertType.WARNING);
             return;
         }
 
-        // Crea un bean con i dati raccolti
         OrdinazioneBean ordinazioneBean = new OrdinazioneBean();
         ordinazioneBean.setNomeCliente(nomeCliente);
         ordinazioneBean.setTipoOrdine(tipoOrdine);
-        ordinazioneBean.setOrarioCreazione(orario);  // Usa l'ora attuale o quella fornita
-        ordinazioneBean.setNumeroClienti(coperti);  // null se "Asporto"
-        ordinazioneBean.setInfoTavolo(tavolo);      // null se "Asporto"
+        ordinazioneBean.setOrarioCreazione(orario);
+        ordinazioneBean.setNumeroClienti(coperti);
+        ordinazioneBean.setInfoTavolo(tavolo);
 
-        // Passa il bean al controller per creare un nuovo ordine
         ordinazioneController.creaOrdine(ordinazioneBean);
 
-        // Aggiorna la tabella dopo la creazione
+        showAlert("Ordine Creato",
+                "L'ordine è stato creato con successo per il cliente: " + nomeCliente,
+                Alert.AlertType.INFORMATION);
+
+        clearFields();
         refreshTable();
     }
 
@@ -190,35 +192,21 @@ public class OrdinazioneBoundary {
         }
 
         try {
-            // Inizializza OrdinazioneBean con i dettagli dell'ordine selezionato
             ordineSelezionato = new OrdinazioneBean();
             ordineSelezionato.setId(ordinazione.getId());
             ordineSelezionato.setNomeCliente(ordinazione.getNomeCliente());
             ordineSelezionato.setNumeroClienti(ordinazione.getNumeroClienti());
-
-            // Utilizza il valore TipoOrdine correttamente
-            TipoOrdine tipoOrdine = ordinazione.getTipoOrdine(); // Assume che sia un enum
-            if (tipoOrdine == null) {
-                throw new IllegalArgumentException("Tipo ordine nullo!");
-            }
-            ordineSelezionato.setTipoOrdine(tipoOrdine);
-
-            // Gestione campo InfoTavolo basata sul tipo ordine
-            ordineSelezionato.setInfoTavolo(
-                    ordineSelezionato.getTipoOrdine() == TipoOrdine.ASPORTO
-                            ? "Asporto"
-                            : ordinazione.getInfoTavolo()
-            );
-
+            ordineSelezionato.setTipoOrdine(ordinazione.getTipoOrdine());
+            ordineSelezionato.setInfoTavolo(ordinazione.getInfoTavolo());
             ordineSelezionato.setStatoOrdine(ordinazione.getStatoOrdine());
             ordineSelezionato.setOrarioCreazione(ordinazione.getOrarioCreazione());
 
-            // Carica la scena con SceneLoader
             SceneLoader.loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
 
-        } catch (IllegalArgumentException e) {
-            showAlert("Errore", "Il tipo ordine selezionato non è valido: " + e.getMessage(), Alert.AlertType.ERROR);
-            e.printStackTrace();
+            showAlert("Modifica Completata",
+                    "L'ordine del cliente " + ordineSelezionato.getNomeCliente() + " è stato modificato con successo.",
+                    Alert.AlertType.INFORMATION);
+
         } catch (Exception e) {
             showAlert("Errore", "Errore durante il caricamento della schermata di modifica.", Alert.AlertType.ERROR);
             e.printStackTrace();
@@ -247,12 +235,22 @@ public class OrdinazioneBoundary {
     }
 
     private void refreshTable() {
-        // Recupera la lista aggiornata di ordini dal controller
         List<Ordinazione> ordini = ordinazioneController.getOrdini();
-
-        // Aggiorna gli elementi nella TableView
         ordinazioniTableView.getItems().setAll(ordini);
     }
+
+    private void clearFields() {
+        // Ripulisci i campi
+        nomeClienteField.clear();
+        orarioField.clear();
+        copertiField.clear();
+        tavoloField.clear();
+
+        // Resetta la ComboBox al placeholder
+        tipoOrdineComboBox.getSelectionModel().clearSelection();
+        tipoOrdineComboBox.setValue(null);
+    }
+
 
     private boolean mostraDialogConferma(String messaggio) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
