@@ -1,9 +1,9 @@
 package com.biteme.app.persistence.database;
 
-import com.biteme.app.entity.Ordinazione;
+import com.biteme.app.entity.Ordine;
 import com.biteme.app.exception.DatabaseConfigurationException;
-import com.biteme.app.persistence.OrdinazioneDao;
-import com.biteme.app.entity.TipoOrdine;
+import com.biteme.app.persistence.OrdineDao;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,13 +11,12 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+public class DatabaseOrdineDao implements OrdineDao {
 
-public class DatabaseOrdinazioneDao implements OrdinazioneDao {
-
-    private static final Logger LOGGER = Logger.getLogger(DatabaseOrdinazioneDao.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DatabaseOrdineDao.class.getName());
     private final Connection connection;
 
-    public DatabaseOrdinazioneDao() {
+    public DatabaseOrdineDao() {
         try {
             this.connection = DatabaseConnection.getConnection();
         } catch (SQLException e) {
@@ -26,8 +25,8 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
     }
 
     @Override
-    public Optional<Ordinazione> load(Integer id) {
-        String query = "SELECT id, nomeCliente, numeroClienti, tipoOrdine, infoTavolo, statoOrdine, orarioCreazione FROM ordinazione WHERE id = ?";
+    public Optional<Ordine> load(Integer id) {
+        String query = "SELECT id, prodotti, quantita FROM ordine WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -42,15 +41,12 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
     }
 
     @Override
-    public void store(Ordinazione ordinazione) {
-        String query = "INSERT INTO ordinazione (nomeCliente, numeroClienti, tipoOrdine, infoTavolo, statoOrdine, orarioCreazione) VALUES (?, ?, ?, ?, ?, ?)";
+    public void store(Ordine ordine) {
+        String query = "INSERT INTO ordine (prodotti, quantita) VALUES (?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, ordinazione.getNomeCliente());
-            stmt.setString(2, ordinazione.getNumeroClienti() == null ? null : ordinazione.getNumeroClienti());
-            stmt.setString(3, ordinazione.getTipoOrdine().name());
-            stmt.setString(4, ordinazione.getInfoTavolo() == null ? null : ordinazione.getInfoTavolo());
-            stmt.setString(5, ordinazione.getStatoOrdine() == null ? null : ordinazione.getStatoOrdine());
-            stmt.setString(6, ordinazione.getOrarioCreazione() == null ? null : ordinazione.getOrarioCreazione());
+            // Convertire la lista in una stringa serializzata
+            stmt.setString(1, String.join(",", ordine.getProdotti()));
+            stmt.setString(2, ordine.getQuantita().toString());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -59,7 +55,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
 
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    ordinazione.setId(generatedKeys.getInt(1));
+                    ordine.setId(generatedKeys.getInt(1));
                 } else {
                     throw new SQLException("Inserimento dell'ordine fallito, nessun ID generato.");
                 }
@@ -71,7 +67,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
 
     @Override
     public void delete(Integer id) {
-        String query = "DELETE FROM ordinazione WHERE id = ?";
+        String query = "DELETE FROM ordine WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             int affectedRows = stmt.executeUpdate();
@@ -87,7 +83,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
 
     @Override
     public boolean exists(Integer id) {
-        String query = "SELECT COUNT(*) FROM ordinazione WHERE id = ?";
+        String query = "SELECT COUNT(*) FROM ordine WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -99,31 +95,18 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
         }
     }
 
-    @Override
-    public List<Ordinazione> getAll() {
-        String query = "SELECT id, nomeCliente, numeroClienti, tipoOrdine, infoTavolo, statoOrdine, orarioCreazione FROM ordinazione";
-        List<Ordinazione> ordini = new ArrayList<>();
-        try (PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                ordini.add(mapResultSetToOrdine(rs));
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il recupero di tutti gli ordini.");
+    private Ordine mapResultSetToOrdine(ResultSet rs) throws SQLException {
+        // Ricostruisce i prodotti e le quantitÃ  dalle stringhe serializzate (consulta un eventuale specifico separatore)
+        List<String> prodotti = List.of(rs.getString("prodotti").split(","));
+        List<Integer> quantita = new ArrayList<>();
+        for (String q : rs.getString("quantita").replace("[", "").replace("]", "").split(", ")) {
+            quantita.add(Integer.parseInt(q));
         }
-        return ordini;
-    }
 
-    private Ordinazione mapResultSetToOrdine(ResultSet rs) throws SQLException {
-        return new Ordinazione(
+        return new Ordine(
                 rs.getInt("id"),
-                rs.getString("nomeCliente"),
-                rs.getString("numeroClienti"),
-                TipoOrdine.valueOf(rs.getString("tipoOrdine").toUpperCase()),
-                rs.getString("infoTavolo"),
-                rs.getString("statoOrdine"),
-                rs.getString("orarioCreazione") // Ora Ã¨ gestito come String
+                prodotti,
+                quantita
         );
     }
 }
