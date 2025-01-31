@@ -1,7 +1,6 @@
 package com.biteme.app.boundary;
 
 import com.biteme.app.controller.OrdinazioneController;
-import com.biteme.app.entity.Categoria;
 import com.biteme.app.entity.Ordinazione;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -209,7 +208,6 @@ public class OrdinazioneBoundary {
 
         } catch (Exception e) {
             showAlert("Errore", "Errore durante il caricamento della schermata di modifica.", Alert.AlertType.ERROR);
-            e.printStackTrace();
         }
     }
 
