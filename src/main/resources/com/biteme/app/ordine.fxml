@@ -7,9 +7,21 @@
 
 <BorderPane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.OrdineBoundary">
 
-    <!-- Rettangolo superiore -->
     <top>
-        <Rectangle height="120" width="1440" fill="#303d68" />
+        <StackPane>
+            <!-- Rettangolo superiore -->
+            <Rectangle height="120" width="1440" fill="#303d68" />
+
+            <!-- Pulsante Indietro -->
+            <Button text="Indietro" onAction="#handleIndietro"
+                    style="-fx-font-size: 16px; -fx-background-color: #e02189; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5px;"
+                    prefHeight="40" prefWidth="100"
+                    StackPane.alignment="CENTER_LEFT">
+                <StackPane.margin>
+                    <Insets left="50" />
+                </StackPane.margin>
+            </Button>
+        </StackPane>
     </top>
 
     <!-- Rettangolo inferiore -->
@@ -95,21 +107,7 @@
             <!-- Scorrimento per il contenuto dinamico -->
             <ScrollPane fitToWidth="true" fitToHeight="true">
                 <VBox fx:id="riepilogoContenuto" spacing="10">
-                    <!-- Esempio di elemento del riepilogo -->
-                    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 3;"> <!-- Leggero padding -->
-                        <!-- Colonna della descrizione -->
-                        <Label text="2 Pizza Margherita" style="-fx-font-size: 14px;" />
-                        <Pane HBox.hgrow="ALWAYS" /> <!-- Spazio flessibile -->
-                        <!-- Colonna del prezzo -->
-                        <Label text="€21,00" style="-fx-font-size: 14px;" />
-                    </HBox>
 
-                    <!-- Altro prodotto -->
-                    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 3;"> <!-- Leggero padding -->
-                        <Label text="1 Bibita" style="-fx-font-size: 14px;" />
-                        <Pane HBox.hgrow="ALWAYS" /> <!-- Spazio flessibile -->
-                        <Label text="€3,50" style="-fx-font-size: 14px;" />
-                    </HBox>
                 </VBox>
             </ScrollPane>
 
@@ -121,7 +119,7 @@
                 <Label text="TOTALE EURO" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
                 <Pane HBox.hgrow="ALWAYS" /> <!-- Spazio flessibile -->
                 <!-- Colonna Euro per il totale -->
-                <Label fx:id="totaleOrdine" text="€24,50" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                <Label fx:id="totaleOrdine" text="" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
             </HBox>
         </VBox>
     </right>

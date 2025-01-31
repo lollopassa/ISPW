@@ -177,7 +177,7 @@ public class PrenotazioniBoundary {
 
         // Configurazione dei campi di input per la modifica
         TextField nomeField = new TextField(prenotazione.getNomeCliente());
-        DatePicker dataPicker = new DatePicker(prenotazione.getData()); // Aggiunto DatePicker
+        DatePicker dataPicker = new DatePicker(prenotazione.getData());
         TextField orarioField = new TextField(prenotazione.getOrario().toString());
         TextField copertiField = new TextField(String.valueOf(prenotazione.getCoperti()));
         TextField telefonoField = new TextField(prenotazione.getTelefono());
@@ -190,7 +190,7 @@ public class PrenotazioniBoundary {
         grid.add(new Label("Nome cliente:"), 0, 0);
         grid.add(nomeField, 1, 0);
         grid.add(new Label("Data:"), 0, 1);
-        grid.add(dataPicker, 1, 1); // Aggiunto DatePicker al layout
+        grid.add(dataPicker, 1, 1);
         grid.add(new Label("Orario (hh:mm):"), 0, 2);
         grid.add(orarioField, 1, 2);
         grid.add(new Label("Coperti:"), 0, 3);
@@ -209,7 +209,6 @@ public class PrenotazioniBoundary {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == salvaButtonType) {
                 try {
-
                     // Validazione dei dati inseriti
                     String nomeCliente = nomeField.getText().trim();
                     if (nomeCliente.isEmpty()) {
@@ -217,14 +216,12 @@ public class PrenotazioniBoundary {
                         return null;
                     }
 
-                    // Validazione data
                     LocalDate data = dataPicker.getValue();
                     if (data == null) {
                         showAlert(ERROR_TITLE, "Devi selezionare una data.", Alert.AlertType.ERROR);
                         return null;
                     }
 
-                    // Validazione orario
                     LocalTime orario;
                     try {
                         orario = LocalTime.parse(orarioField.getText().trim());
@@ -233,7 +230,6 @@ public class PrenotazioniBoundary {
                         return null;
                     }
 
-                    // Validazione coperti
                     int coperti;
                     try {
                         coperti = Integer.parseInt(copertiField.getText().trim());
@@ -243,7 +239,6 @@ public class PrenotazioniBoundary {
                         return null;
                     }
 
-                    // Validazione telefono
                     String telefono = telefonoField.getText().trim();
                     if (!telefono.isEmpty() && !telefono.matches("\\d{10}")) {
                         showAlert(ERROR_TITLE, "Il numero di telefono deve essere composto da 10 cifre.", Alert.AlertType.ERROR);
@@ -252,12 +247,11 @@ public class PrenotazioniBoundary {
 
                     String note = noteField.getText().trim();
 
-                    // Creazione di una nuova prenotazione aggiornata
                     return new Prenotazione(
-                            prenotazione.getId(), // ID della prenotazione invariato
-                            nomeCliente,           // Modifica il nome cliente
+                            prenotazione.getId(), // Manteniamo l'ID originale
+                            nomeCliente,
                             orario,
-                            data,                  // Modifica anche la data
+                            data,
                             note,
                             telefono,
                             coperti
@@ -271,8 +265,18 @@ public class PrenotazioniBoundary {
         });
 
         dialog.showAndWait().ifPresent(prenotazioneAggiornata -> {
+            // Controllo se la data è stata modificata
+            if (!prenotazione.getData().equals(prenotazioneAggiornata.getData())) {
+                // Rimuovi la prenotazione dalla vecchia data e aggiorna anche il calendario del giorno nuovo
+                refreshTable(prenotazione.getData());
+                refreshTable(prenotazioneAggiornata.getData());
+            } else {
+                // Solo aggiorna senza spostamenti
+                refreshTable(prenotazioneAggiornata.getData());
+            }
+
+            // Salva la prenotazione modificata nel database
             prenotazioniController.modificaPrenotazione(prenotazioneAggiornata);
-            refreshTable(prenotazioneAggiornata.getData()); // Rinfresca con la nuova data
             showAlert(SUCCESS_TITLE, "Prenotazione aggiornata correttamente!", Alert.AlertType.INFORMATION);
         });
     }
@@ -282,7 +286,7 @@ public class PrenotazioniBoundary {
         // Ottieni la prenotazione selezionata
         Prenotazione prenotazioneSelezionata = prenotazioniTableView.getSelectionModel().getSelectedItem();
         if (prenotazioneSelezionata == null) {
-            showAlert("Errore", "Seleziona una prenotazione da modificare.", Alert.AlertType.ERROR);
+            showAlert(ERROR_TITLE, "Seleziona una prenotazione da modificare.", Alert.AlertType.ERROR);
             return;
         }
 
@@ -347,7 +351,7 @@ public class PrenotazioniBoundary {
 
     private void selezionaGiorno(LocalDate data, Label giorno) {
         if (casellaSelezionata instanceof Label) {
-            ((Label) casellaSelezionata).setStyle(DAY_LABEL_DEFAULT_STYLE);
+            (casellaSelezionata).setStyle(DAY_LABEL_DEFAULT_STYLE);
         }
         giorno.setStyle(DAY_LABEL_SELECTED_STYLE);
         casellaSelezionata = giorno;

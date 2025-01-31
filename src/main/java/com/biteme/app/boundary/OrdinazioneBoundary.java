@@ -1,8 +1,7 @@
 package com.biteme.app.boundary;
 
 import com.biteme.app.controller.OrdinazioneController;
-import com.biteme.app.entity.Categoria;
-import com.biteme.app.entity.Ordine;
+import com.biteme.app.entity.Ordinazione;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -36,28 +35,28 @@ public class OrdinazioneBoundary {
     private TextField tavoloField;
 
     @FXML
-    private TableView<Ordine> ordinazioniTableView;
+    private TableView<Ordinazione> ordinazioniTableView;
 
     @FXML
-    private TableColumn<Ordine, Integer> idColumn;
+    private TableColumn<Ordinazione, Integer> idColumn;
 
     @FXML
-    private TableColumn<Ordine, String> nomeColumn;
+    private TableColumn<Ordinazione, String> nomeColumn;
 
     @FXML
-    private TableColumn<Ordine, String> tipoOrdineColumn;
+    private TableColumn<Ordinazione, String> tipoOrdineColumn;
 
     @FXML
-    private TableColumn<Ordine, String> orarioColumn;
+    private TableColumn<Ordinazione, String> orarioColumn;
 
     @FXML
-    private TableColumn<Ordine, String> copertiColumn;
+    private TableColumn<Ordinazione, String> copertiColumn;
 
     @FXML
-    private TableColumn<Ordine, String> infoTavoloColumn;
+    private TableColumn<Ordinazione, String> infoTavoloColumn;
 
     @FXML
-    private TableColumn<Ordine, String> statoOrdineColumn;
+    private TableColumn<Ordinazione, String> statoOrdineColumn;
 
     @FXML
     private Button modificaButton; // Pulsante per modificare l'ordine
@@ -184,8 +183,8 @@ public class OrdinazioneBoundary {
 
     @FXML
     private void modificaOrdine() {
-        Ordine ordine = ordinazioniTableView.getSelectionModel().getSelectedItem();
-        if (ordine == null) {
+        Ordinazione ordinazione = ordinazioniTableView.getSelectionModel().getSelectedItem();
+        if (ordinazione == null) {
             showAlert("Errore", "Seleziona un ordine da modificare.", Alert.AlertType.ERROR);
             return;
         }
@@ -193,12 +192,12 @@ public class OrdinazioneBoundary {
         try {
             // Inizializza OrdinazioneBean con i dettagli dell'ordine selezionato
             ordineSelezionato = new OrdinazioneBean();
-            ordineSelezionato.setId(ordine.getId());
-            ordineSelezionato.setNomeCliente(ordine.getNomeCliente());
-            ordineSelezionato.setNumeroClienti(ordine.getNumeroClienti());
+            ordineSelezionato.setId(ordinazione.getId());
+            ordineSelezionato.setNomeCliente(ordinazione.getNomeCliente());
+            ordineSelezionato.setNumeroClienti(ordinazione.getNumeroClienti());
 
             // Utilizza il valore TipoOrdine correttamente
-            TipoOrdine tipoOrdine = ordine.getTipoOrdine(); // Assume che sia un enum
+            TipoOrdine tipoOrdine = ordinazione.getTipoOrdine(); // Assume che sia un enum
             if (tipoOrdine == null) {
                 throw new IllegalArgumentException("Tipo ordine nullo!");
             }
@@ -208,11 +207,11 @@ public class OrdinazioneBoundary {
             ordineSelezionato.setInfoTavolo(
                     ordineSelezionato.getTipoOrdine() == TipoOrdine.ASPORTO
                             ? "Asporto"
-                            : ordine.getInfoTavolo()
+                            : ordinazione.getInfoTavolo()
             );
 
-            ordineSelezionato.setStatoOrdine(ordine.getStatoOrdine());
-            ordineSelezionato.setOrarioCreazione(ordine.getOrarioCreazione());
+            ordineSelezionato.setStatoOrdine(ordinazione.getStatoOrdine());
+            ordineSelezionato.setOrarioCreazione(ordinazione.getOrarioCreazione());
 
             // Carica la scena con SceneLoader
             SceneLoader.loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
@@ -229,16 +228,16 @@ public class OrdinazioneBoundary {
     // Metodo per eliminare l'ordine selezionato
     @FXML
     private void eliminaOrdine() {
-        Ordine ordineSelezionato = ordinazioniTableView.getSelectionModel().getSelectedItem();
-        if (ordineSelezionato == null) {
+        Ordinazione ordinazioneSelezionato = ordinazioniTableView.getSelectionModel().getSelectedItem();
+        if (ordinazioneSelezionato == null) {
             showAlert("Errore", "Seleziona un ordine da eliminare.", Alert.AlertType.ERROR);
             return;
         }
 
-        boolean conferma = mostraDialogConferma("Sei sicuro di voler eliminare l'ordine " + ordineSelezionato.getId() + "?");
+        boolean conferma = mostraDialogConferma("Sei sicuro di voler eliminare l'ordine " + ordinazioneSelezionato.getId() + "?");
         if (conferma) {
             try {
-                ordinazioneController.eliminaOrdine(ordineSelezionato.getId());
+                ordinazioneController.eliminaOrdine(ordinazioneSelezionato.getId());
                 refreshTable();
                 showAlert("Successo", "Ordine eliminato con successo.", Alert.AlertType.INFORMATION);
             } catch (Exception e) {
@@ -249,7 +248,7 @@ public class OrdinazioneBoundary {
 
     private void refreshTable() {
         // Recupera la lista aggiornata di ordini dal controller
-        List<Ordine> ordini = ordinazioneController.getOrdini();
+        List<Ordinazione> ordini = ordinazioneController.getOrdini();
 
         // Aggiorna gli elementi nella TableView
         ordinazioniTableView.getItems().setAll(ordini);

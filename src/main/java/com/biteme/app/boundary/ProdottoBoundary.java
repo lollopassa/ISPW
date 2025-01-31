@@ -10,16 +10,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 
 import java.math.BigDecimal;
 
 public class ProdottoBoundary {
     private static final String ALERT_ERROR_TITLE = "Errore";
     private static final String ALERT_SUCCESS_TITLE = "Successo";
-    // Stile per i pulsanti
-    private static final String DELETE_BUTTON_STYLE = "-fx-background-color: #E0218A; -fx-text-fill: white; -fx-cursor: hand; -fx-font-size: 12px;";
-    private static final String EDIT_BUTTON_STYLE = "-fx-background-color: #303d68; -fx-text-fill: white; -fx-cursor: hand; -fx-font-size: 12px;";
 
     @FXML
     private TextField nomeProdottoField;
@@ -77,9 +73,41 @@ public class ProdottoBoundary {
     }
 
     private void configureComboBox() {
-        // Configuriamo il ComboBox per la selezione della categoria
+        // Creiamo una lista con un messaggio iniziale come 'placeholder'
         categoriaComboBox.setItems(FXCollections.observableArrayList(Categoria.values()));
-        categoriaComboBox.setPromptText("Seleziona una categoria"); // Mostra l'indicazione iniziale
+        categoriaComboBox.getItems().add(0, null); // Aggiunge un 'null' iniziale che funge da placeholder
+        categoriaComboBox.setPromptText("Seleziona una categoria");
+
+        // Assegniamo un prompt come valore predefinito non selezionabile
+        categoriaComboBox.setValue(null);
+
+        // Aggiungiamo un "cell factory" per mostrare il placeholder con nome personalizzato
+        categoriaComboBox.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Categoria item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) { // 'null' è il placeholder
+                    setText("Seleziona una categoria");
+                } else {
+                    setText(item.name()); // Chiama `name()` o un metodo per mostrare il nome delle categorie.
+                }
+            }
+        });
+
+        // Aggiungiamo un `button cell` per modificare la cella visibile quando il valore è nullo o selezionato
+        categoriaComboBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Categoria item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) { // Mostriamo il placeholder
+                    setText("Seleziona una categoria");
+                } else {
+                    setText(item.name());
+                }
+            }
+        });
     }
 
     private void configureTableColumns() {
@@ -107,36 +135,36 @@ public class ProdottoBoundary {
     @FXML
     private void aggiungiProdotto() {
         try {
-            // Controllo che il TextField del nome non sia vuoto
+            // Controlla che il nome del prodotto non sia vuoto
             if (nomeProdottoField.getText().isBlank()) {
                 showAlert(ALERT_ERROR_TITLE, "Il nome del prodotto non può essere vuoto!", Alert.AlertType.ERROR);
                 return;
             }
 
-            // Controllo che la categoria sia selezionata
-            if (categoriaComboBox.getValue() == null) {
-                showAlert(ALERT_ERROR_TITLE, "Seleziona una categoria valida!", Alert.AlertType.ERROR);
+            // Controlla che sia stata selezionata una categoria valida
+            if (categoriaComboBox.getValue() == null) { // 'null' rappresenta il placeholder
+                showAlert(ALERT_ERROR_TITLE, "Seleziona una categoria!", Alert.AlertType.ERROR);
                 return;
             }
 
-            // Controllo che il prezzo sia valido (numerico)
+            // Controlla che il prezzo sia numerico e valido
             if (prezzoField.getText().isBlank() || !isNumeric(prezzoField.getText())) {
                 showAlert(ALERT_ERROR_TITLE, "Inserisci un valore numerico valido per il prezzo!", Alert.AlertType.ERROR);
                 return;
             }
 
-            // Creazione del bean e assegnazione dei valori
+            // Creazione del bean Prodotto
             ProdottoBean prodottoBean = new ProdottoBean();
             prodottoBean.setNome(nomeProdottoField.getText());
-            prodottoBean.setCategoria(categoriaComboBox.getValue());
+            prodottoBean.setCategoria(categoriaComboBox.getValue()); // Categoria valida selezionata
             prodottoBean.setPrezzo(new BigDecimal(prezzoField.getText()));
-            prodottoBean.setDisponibile(true); // Di default, disponibilità impostata a true
+            prodottoBean.setDisponibile(true); // Di default è disponibile
 
-            // Chiamata al controller per salvare il prodotto
+            // Salva attraverso il controller
             prodottoController.aggiungiProdotto(prodottoBean);
             showAlert(ALERT_SUCCESS_TITLE, "Prodotto aggiunto correttamente!", Alert.AlertType.INFORMATION);
 
-            // Ripulire i campi dopo il salvataggio
+            // Pulisce i campi dopo il salvataggio
             clearFields();
             refreshTable();
         } catch (NumberFormatException e) {
@@ -150,8 +178,9 @@ public class ProdottoBoundary {
 
     private void clearFields() {
         nomeProdottoField.clear();
-        categoriaComboBox.getSelectionModel().clearSelection(); // Deseleziona la categoria
         prezzoField.clear();
+        categoriaComboBox.getSelectionModel().clearSelection();
+        categoriaComboBox.setValue(null); // Ripristina il placeholder
     }
 
     private void showAlert(String title, String message, Alert.AlertType type) {
@@ -227,7 +256,7 @@ public class ProdottoBoundary {
         // Prendere il prodotto selezionato
         Prodotto prodottoSelezionato = prodottiTableView.getSelectionModel().getSelectedItem();
         if (prodottoSelezionato == null) {
-            showAlert("Errore", "Seleziona un prodotto da modificare.", Alert.AlertType.ERROR);
+            showAlert(ALERT_ERROR_TITLE, "Seleziona un prodotto da modificare.", Alert.AlertType.ERROR);
             return;
         }
 
@@ -239,7 +268,7 @@ public class ProdottoBoundary {
         // Prendere il prodotto selezionato
         Prodotto prodottoSelezionato = prodottiTableView.getSelectionModel().getSelectedItem();
         if (prodottoSelezionato == null) {
-            showAlert("Errore", "Seleziona un prodotto da eliminare.", Alert.AlertType.ERROR);
+            showAlert(ALERT_ERROR_TITLE, "Seleziona un prodotto da eliminare.", Alert.AlertType.ERROR);
             return;
         }
 
@@ -247,7 +276,7 @@ public class ProdottoBoundary {
         if (confermato) {
             prodottoController.eliminaProdotto(prodottoSelezionato.getId());
             refreshTable();
-            showAlert("Successo", "Prodotto eliminato con successo!", Alert.AlertType.INFORMATION);
+            showAlert(ALERT_SUCCESS_TITLE, "Prodotto eliminato con successo!", Alert.AlertType.INFORMATION);
         }
     }
 }
