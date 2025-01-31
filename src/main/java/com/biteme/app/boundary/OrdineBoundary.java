@@ -116,7 +116,7 @@ public class OrdineBoundary {
      */
     @FXML
     private void handleCategoriaPrimiPiatti() {
-        caricaProdotti("Primi Piatti");
+        caricaProdotti("Primi");
     }
 
     /**
@@ -124,7 +124,7 @@ public class OrdineBoundary {
      */
     @FXML
     private void handleCategoriaSecondiPiatti() {
-        caricaProdotti("Secondi Piatti");
+        caricaProdotti("Secondi");
     }
 
     /**
@@ -143,12 +143,6 @@ public class OrdineBoundary {
         caricaProdotti("Dolci");
     }
 
-    /**
-     * Metodo generico per caricare i prodotti in base alla categoria.
-     * Utilizza il controller per recuperare i dati e li aggiunge al FlowPane.
-     *
-     * @param categoria Categoria dei prodotti
-     */
     private void caricaProdotti(String categoria) {
         // Verifica che il FlowPane sia inizializzato
         if (flowPaneProdotti == null) {
@@ -162,65 +156,97 @@ public class OrdineBoundary {
         // Ottieni i prodotti tramite il controller
         List<ProdottoBean> prodotti = controller.getProdottiByCategoria(categoria);
 
-        // Aggiungi i nuovi prodotti al FlowPane
+        // Aggiungi i prodotti al FlowPane
         if (prodotti != null && !prodotti.isEmpty()) {
             for (ProdottoBean prodotto : prodotti) {
-                // Creazione del layout grafico per ogni prodotto
-                VBox boxProdotto = new VBox(10); // Box verticale con spaziatura di 10px
-                boxProdotto.setAlignment(Pos.CENTER); // Contenuto centrato
-                boxProdotto.setStyle("-fx-padding: 10px; -fx-background-color: white; -fx-border-color: lightgray; "
-                        + "-fx-border-width: 1; -fx-effect: dropshadow(gaussian, lightgray, 10, 0, 3, 3);");
-                boxProdotto.setPrefSize(150, 150);
-
-                // Nome del prodotto centrato
-                Label labelNome = new Label(prodotto.getNome());
-                labelNome.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-                // Etichetta quantità centrata
-                Label labelQuantita = new Label("Quantità");
-                labelQuantita.setStyle("-fx-font-size: 14px; -fx-text-fill: gray;");
-
-                // Controllo della quantità
-                HBox controlloQuantita = new HBox(10); // Box orizzontale con spaziatura di 10px
-                controlloQuantita.setAlignment(Pos.CENTER); // Elementi centrati
-
-                Button meno = new Button("-"); // Pulsante per diminuire
-                meno.setPrefSize(30, 30);
-
-                Label quantita = new Label("0"); // Quantità iniziale
-                quantita.setStyle("-fx-font-size: 14px;");
-
-                Button piu = new Button("+"); // Pulsante per incrementare
-                piu.setPrefSize(30, 30);
-
-                // Aggiungi evento al pulsante +
-                piu.setOnAction(event -> {
-                    int currentQuantity = Integer.parseInt(quantita.getText());
-                    quantita.setText(String.valueOf(currentQuantity + 1));
-                });
-
-                // Aggiungi evento al pulsante -
-                meno.setOnAction(event -> {
-                    int currentQuantity = Integer.parseInt(quantita.getText());
-                    if (currentQuantity > 0) {
-                        quantita.setText(String.valueOf(currentQuantity - 1));
-                    }
-                });
-
-                // Aggiungi i controlli di quantità al layout
-                controlloQuantita.getChildren().addAll(meno, quantita, piu);
-
-                // Aggiungi elementi al layout del prodotto
-                boxProdotto.getChildren().addAll(labelNome, labelQuantita, controlloQuantita);
-
-                // Aggiungi il prodotto al FlowPane
+                VBox boxProdotto = creaBoxProdotto(prodotto);
                 flowPaneProdotti.getChildren().add(boxProdotto);
             }
         } else {
-            // Nessun prodotto trovato: mostra messaggio
-            Label noProdotti = new Label("Nessun prodotto disponibile per la categoria: " + categoria);
-            noProdotti.setStyle("-fx-font-size: 14px; -fx-text-fill: gray; -fx-padding: 10px;");
-            flowPaneProdotti.getChildren().add(noProdotti);
+            mostraMessaggioNessunProdotto(categoria);
         }
+    }
+
+    private VBox creaBoxProdotto(ProdottoBean prodotto) {
+        VBox boxProdotto = new VBox(10); // Box verticale con spaziatura di 10px
+        boxProdotto.setAlignment(Pos.CENTER); // Contenuto centrato
+        boxProdotto.setStyle("-fx-padding: 10px; -fx-background-color: white; -fx-border-color: lightgray; "
+                + "-fx-border-width: 1; -fx-effect: dropshadow(gaussian, lightgray, 10, 0, 3, 3);");
+        boxProdotto.setPrefSize(150, 150);
+
+        // Nome del prodotto
+        Label labelNome = creaLabelNome(prodotto.getNome());
+        Label labelQuantita = creaLabelQuantita();
+
+        HBox controlloQuantita = creaControlliQuantita();
+
+        // Aggiungi elementi al layout del prodotto
+        boxProdotto.getChildren().addAll(labelNome, labelQuantita, controlloQuantita);
+
+        return boxProdotto;
+    }
+
+    private Label creaLabelNome(String nome) {
+        Label labelNome = new Label(nome);
+        labelNome.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        return labelNome;
+    }
+
+    private Label creaLabelQuantita() {
+        Label labelQuantita = new Label("Quantità");
+        labelQuantita.setStyle("-fx-font-size: 14px; -fx-text-fill: gray;");
+        return labelQuantita;
+    }
+
+    private HBox creaControlliQuantita() {
+        HBox controlloQuantita = new HBox(10); // Box orizzontale con spaziatura di 10px
+        controlloQuantita.setAlignment(Pos.CENTER); // Elementi centrati
+
+        Button meno = creaBottoneMeno();
+        Label quantita = creaLabelQuantitaContatore();
+        Button piu = creaBottonePiu(quantita);
+
+        meno.setOnAction(event -> diminuisciQuantita(quantita));
+        piu.setOnAction(event -> aumentaQuantita(quantita));
+
+        controlloQuantita.getChildren().addAll(meno, quantita, piu);
+
+        return controlloQuantita;
+    }
+
+    private Button creaBottoneMeno() {
+        Button meno = new Button("-");
+        meno.setPrefSize(30, 30); // Imposta dimensioni del pulsante
+        return meno;
+    }
+
+    private Button creaBottonePiu(Label quantita) {
+        Button piu = new Button("+");
+        piu.setPrefSize(30, 30); // Imposta dimensioni del pulsante
+        return piu;
+    }
+
+    private Label creaLabelQuantitaContatore() {
+        Label quantita = new Label("0"); // Quantità iniziale
+        quantita.setStyle("-fx-font-size: 14px;");
+        return quantita;
+    }
+
+    private void aumentaQuantita(Label quantita) {
+        int currentQuantity = Integer.parseInt(quantita.getText());
+        quantita.setText(String.valueOf(currentQuantity + 1));
+    }
+
+    private void diminuisciQuantita(Label quantita) {
+        int currentQuantity = Integer.parseInt(quantita.getText());
+        if (currentQuantity > 0) {
+            quantita.setText(String.valueOf(currentQuantity - 1));
+        }
+    }
+
+    private void mostraMessaggioNessunProdotto(String categoria) {
+        Label noProdotti = new Label("Nessun prodotto disponibile per la categoria: " + categoria);
+        noProdotti.setStyle("-fx-font-size: 14px; -fx-text-fill: gray; -fx-padding: 10px;");
+        flowPaneProdotti.getChildren().add(noProdotti);
     }
 }
