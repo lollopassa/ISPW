@@ -68,7 +68,14 @@
         </VBox>
 
         <!-- Tabella delle Prenotazioni con Icona Elimina -->
-        <VBox layoutX="600.0" layoutY="490.0" prefHeight="350.0" prefWidth="802.0" spacing="10">
+        <VBox layoutX="600.0" layoutY="490.0" prefHeight="350.0" prefWidth="702.0" spacing="10">
+            <HBox alignment="CENTER_RIGHT" spacing="15" layoutX="600.0" layoutY="460.0" prefWidth="802.0">
+                <Button fx:id="modificaButton" onAction="#modificaPrenotazione" text="Modifica"
+                        style="-fx-font-size: 14px; -fx-padding: 8px; -fx-background-color: #303d68; -fx-text-fill: white;" />
+                <Button fx:id="eliminaButton" onAction="#eliminaPrenotazione" text="Elimina"
+                        style="-fx-font-size: 14px; -fx-padding: 8px; -fx-background-color: #E0218A; -fx-text-fill: white;" />
+            </HBox>
+
             <TableView fx:id="prenotazioniTableView" prefHeight="300.0" prefWidth="70.0">
                 <columns>
                     <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
@@ -78,10 +85,8 @@
                     <TableColumn fx:id="copertiColumn" prefWidth="100.0" text="Coperti" />
                     <TableColumn fx:id="telefonoColumn" prefWidth="100.0" text="Telefono" />
                     <TableColumn fx:id="noteColumn" prefWidth="150.0" text="Note" />
-                    <TableColumn fx:id="azioniColumn" text="Azioni" prefWidth="100.0" />
                 </columns>
             </TableView>
-
         </VBox>
 
     </children>

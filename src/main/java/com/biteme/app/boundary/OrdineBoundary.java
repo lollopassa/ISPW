@@ -116,7 +116,7 @@ public class OrdineBoundary {
      */
     @FXML
     private void handleCategoriaPrimiPiatti() {
-        caricaProdotti("Primi Piatti");
+        caricaProdotti("Primi");
     }
 
     /**
@@ -124,7 +124,7 @@ public class OrdineBoundary {
      */
     @FXML
     private void handleCategoriaSecondiPiatti() {
-        caricaProdotti("Secondi Piatti");
+        caricaProdotti("Secondi");
     }
 
     /**

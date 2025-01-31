@@ -134,6 +134,31 @@ public class DatabasePrenotazioneDao implements PrenotazioneDao {
         return prenotazioni;
     }
 
+    @Override
+    public void update(Prenotazione prenotazione) {
+        String query = "UPDATE prenotazione " +
+                "SET nomeCliente = ?, orario = ?, data = ?, note = ?, telefono = ?, coperti = ? " +
+                "WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, prenotazione.getNomeCliente());
+            stmt.setTime(2, Time.valueOf(prenotazione.getOrario()));
+            stmt.setDate(3, Date.valueOf(prenotazione.getData()));
+            stmt.setString(4, prenotazione.getNote());
+            stmt.setString(5, prenotazione.getTelefono());
+            stmt.setInt(6, prenotazione.getCoperti());
+            stmt.setInt(7, prenotazione.getId());
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                LOGGER.log(Level.WARNING, () -> "Nessuna prenotazione trovata con ID: " + prenotazione.getId() + " per l'aggiornamento");
+            } else {
+                LOGGER.log(Level.INFO, () -> "Prenotazione con ID: " + prenotazione.getId() + " aggiornata con successo");
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'aggiornamento della prenotazione con ID: " + prenotazione.getId());
+        }
+    }
+
     private Prenotazione mapResultSetToPrenotazione(ResultSet rs) throws SQLException {
         return new Prenotazione(
                 rs.getInt("id"),

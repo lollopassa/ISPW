@@ -49,7 +49,10 @@ public class ProdottoBoundary {
     private TableColumn<Prodotto, Boolean> disponibileColumn;
 
     @FXML
-    private TableColumn<Prodotto, Void> azioniColumn;
+    private Button modificaButton;
+
+    @FXML
+    private Button eliminaButton;
 
     private final ProdottoController prodottoController;
 
@@ -61,8 +64,16 @@ public class ProdottoBoundary {
     private void initialize() {
         configureComboBox();
         configureTableColumns();
-        configureActionColumns();
         refreshTable();
+
+        modificaButton.setDisable(true);
+        eliminaButton.setDisable(true);
+
+        prodottiTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            boolean isSelected = (newValue != null);
+            modificaButton.setDisable(!isSelected);
+            eliminaButton.setDisable(!isSelected);
+        });
     }
 
     private void configureComboBox() {
@@ -83,10 +94,6 @@ public class ProdottoBoundary {
         nomeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
     }
 
-    private void configureActionColumns() {
-        // Configuriamo la colonna Azioni per eliminare i prodotti
-        azioniColumn.setCellFactory(_ -> new ActionCell());
-    }
 
     private boolean isNumeric(String str) {
         try {
@@ -154,114 +161,93 @@ public class ProdottoBoundary {
         alert.showAndWait();
     }
 
-    // Classe interna per la colonna delle azioni
-    private class ActionCell extends TableCell<Prodotto, Void> {
-        private final Button deleteButton;
-        private final Button editButton;
-        private final HBox actionBox;
+    private boolean mostraDialogConferma(String messaggio) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, messaggio, ButtonType.YES, ButtonType.NO);
+        alert.setHeaderText(null);
+        alert.setTitle("Conferma Eliminazione");
+        alert.showAndWait();
+        return alert.getResult() == ButtonType.YES;
+    }
 
-        public ActionCell() {
-            // Pulsante Elimina
-            this.deleteButton = new Button("Elimina");
-            deleteButton.setStyle(DELETE_BUTTON_STYLE); // Applica lo stile
-            deleteButton.setOnAction(_ -> {
-                Prodotto prodotto = getTableView().getItems().get(getIndex());
-                eliminaProdotto(prodotto.getId());
-            });
+    private void mostraDialogModifica(Prodotto prodotto) {
+        Dialog<Prodotto> dialog = new Dialog<>();
+        dialog.setTitle("Modifica Prodotto");
 
-            // Pulsante Modifica
-            this.editButton = new Button("Modifica");
-            editButton.setStyle(EDIT_BUTTON_STYLE); // Applica lo stile
-            editButton.setOnAction(_ -> {
-                Prodotto prodotto = getTableView().getItems().get(getIndex());
-                mostraDialogModifica(prodotto);
-            });
+        // Configuriamo i campi di input per la modifica
+        TextField nomeField = new TextField(prodotto.getNome());
+        ComboBox<Categoria> categoriaField = new ComboBox<>(FXCollections.observableArrayList(Categoria.values()));
+        categoriaField.setValue(prodotto.getCategoria());
+        TextField priceField = new TextField(prodotto.getPrezzo().toString());
 
-            // Contenitore per i pulsanti
-            this.actionBox = new HBox(10, editButton, deleteButton);
-        }
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.add(new Label("Nome:"), 0, 0);
+        grid.add(nomeField, 1, 0);
+        grid.add(new Label("Categoria:"), 0, 1);
+        grid.add(categoriaField, 1, 1);
+        grid.add(new Label("Prezzo (€):"), 0, 2);
+        grid.add(priceField, 1, 2);
 
-        private void eliminaProdotto(int id) {
-            boolean confermato = mostraDialogConferma("Sei sicuro di voler eliminare questo prodotto?");
-            if (!confermato) {
-                return;
-            }
+        dialog.getDialogPane().setContent(grid);
 
-            prodottoController.eliminaProdotto(id);
-            refreshTable();
-            showAlert(ALERT_SUCCESS_TITLE, "Prodotto eliminato con successo!", Alert.AlertType.INFORMATION);
-        }
+        // Pulsanti di azione per il dialogo
+        ButtonType salvaButtonType = new ButtonType("Salva", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(salvaButtonType, ButtonType.CANCEL);
 
-        private boolean mostraDialogConferma(String messaggio) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, messaggio, ButtonType.YES, ButtonType.NO);
-            alert.setHeaderText(null);
-            alert.setTitle("Conferma Eliminazione");
-            alert.showAndWait();
-            return alert.getResult() == ButtonType.YES;
-        }
-
-        private void mostraDialogModifica(Prodotto prodotto) {
-            Dialog<Prodotto> dialog = new Dialog<>();
-            dialog.setTitle("Modifica Prodotto");
-
-            // Configuriamo i campi di input per la modifica
-            TextField nomeField = new TextField(prodotto.getNome());
-            ComboBox<Categoria> categoriaField = new ComboBox<>(FXCollections.observableArrayList(Categoria.values()));
-            categoriaField.setValue(prodotto.getCategoria());
-            TextField priceField = new TextField(prodotto.getPrezzo().toString());
-
-            GridPane grid = new GridPane();
-            grid.setHgap(10);
-            grid.setVgap(10);
-            grid.add(new Label("Nome:"), 0, 0);
-            grid.add(nomeField, 1, 0);
-            grid.add(new Label("Categoria:"), 0, 1);
-            grid.add(categoriaField, 1, 1);
-            grid.add(new Label("Prezzo (€):"), 0, 2);
-            grid.add(priceField, 1, 2);
-
-            dialog.getDialogPane().setContent(grid);
-
-            // Pulsanti di azione per il dialogo
-            ButtonType salvaButtonType = new ButtonType("Salva", ButtonBar.ButtonData.OK_DONE);
-            dialog.getDialogPane().getButtonTypes().addAll(salvaButtonType, ButtonType.CANCEL);
-
-            dialog.setResultConverter(dialogButton -> {
-                if (dialogButton == salvaButtonType) {
-                    try {
-                        // Ritorna il prodotto aggiornato
-                        return new Prodotto(
-                                prodotto.getId(),
-                                nomeField.getText(),
-                                new BigDecimal(priceField.getText()),
-                                categoriaField.getValue(),
-                                prodotto.isDisponibile() // Mantieni la disponibilità invariata
-                        );
-                    } catch (NumberFormatException e) {
-                        showAlert(ALERT_ERROR_TITLE, "Inserisci un valore valido per il prezzo!", Alert.AlertType.ERROR);
-                        return null;
-                    }
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == salvaButtonType) {
+                try {
+                    // Ritorna il prodotto aggiornato
+                    return new Prodotto(
+                            prodotto.getId(),
+                            nomeField.getText(),
+                            new BigDecimal(priceField.getText()),
+                            categoriaField.getValue(),
+                            prodotto.isDisponibile() // Mantieni la disponibilità invariata
+                    );
+                } catch (NumberFormatException e) {
+                    showAlert(ALERT_ERROR_TITLE, "Inserisci un valore valido per il prezzo!", Alert.AlertType.ERROR);
+                    return null;
                 }
-                return null;
-            });
-
-            // Otteniamo il risultato del dialogo
-            dialog.showAndWait().ifPresent(prodottoAggiornato -> {
-                prodottoController.modificaProdotto(prodottoAggiornato);
-                refreshTable();
-                showAlert(ALERT_SUCCESS_TITLE, "Prodotto aggiornato con successo!", Alert.AlertType.INFORMATION);
-            });
-        }
-
-        @Override
-        protected void updateItem(Void item, boolean empty) {
-            super.updateItem(item, empty);
-            if (empty) {
-                setGraphic(null);
-            } else {
-                setGraphic(actionBox);
             }
+            return null;
+        });
+
+        // Otteniamo il risultato del dialogo
+        dialog.showAndWait().ifPresent(prodottoAggiornato -> {
+            prodottoController.modificaProdotto(prodottoAggiornato);
+            refreshTable();
+            showAlert(ALERT_SUCCESS_TITLE, "Prodotto aggiornato con successo!", Alert.AlertType.INFORMATION);
+        });
+    }
+
+    @FXML
+    private void modificaProdotto() {
+        // Prendere il prodotto selezionato
+        Prodotto prodottoSelezionato = prodottiTableView.getSelectionModel().getSelectedItem();
+        if (prodottoSelezionato == null) {
+            showAlert("Errore", "Seleziona un prodotto da modificare.", Alert.AlertType.ERROR);
+            return;
         }
 
+        mostraDialogModifica(prodottoSelezionato);
+    }
+
+    @FXML
+    private void eliminaProdotto() {
+        // Prendere il prodotto selezionato
+        Prodotto prodottoSelezionato = prodottiTableView.getSelectionModel().getSelectedItem();
+        if (prodottoSelezionato == null) {
+            showAlert("Errore", "Seleziona un prodotto da eliminare.", Alert.AlertType.ERROR);
+            return;
+        }
+
+        boolean confermato = mostraDialogConferma("Sei sicuro di voler eliminare il prodotto " + prodottoSelezionato.getNome() + "?");
+        if (confermato) {
+            prodottoController.eliminaProdotto(prodottoSelezionato.getId());
+            refreshTable();
+            showAlert("Successo", "Prodotto eliminato con successo!", Alert.AlertType.INFORMATION);
+        }
     }
 }

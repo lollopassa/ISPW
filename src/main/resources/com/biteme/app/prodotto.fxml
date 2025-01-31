@@ -4,52 +4,61 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
-<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.ProdottoBoundary">
+<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.OrdinazioneBoundary">
     <children>
 
         <!-- Inclusione del Menu Laterale -->
         <fx:include source="menuLaterale.fxml" />
 
-        <!-- Etichetta "Magazzino" -->
-        <Label fx:id="magazzinoLabelG" layoutX="349.0" layoutY="24.0" text="Magazzino" textAlignment="CENTER" textFill="BLACK">
+        <!-- Etichetta "Ordinazione" -->
+        <Label fx:id="ordinazioneLabelG" layoutX="349.0" layoutY="24.0" text="Ordinazione" textAlignment="CENTER" textFill="BLACK">
             <font>
                 <Font size="32.0" />
             </font>
         </Label>
 
-        <!-- Tabella del Magazzino -->
-        <VBox layoutX="350.0" layoutY="150.0" prefHeight="500.0" prefWidth="602.0">
-            <TableView fx:id="prodottiTableView" prefHeight="450.0" prefWidth="750.0">
-                <columns>
-                    <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
-                    <TableColumn fx:id="nomeColumn" text="Prodotto" prefWidth="100.0" />
-                    <TableColumn fx:id="categoriaColumn" prefWidth="100.0" text="Categoria" />
-                    <TableColumn fx:id="prezzoColumn" prefWidth="100.0" text="Prezzo (€)" />
-                    <TableColumn fx:id="disponibileColumn" prefWidth="100.0" text="Disponibile" />
-                    <TableColumn fx:id="azioniColumn" prefWidth="150.0" text="Azioni" />
-                </columns>
-            </TableView>
-        </VBox>
+        <!-- Tabella delle ordinazioni -->
+        <TableView fx:id="ordinazioniTableView" layoutX="370.0" layoutY="141.0" prefHeight="250.0" prefWidth="652.0">
+            <columns>
+                <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
+                <TableColumn fx:id="nomeColumn" prefWidth="100.0" text="Nome Cliente" />
+                <TableColumn fx:id="copertiColumn" prefWidth="100.0" text="Numero Coperti" />
+                <TableColumn fx:id="tipoOrdineColumn" prefWidth="100.0" text="Tipo Ordine" />
+                <TableColumn fx:id="infoTavoloColumn" prefWidth="100.0" text="Tavolo" />
+                <TableColumn fx:id="statoOrdineColumn" prefWidth="100.0" text="Stato Ordine" />
+                <TableColumn fx:id="orarioColumn" prefWidth="100.0" text="Orario" />
+            </columns>
+        </TableView>
 
-        <!-- Modulo per aggiungere nuovi prodotti -->
-        <VBox alignment="TOP_CENTER" layoutX="1070.0" layoutY="150.0" spacing="15.0" style="-fx-padding: 15px; -fx-border-color: lightgray; -fx-border-width: 1.5px; -fx-background-color: #f9f9f9; -fx-border-radius: 8px;">
-            <!-- Titolo del modulo -->
-            <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Aggiungi Prodotto" />
+        <!-- Pulsanti fuori dalla tabella -->
+        <HBox alignment="CENTER_RIGHT" layoutX="370.0" layoutY="410.0" prefWidth="652.0" spacing="15" style="-fx-alignment: BASELINE_RIGHT;">
+            <Button fx:id="modificaButton" onAction="#modificaOrdine" style="-fx-font-size: 14px; -fx-padding: 8px; -fx-background-color: #303d68; -fx-text-fill: white;" text="Modifica" />
+            <Button fx:id="eliminaButton" onAction="#eliminaOrdine" style="-fx-font-size: 14px; -fx-padding: 8px; -fx-background-color: #E0218A; -fx-text-fill: white;" text="Elimina" />
+        </HBox>
 
-            <!-- Campo Nome Prodotto -->
-            <TextField fx:id="nomeProdottoField" prefHeight="35.0" prefWidth="250.0" promptText="Nome Prodotto" style="-fx-font-size: 14px;" />
+        <!-- Modulo per Aggiungere Ordinazione -->
+        <VBox alignment="TOP_CENTER" layoutX="370.0" layoutY="428.0" spacing="15.0" style="-fx-padding: 15px; -fx-border-color: lightgray; -fx-border-width: 1.5px; -fx-background-color: #f9f9f9; -fx-border-radius: 8px;">
+            <!-- Titolo della sezione -->
+            <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Nuova Ordinazione" />
 
-            <!-- Campo Categoria -->
-            <ComboBox fx:id="categoriaComboBox" prefHeight="35.0" prefWidth="250.0" style="-fx-font-size: 14px;" promptText="Categoria">
+            <!-- Campo Nome Cliente -->
+            <TextField fx:id="nomeClienteField" prefHeight="35.0" prefWidth="300.0" promptText="Nome Cliente" style="-fx-font-size: 14px;" />
+
+            <!-- Campo Tipo Ordine -->
+            <ComboBox fx:id="tipoOrdineComboBox" prefHeight="35.0" prefWidth="300.0" promptText="Asporto o Al Tavolo?" style="-fx-font-size: 14px;">
             </ComboBox>
 
-            <!-- Campo Prezzo -->
-            <TextField fx:id="prezzoField" prefHeight="35.0" prefWidth="250.0" promptText="Prezzo (€)" style="-fx-font-size: 14px;" />
+            <!-- Campo Orario Ordinazione -->
+            <TextField fx:id="orarioField" prefHeight="35.0" prefWidth="300.0" promptText="Orario (hh:mm)" style="-fx-font-size: 14px;" />
 
-            <!-- Pulsante Aggiungi -->
-            <Button onAction="#aggiungiProdotto" prefHeight="40.0" prefWidth="250.0" style="-fx-background-color: #303d68; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;" text="Aggiungi Prodotto" />
+            <!-- Campo Numero Coperti -->
+            <TextField fx:id="copertiField" prefHeight="35.0" prefWidth="300.0" promptText="Numero Coperti" style="-fx-font-size: 14px;" />
+
+            <!-- Campo Info Tavolo -->
+            <TextField fx:id="tavoloField" prefHeight="35.0" prefWidth="300.0" promptText="Tavolo" style="-fx-font-size: 14px;" />
+
+            <!-- Pulsante per aggiungere un'ordinazione -->
+            <Button onAction="#createOrdine" prefHeight="40.0" prefWidth="300.0" style="-fx-background-color: #303d68; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;" text="Aggiungi Ordinazione" />
         </VBox>
 
     </children>
