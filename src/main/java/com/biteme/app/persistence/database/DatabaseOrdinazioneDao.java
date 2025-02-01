@@ -32,11 +32,11 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return Optional.of(mapResultSetToOrdine(rs));
+                    return Optional.of(mapResultSetToOrdinazione(rs));
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il caricamento dell'ordine con ID: " + id);
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il caricamento dell'ordinazione con ID: " + id);
         }
         return Optional.empty();
     }
@@ -54,18 +54,18 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Inserimento dell'ordine fallito, nessuna riga aggiunta.");
+                throw new SQLException("Inserimento dell'ordinazione fallito, nessuna riga aggiunta.");
             }
 
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     ordinazione.setId(generatedKeys.getInt(1));
                 } else {
-                    throw new SQLException("Inserimento dell'ordine fallito, nessun ID generato.");
+                    throw new SQLException("Inserimento dell'ordinazione fallito, nessun ID generato.");
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il salvataggio dell'ordine");
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il salvataggio dell'ordinazione");
         }
     }
 
@@ -76,12 +76,12 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
             stmt.setInt(1, id);
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
-                LOGGER.log(Level.WARNING, () -> "Nessun ordine trovato con ID: " + id);
+                LOGGER.log(Level.WARNING, () -> "Nessun ordinazione trovato con ID: " + id);
             } else {
-                LOGGER.log(Level.INFO, () -> "Ordine con ID: " + id + " eliminato con successo");
+                LOGGER.log(Level.INFO, () -> "Ordinazione con ID: " + id + " eliminato con successo");
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'eliminazione dell'ordine con ID: " + id);
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'eliminazione dell'ordinazione con ID: " + id);
         }
     }
 
@@ -94,7 +94,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
                 return rs.next() && rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante la verifica dell'esistenza dell'ordine con ID: " + id);
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante la verifica dell'esistenza dell'ordinazione con ID: " + id);
             return false;
         }
     }
@@ -107,7 +107,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                ordini.add(mapResultSetToOrdine(rs));
+                ordini.add(mapResultSetToOrdinazione(rs));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e, () -> "Errore durante il recupero di tutti gli ordini.");
@@ -115,7 +115,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
         return ordini;
     }
 
-    private Ordinazione mapResultSetToOrdine(ResultSet rs) throws SQLException {
+    private Ordinazione mapResultSetToOrdinazione(ResultSet rs) throws SQLException {
         return new Ordinazione(
                 rs.getInt("id"),
                 rs.getString("nomeCliente"),
