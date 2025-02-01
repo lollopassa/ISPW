@@ -20,7 +20,7 @@ public class OrdinazioneController {
     public void creaOrdine(OrdinazioneBean ordinazioneBean) {
         Ordinazione ordinazione = new Ordinazione(
                 0, // ID sarà generato automaticamente dal DAO
-                ordinazioneBean.getNomeCliente(),
+                ordinazioneBean.getNome(),
                 ordinazioneBean.getNumeroClienti(),
                 ordinazioneBean.getTipoOrdine(),
                 ordinazioneBean.getInfoTavolo(),

@@ -164,7 +164,7 @@ public class OrdinazioneBoundary {
         }
 
         OrdinazioneBean ordinazioneBean = new OrdinazioneBean();
-        ordinazioneBean.setNomeCliente(nomeCliente);
+        ordinazioneBean.setNome(nomeCliente);
         ordinazioneBean.setTipoOrdine(tipoOrdine);
         ordinazioneBean.setOrarioCreazione(orario);
         ordinazioneBean.setNumeroClienti(coperti);
@@ -201,7 +201,7 @@ public class OrdinazioneBoundary {
             // Creiamo un nuovo OrdinazioneBean e usiamo il setter statico per impostarlo
             OrdinazioneBean ordine = new OrdinazioneBean();
             ordine.setId(ordinazione.getId());
-            ordine.setNomeCliente(ordinazione.getNomeCliente());
+            ordine.setNome(ordinazione.getNomeCliente());
             ordine.setNumeroClienti(ordinazione.getNumeroClienti());
             ordine.setTipoOrdine(ordinazione.getTipoOrdine());
             ordine.setInfoTavolo(ordinazione.getInfoTavolo());

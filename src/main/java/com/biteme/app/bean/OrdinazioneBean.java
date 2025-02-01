@@ -5,7 +5,7 @@ import com.biteme.app.entity.TipoOrdine;
 public class OrdinazioneBean {
 
     private int id; // BIGINT
-    private String nomeCliente; // VARCHAR
+    private String nome; // VARCHAR
     private String numeroClienti; // VARCHAR
     private TipoOrdine tipoOrdine; // VARCHAR
     private String infoTavolo; // VARCHAR
@@ -21,12 +21,12 @@ public class OrdinazioneBean {
         this.id = id;
     }
 
-    public String getNomeCliente() {
-        return nomeCliente;
+    public String getNome() {
+        return nome;
     }
 
-    public void setNomeCliente(String nomeCliente) {
-        this.nomeCliente = nomeCliente;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getNumeroClienti() {
