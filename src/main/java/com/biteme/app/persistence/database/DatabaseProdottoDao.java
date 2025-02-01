@@ -144,7 +144,7 @@ public class DatabaseProdottoDao implements ProdottoDao {
     @Override
     public List<Prodotto> getAll() {
         List<Prodotto> prodotti = new ArrayList<>();
-        String query = "SELECT * FROM prodotti"; // Supponiamo che la tabella si chiami 'prodotti'
+        String query = "SELECT id, nome, prezzo, categoria, disponibile FROM prodotti";
 
         try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {

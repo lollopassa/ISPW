@@ -91,9 +91,6 @@ public class OrdineBoundary {
                 caricaProdottiAssociati();
                 // Carica i prodotti e le quantità nel riepilogo
                 caricaProdottiNelRiepilogo(ordineBean);
-            } else {
-                Logger.getLogger(OrdineBoundary.class.getName())
-                        .warning("Nessun ordine trovato con ID: " + ordineId);
             }
         } else {
             Logger.getLogger(OrdineBoundary.class.getName())
@@ -144,9 +141,6 @@ public class OrdineBoundary {
                 return prodotto.getPrezzo().doubleValue();
             }
         }
-        // Restituisci 0.0 se il prodotto non viene trovato (può essere migliorato con un logging)
-        Logger.getLogger(OrdineBoundary.class.getName())
-                .warning("Prezzo non trovato per il prodotto: " + nomeProdotto);
         return 0.0;
     }
 

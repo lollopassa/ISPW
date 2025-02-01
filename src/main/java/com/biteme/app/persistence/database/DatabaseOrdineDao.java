@@ -71,8 +71,7 @@ public class DatabaseOrdineDao implements OrdineDao {
                 throw new SQLException("Operazione fallita: nessuna riga modificata.");
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il salvataggio/aggiornamento dell'ordine");
-            throw new RuntimeException("Errore durante il salvataggio/aggiornamento dell'ordine", e);
+            throw new DatabaseConfigurationException("Errore durante il salvataggio/aggiornamento dell'ordine", e);
         }
     }
 
@@ -119,8 +118,7 @@ public class DatabaseOrdineDao implements OrdineDao {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il caricamento dell'ordine con ID: " + id);
-            throw new RuntimeException("Impossibile recuperare l'ordine con ID " + id, e); // Gestione dell'errore
+            throw new DatabaseConfigurationException("Impossibile recuperare l'ordine con ID " + id, e); // Gestione dell'errore
         }
     }
 
@@ -141,11 +139,8 @@ public class DatabaseOrdineDao implements OrdineDao {
                     quantita.add(Integer.parseInt(q)); // Prova a fare il parsing
                 } catch (NumberFormatException e) {
                     // Logga un avviso e salta i valori non validi
-                    LOGGER.log(Level.WARNING, "Valore non valido trovato nella quantità: " + q, e);
-                }
+                    LOGGER.log(Level.WARNING, e, () -> "Valore non valido trovato nella quantità: " + q);                }
             }
-        } else {
-            LOGGER.log(Level.WARNING, "La colonna 'quantita' è vuota o non valida per l'ordine con id: " + rs.getInt("id"));
         }
 
         // Restituisce l'ordine
