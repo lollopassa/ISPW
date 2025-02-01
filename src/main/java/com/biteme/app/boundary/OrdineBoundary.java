@@ -73,9 +73,15 @@ public class OrdineBoundary {
             throw new IllegalStateException("Nessun ordine selezionato. Impossibile inizializzare la schermata.");
         }
 
-        // Imposta i dati relativi all'ordine
-        this.tavoloCorrente = ordinazioneBean.getInfoTavolo(); // Nome del tavolo o "Asporto"
-        this.nomeTavolo.setText("Tavolo: " + tavoloCorrente);
+        // Controlla se infoTavolo è null o rappresenta un ordine da asporto
+        String infoTavolo = ordinazioneBean.getInfoTavolo();
+        if (infoTavolo == null || "Asporto".equalsIgnoreCase(infoTavolo)) {
+            this.tavoloCorrente = "Asporto";
+            this.nomeTavolo.setText("Asporto");
+        } else {
+            this.tavoloCorrente = infoTavolo; // Recupera il nome del tavolo
+            this.nomeTavolo.setText("Tavolo: " + tavoloCorrente);
+        }
 
         // Mostra il numero di clienti
         Label numeroClientiLabel = new Label("Numero Clienti: " + ordinazioneBean.getNumeroClienti());
@@ -89,6 +95,7 @@ public class OrdineBoundary {
         // Carica i prodotti associati all'ordine
         caricaProdottiAssociati();
     }
+
 
     /**
      * Metodo per caricare dinamicamente i prodotti associati all'ordine.

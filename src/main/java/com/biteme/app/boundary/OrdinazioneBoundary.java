@@ -66,6 +66,7 @@ public class OrdinazioneBoundary {
 
     private static OrdinazioneBean ordineSelezionato; // Variabile statica per mantenere l'ordine selezionato
     private final OrdinazioneController ordinazioneController = new OrdinazioneController();
+    private static final String ERROR_TITLE = "Errore";
 
 
 
@@ -183,40 +184,37 @@ public class OrdinazioneBoundary {
     }
 
     @FXML
-    private void modificaOrdine() {
-        Ordinazione ordinazione = ordinazioniTableView.getSelectionModel().getSelectedItem();
+    private void modificaOrdine(){
+    Ordinazione ordinazione = ordinazioniTableView.getSelectionModel().getSelectedItem();
         if (ordinazione == null) {
-            showAlert("Errore", "Seleziona un ordine da modificare.", Alert.AlertType.ERROR);
-            return;
-        }
-
-        try {
-            ordineSelezionato = new OrdinazioneBean();
-            ordineSelezionato.setId(ordinazione.getId());
-            ordineSelezionato.setNomeCliente(ordinazione.getNomeCliente());
-            ordineSelezionato.setNumeroClienti(ordinazione.getNumeroClienti());
-            ordineSelezionato.setTipoOrdine(ordinazione.getTipoOrdine());
-            ordineSelezionato.setInfoTavolo(ordinazione.getInfoTavolo());
-            ordineSelezionato.setStatoOrdine(ordinazione.getStatoOrdine());
-            ordineSelezionato.setOrarioCreazione(ordinazione.getOrarioCreazione());
-
-            SceneLoader.loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
-
-            showAlert("Modifica Completata",
-                    "L'ordine del cliente " + ordineSelezionato.getNomeCliente() + " è stato modificato con successo.",
-                    Alert.AlertType.INFORMATION);
-
-        } catch (Exception e) {
-            showAlert("Errore", "Errore durante il caricamento della schermata di modifica.", Alert.AlertType.ERROR);
-        }
+        showAlert(ERROR_TITLE, "Seleziona un ordine da modificare.", Alert.AlertType.ERROR);
+        return;
     }
 
-    // Metodo per eliminare l'ordine selezionato
+        try {
+        ordineSelezionato = new OrdinazioneBean();
+        ordineSelezionato.setId(ordinazione.getId());
+        ordineSelezionato.setNomeCliente(ordinazione.getNomeCliente());
+        ordineSelezionato.setNumeroClienti(ordinazione.getNumeroClienti());
+        ordineSelezionato.setTipoOrdine(ordinazione.getTipoOrdine());
+        ordineSelezionato.setInfoTavolo(ordinazione.getInfoTavolo());
+        ordineSelezionato.setStatoOrdine(ordinazione.getStatoOrdine());
+        ordineSelezionato.setOrarioCreazione(ordinazione.getOrarioCreazione());
+
+        SceneLoader.loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
+
+    } catch (Exception e) {
+        showAlert(ERROR_TITLE, "Errore durante il caricamento della schermata di modifica.", Alert.AlertType.ERROR);
+    }
+}
+
+
+// Metodo per eliminare l'ordine selezionato
     @FXML
     private void eliminaOrdine() {
         Ordinazione ordinazioneSelezionato = ordinazioniTableView.getSelectionModel().getSelectedItem();
         if (ordinazioneSelezionato == null) {
-            showAlert("Errore", "Seleziona un ordine da eliminare.", Alert.AlertType.ERROR);
+            showAlert(ERROR_TITLE, "Seleziona un ordine da eliminare.", Alert.AlertType.ERROR);
             return;
         }
 
@@ -227,7 +225,7 @@ public class OrdinazioneBoundary {
                 refreshTable();
                 showAlert("Successo", "Ordine eliminato con successo.", Alert.AlertType.INFORMATION);
             } catch (Exception e) {
-                showAlert("Errore", "Errore durante l'eliminazione dell'ordine.", Alert.AlertType.ERROR);
+                showAlert(ERROR_TITLE, "Errore durante l'eliminazione dell'ordine.", Alert.AlertType.ERROR);
             }
         }
     }
