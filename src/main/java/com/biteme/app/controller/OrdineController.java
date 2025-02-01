@@ -7,7 +7,6 @@ import com.biteme.app.entity.Prodotto;
 import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.util.Configuration;
-import com.biteme.app.persistence.OrdineDao;
 import java.util.List;
 import java.util.stream.Collectors;
 

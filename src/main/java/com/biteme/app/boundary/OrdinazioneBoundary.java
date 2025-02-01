@@ -58,15 +58,17 @@ public class OrdinazioneBoundary {
     @FXML
     private TableColumn<Ordinazione, String> statoOrdineColumn;
 
+    private static OrdinazioneBean ordineSelezionato;
+    private final OrdinazioneController ordinazioneController = new OrdinazioneController();
+    private static final String ERROR_TITLE = "Errore";
+
     @FXML
     private Button modificaButton; // Pulsante per modificare l'ordine
 
     @FXML
     private Button eliminaButton; // Pulsante per eliminare l'ordine
 
-    private static OrdinazioneBean ordineSelezionato; // Variabile statica per mantenere l'ordine selezionato
-    private final OrdinazioneController ordinazioneController = new OrdinazioneController();
-    private static final String ERROR_TITLE = "Errore";
+
 
 
 
@@ -171,7 +173,7 @@ public class OrdinazioneBoundary {
         ordinazioneController.creaOrdine(ordinazioneBean);
 
         showAlert("Ordine Creato",
-                "L'ordine è stato creato con successo per il cliente: " + nomeCliente,
+                "L'ordine Ã¨ stato creato con successo per il cliente: " + nomeCliente,
                 Alert.AlertType.INFORMATION);
 
         clearFields();
@@ -183,33 +185,42 @@ public class OrdinazioneBoundary {
         return ordineSelezionato;
     }
 
-    @FXML
-    private void modificaOrdine(){
-    Ordinazione ordinazione = ordinazioniTableView.getSelectionModel().getSelectedItem();
-        if (ordinazione == null) {
-        showAlert(ERROR_TITLE, "Seleziona un ordine da modificare.", Alert.AlertType.ERROR);
-        return;
+    public static void setOrdineSelezionato(OrdinazioneBean ordine) {
+        ordineSelezionato = ordine;
     }
+
+    @FXML
+    private void modificaOrdine() {
+        Ordinazione ordinazione = ordinazioniTableView.getSelectionModel().getSelectedItem();
+        if (ordinazione == null) {
+            showAlert(ERROR_TITLE, "Seleziona un ordine da modificare.", Alert.AlertType.ERROR);
+            return;
+        }
 
         try {
-        ordineSelezionato = new OrdinazioneBean();
-        ordineSelezionato.setId(ordinazione.getId());
-        ordineSelezionato.setNomeCliente(ordinazione.getNomeCliente());
-        ordineSelezionato.setNumeroClienti(ordinazione.getNumeroClienti());
-        ordineSelezionato.setTipoOrdine(ordinazione.getTipoOrdine());
-        ordineSelezionato.setInfoTavolo(ordinazione.getInfoTavolo());
-        ordineSelezionato.setStatoOrdine(ordinazione.getStatoOrdine());
-        ordineSelezionato.setOrarioCreazione(ordinazione.getOrarioCreazione());
+            // Creiamo un nuovo OrdinazioneBean e usiamo il setter statico per impostarlo
+            OrdinazioneBean ordine = new OrdinazioneBean();
+            ordine.setId(ordinazione.getId());
+            ordine.setNomeCliente(ordinazione.getNomeCliente());
+            ordine.setNumeroClienti(ordinazione.getNumeroClienti());
+            ordine.setTipoOrdine(ordinazione.getTipoOrdine());
+            ordine.setInfoTavolo(ordinazione.getInfoTavolo());
+            ordine.setStatoOrdine(ordinazione.getStatoOrdine());
+            ordine.setOrarioCreazione(ordinazione.getOrarioCreazione());
 
-        SceneLoader.loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
+            // Utilizzo del metodo statico per impostare l'ordine selezionato
+            setOrdineSelezionato(ordine);
 
-    } catch (Exception e) {
-        showAlert(ERROR_TITLE, "Errore durante il caricamento della schermata di modifica.", Alert.AlertType.ERROR);
+            // Carichiamo la nuova scena
+            SceneLoader.loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
+
+        } catch (Exception e) {
+            showAlert(ERROR_TITLE, "Errore durante il caricamento della schermata di modifica.", Alert.AlertType.ERROR);
+        }
     }
-}
 
 
-// Metodo per eliminare l'ordine selezionato
+    // Metodo per eliminare l'ordine selezionato
     @FXML
     private void eliminaOrdine() {
         Ordinazione ordinazioneSelezionato = ordinazioniTableView.getSelectionModel().getSelectedItem();

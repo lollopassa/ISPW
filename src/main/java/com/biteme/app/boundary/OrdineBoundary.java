@@ -15,6 +15,7 @@ import javafx.scene.layout.Region;
 import com.biteme.app.util.SceneLoader;
 import com.biteme.app.bean.OrdineBean;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public class OrdineBoundary {
 
@@ -26,13 +27,13 @@ public class OrdineBoundary {
     @FXML
     private Label nomeTavolo; // Etichetta con fx:id="nomeTavolo"
 
-    private String tavoloCorrente; // Nome del tavolo corrente
-
     @FXML
     private VBox riepilogoContenuto; // Contenitore per il riepilogo
 
     @FXML
     private Label totaleOrdine; // Etichetta con fx:id="totaleOrdine"
+
+    private static final String ASPORTO = "Asporto";
 
     public OrdineBoundary() {
         // Costruttore vuoto
@@ -75,12 +76,10 @@ public class OrdineBoundary {
 
         // Controlla se infoTavolo è null o rappresenta un ordine da asporto
         String infoTavolo = ordinazioneBean.getInfoTavolo();
-        if (infoTavolo == null || "Asporto".equalsIgnoreCase(infoTavolo)) {
-            this.tavoloCorrente = "Asporto";
-            this.nomeTavolo.setText("Asporto");
+        if (infoTavolo == null || ASPORTO.equalsIgnoreCase(infoTavolo)) {
+            this.nomeTavolo.setText(ASPORTO);
         } else {
-            this.tavoloCorrente = infoTavolo; // Recupera il nome del tavolo
-            this.nomeTavolo.setText("Tavolo: " + tavoloCorrente);
+            this.nomeTavolo.setText("Tavolo: " + infoTavolo); // Usa direttamente infoTavolo
         }
 
         // Mostra il numero di clienti
@@ -206,22 +205,19 @@ public class OrdineBoundary {
     private int recuperaQuantitaDalRiepilogo(String nomeProdotto) {
 
         for (javafx.scene.Node nodo : riepilogoContenuto.getChildren()) {
-            // Controlla se il nodo è un HBox
-            if (nodo instanceof HBox hbox) {
-                // Controlla se il primo elemento dell'HBox è una label
-                if (hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
-                    String testo = nomeEQuantitaLabel.getText(); // Es. "Pizza Margherita x 2"
+            // Verifica direttamente se il nodo è un HBox e contiene una Label come primo elemento
+            if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
+                String testo = nomeEQuantitaLabel.getText(); // Es. "Pizza Margherita x 2"
 
-                    // Verifica che il testo sia nel formato atteso ("NomeProdotto x Quantità")
-                    if (testo.startsWith(nomeProdotto + " x")) {
-                        try {
-                            // Estrae la quantità dal testo
-                            String[] parti = testo.split(" x ");
-                            return Integer.parseInt(parti[1].trim()); // Converti in intero
-                        } catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
-                            // In caso di errore nel parsing, restituisce 0
-                            return 0;
-                        }
+                // Verifica che il testo sia nel formato atteso ("NomeProdotto x Quantità")
+                if (testo.startsWith(nomeProdotto + " x")) {
+                    try {
+                        // Estrae la quantità dal testo
+                        String[] parti = testo.split(" x ");
+                        return Integer.parseInt(parti[1].trim()); // Converti in intero
+                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
+                        // In caso di errore nel parsing, restituisce 0
+                        return 0;
                     }
                 }
             }
@@ -236,22 +232,18 @@ public class OrdineBoundary {
         List<String> prodotti = new ArrayList<>();
 
         for (javafx.scene.Node nodo : riepilogoContenuto.getChildren()) {
-            // Controlla se il nodo è un HBox
-            if (nodo instanceof HBox hbox) {
-                // Controlla se il primo elemento dell'HBox è una Label
-                if (hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
-                    String testo = nomeEQuantitaLabel.getText(); // Es. "Pizza Margherita x 2"
+            // Verifica direttamente se il nodo è un HBox e il suo primo elemento è una Label
+            if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
+                String testo = nomeEQuantitaLabel.getText(); // Es. "Pizza Margherita x 2"
 
-                    // Verifica che il testo sia nel formato atteso ("NomeProdotto x Quantità")
-                    String[] parti = testo.split(" x ");
-                    if (parti.length > 1) { // Assumiamo che ci sia sempre il formato corretto
-                        String nomeProdotto = parti[0].trim();
-                        prodotti.add(nomeProdotto); // Aggiunge solo il nome del prodotto
-                    }
+                // Verifica che il testo sia nel formato atteso ("NomeProdotto x Quantità")
+                String[] parti = testo.split(" x ");
+                if (parti.length > 1) { // Assumiamo che ci sia sempre il formato corretto
+                    String nomeProdotto = parti[0].trim();
+                    prodotti.add(nomeProdotto); // Aggiunge solo il nome del prodotto
                 }
             }
         }
-
         return prodotti;
     }
 
@@ -430,44 +422,65 @@ public class OrdineBoundary {
 
 
     private void aggiornaRiepilogo(String nomeProdotto, double prezzo, int quantita) {
-        // Trova il prodotto nel riepilogo
-        for (javafx.scene.Node nodo : riepilogoContenuto.getChildren()) {
-            if (nodo instanceof HBox hbox) {
-                // Verifica che il primo nodo sia una Label
-                if (hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
-                    if (nomeEQuantitaLabel.getText().startsWith(nomeProdotto + " x")) {
-
-                        // Estrai la quantità corrente
-                        String[] parti = nomeEQuantitaLabel.getText().split(" x ");
-                        int currentQuantity = Integer.parseInt(parti[1]);
-
-                        // Verifica se la quantità va a 0 o sotto
-                        if (currentQuantity + quantita <= 0) {
-                            // Chiama il metodo per rimuovere
-                            rimuoviDalRiepilogo(nomeProdotto);
-                            return;
-                        }
-
-                        // Aggiorna la quantità e il prezzo
-                        nomeEQuantitaLabel.setText(nomeProdotto + " x " + (currentQuantity + quantita));
-                        Label prezzoLabel = (Label) hbox.getChildren().get(2); // Terzo elemento è il prezzo
-                        prezzoLabel.setText(String.format("%.2f €", prezzo * (currentQuantity + quantita)));
-                        aggiornaTotaleOrdine();
-                        return;
-                    }
-                }
-            }
+        // Cerca e aggiorna l'elemento, se trovato
+        if (aggiornaElementoEsistente(nomeProdotto, prezzo, quantita)) {
+            return;
         }
 
-        // Aggiungere il prodotto nel riepilogo se la quantità è > 0
+        // Aggiungi l'elemento al riepilogo solo se la quantità è > 0
         if (quantita > 0) {
             aggiungiAlRiepilogo(nomeProdotto, prezzo, quantita);
         }
     }
 
+    private boolean aggiornaElementoEsistente(String nomeProdotto, double prezzo, int quantita) {
+        for (javafx.scene.Node nodo : riepilogoContenuto.getChildren()) {
+            if (nodo instanceof HBox hbox) {
+                Label nomeEQuantitaLabel = getNomeEQuantitaLabel(hbox);
+                if (nomeEQuantitaLabel != null && nomeEQuantitaLabel.getText().startsWith(nomeProdotto + " x")) {
+                    int currentQuantity = getQuantitaCorrente(nomeEQuantitaLabel);
+
+                    // Se la nuova quantità va a 0 o sotto, rimuovi
+                    if (currentQuantity + quantita <= 0) {
+                        rimuoviDalRiepilogo(nomeProdotto);
+                        return true;
+                    }
+
+                    // Aggiorna quantità e prezzo
+                    aggiornaQuantitaEPrezzo(hbox, nomeProdotto, prezzo, currentQuantity + quantita);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private Label getNomeEQuantitaLabel(HBox hbox) {
+        if (hbox.getChildren().get(0) instanceof Label label) {
+            return label;
+        }
+        return null;
+    }
+
+    private int getQuantitaCorrente(Label nomeEQuantitaLabel) {
+        String[] parti = nomeEQuantitaLabel.getText().split(" x ");
+        return Integer.parseInt(parti[1]);
+    }
+
+    private void aggiornaQuantitaEPrezzo(HBox hbox, String nomeProdotto, double prezzo, int nuovaQuantita) {
+        Label nomeEQuantitaLabel = (Label) hbox.getChildren().get(0);
+        Label prezzoLabel = (Label) hbox.getChildren().get(2); // Terzo elemento è il prezzo
+
+        nomeEQuantitaLabel.setText(nomeProdotto + " x " + nuovaQuantita);
+        prezzoLabel.setText(String.format("%.2f €", prezzo * nuovaQuantita));
+
+        aggiornaTotaleOrdine();
+    }
+
 
     @FXML
     private void aggiornaTotaleOrdine() {
+        Logger logger = Logger.getLogger(this.getClass().getName());
         double totale = 0.0;
 
         // Calcola il totale solo se ci sono elementi nel riepilogo
@@ -486,7 +499,7 @@ public class OrdineBoundary {
                 try {
                     totale += Double.parseDouble(prezzoTesto);
                 } catch (NumberFormatException e) {
-                    System.err.println("Errore nel formato del prezzo: " + prezzoTesto);
+                    logger.warning("Errore nel formato del prezzo: " + prezzoTesto);
                 }
             }
         }

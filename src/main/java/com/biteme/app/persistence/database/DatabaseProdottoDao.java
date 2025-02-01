@@ -153,9 +153,9 @@ public class DatabaseProdottoDao implements ProdottoDao {
 
             int rowsUpdated = stmt.executeUpdate();
             if (rowsUpdated == 0) {
-                LOGGER.log(Level.WARNING, "Nessun prodotto aggiornato con ID: " + prodotto.getId());
+                LOGGER.log(Level.WARNING, () -> String.format("Nessun prodotto aggiornato con ID: %d", prodotto.getId()));
             } else {
-                LOGGER.log(Level.INFO, "Prodotto aggiornato con successo con ID: " + prodotto.getId());
+                LOGGER.log(Level.INFO, () -> String.format("Prodotto aggiornato con successo con ID: %d", prodotto.getId()));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'aggiornamento del prodotto con ID: " + prodotto.getId());
