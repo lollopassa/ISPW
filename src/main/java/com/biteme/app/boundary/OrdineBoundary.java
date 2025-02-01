@@ -21,6 +21,7 @@ public class OrdineBoundary {
 
     private final OrdineController controller = new OrdineController();
 
+
     @FXML
     private FlowPane flowPaneProdotti; // Pane dove mostreremo i prodotti
 
@@ -58,7 +59,9 @@ public class OrdineBoundary {
 
         // Salva l'ordine utilizzando OrdineController
         OrdineController ordineController = new OrdineController();
-        ordineController.salvaOrdine(ordineBean);
+        OrdinazioneBean ordinazioneBean = OrdinazioneBoundary.getOrdineSelezionato();
+        int ordineId = ordinazioneBean.getId();
+        ordineController.salvaOrdine(ordineBean, ordineId);
 
         // Cambia scena e torna alla schermata di ordinazione
         SceneLoader.loadScene("/com/biteme/app/ordinazione.fxml", "Torna a Ordinazione");
@@ -67,32 +70,84 @@ public class OrdineBoundary {
 
     @FXML
     public void initialize() {
-        // Recupera il bean statico da OrdinazioneBoundary
+        // Recupera l'ordinazione selezionata tramite OrdinazioneBoundary
         OrdinazioneBean ordinazioneBean = OrdinazioneBoundary.getOrdineSelezionato();
 
-        if (ordinazioneBean == null) {
-            throw new IllegalStateException("Nessun ordine selezionato. Impossibile inizializzare la schermata.");
-        }
+        if (ordinazioneBean != null) {
+            // Ottieni l'ID dell'ordine dall'ordinazione selezionata
+            int ordineId = ordinazioneBean.getId();
 
-        // Controlla se infoTavolo è null o rappresenta un ordine da asporto
-        String infoTavolo = ordinazioneBean.getInfoTavolo();
-        if (infoTavolo == null || ASPORTO.equalsIgnoreCase(infoTavolo)) {
-            this.nomeTavolo.setText(ASPORTO);
+            // Carica l'ordine associato a questo ID tramite il controller
+            OrdineBean ordineBean = controller.load(ordineId);
+
+            if (ordineBean != null) {
+                // Controlla se infoTavolo è null o rappresenta un ordine da asporto
+                String infoTavolo = ordinazioneBean.getInfoTavolo();
+                if (infoTavolo == null || ASPORTO.equalsIgnoreCase(infoTavolo)) {
+                    this.nomeTavolo.setText(ASPORTO);
+                } else {
+                    this.nomeTavolo.setText("Tavolo: " + infoTavolo);
+                }
+                caricaProdottiAssociati();
+                // Carica i prodotti e le quantità nel riepilogo
+                caricaProdottiNelRiepilogo(ordineBean);
+            } else {
+                Logger.getLogger(OrdineBoundary.class.getName())
+                        .warning("Nessun ordine trovato con ID: " + ordineId);
+            }
         } else {
-            this.nomeTavolo.setText("Tavolo: " + infoTavolo); // Usa direttamente infoTavolo
+            Logger.getLogger(OrdineBoundary.class.getName())
+                    .warning("Nessuna ordinazione selezionata.");
+        }
+    }
+
+
+    /**
+     * Carica i prodotti e le quantità nel riepilogo utilizzando i dati di OrdineBean.
+     */
+    private void caricaProdottiNelRiepilogo(OrdineBean ordineBean) {
+        // Pulizia iniziale del contenitore per evitare duplicati
+        riepilogoContenuto.getChildren().clear();
+
+        // Recupera i prodotti e le quantità da OrdineBean
+        List<String> prodotti = ordineBean.getProdotti();
+        List<Integer> quantita = ordineBean.getQuantita();
+        List<ProdottoBean> prodottiDisponibili = controller.getTuttiProdotti(); // Ottieni tutti i prodotti disponibili
+
+        // Controllo della coerenza dei dati
+        if (prodotti.size() != quantita.size()) {
+            Logger.getLogger(OrdineBoundary.class.getName())
+                    .warning("I dati del bean ordine sono incoerenti: prodotti e quantità non corrispondono.");
+            return;
         }
 
-        // Mostra il numero di clienti
-        Label numeroClientiLabel = new Label("Numero Clienti: " + ordinazioneBean.getNumeroClienti());
-        numeroClientiLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-        numeroClientiLabel.setAlignment(Pos.CENTER);
+        // Itera su ogni prodotto per aggiungerlo al riepilogo
+        for (int i = 0; i < prodotti.size(); i++) {
+            String nomeProdotto = prodotti.get(i);
+            int quantitaProdotto = quantita.get(i);
 
-        // Aggiungi l'etichetta al FlowPane
-        flowPaneProdotti.getChildren().clear();
-        flowPaneProdotti.getChildren().add(numeroClientiLabel);
+            // Recupera il prezzo del prodotto usando il nome
+            double prezzoProdotto = recuperaPrezzoProdotto(nomeProdotto, prodottiDisponibili);
 
-        // Carica i prodotti associati all'ordine
-        caricaProdottiAssociati();
+            // Aggiunge il prodotto al riepilogo con il prezzo corretto
+            aggiungiAlRiepilogo(nomeProdotto, prezzoProdotto, quantitaProdotto);
+
+        }
+
+        // Aggiorna il totale dell'ordine al termine
+        aggiornaTotaleOrdine();
+    }
+
+    private double recuperaPrezzoProdotto(String nomeProdotto, List<ProdottoBean> prodottiDisponibili) {
+        for (ProdottoBean prodotto : prodottiDisponibili) {
+            if (prodotto.getNome().equalsIgnoreCase(nomeProdotto)) {
+                return prodotto.getPrezzo().doubleValue();
+            }
+        }
+        // Restituisci 0.0 se il prodotto non viene trovato (può essere migliorato con un logging)
+        Logger.getLogger(OrdineBoundary.class.getName())
+                .warning("Prezzo non trovato per il prodotto: " + nomeProdotto);
+        return 0.0;
     }
 
 

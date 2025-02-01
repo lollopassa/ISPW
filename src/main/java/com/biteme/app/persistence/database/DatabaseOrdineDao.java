@@ -42,26 +42,37 @@ public class DatabaseOrdineDao implements OrdineDao {
 
     @Override
     public void store(Ordine ordine) {
-        String query = "INSERT INTO ordine (prodotti, quantita) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            // Convertire la lista in una stringa serializzata
-            stmt.setString(1, String.join(",", ordine.getProdotti()));
-            stmt.setString(2, ordine.getQuantita().toString());
+        String query;
+
+        // Verifica se l'ordine con l'ID esiste già usando il metodo exists
+        if (exists(ordine.getId())) {
+            // Query per aggiornare l'ordine esistente
+            query = "UPDATE ordine SET prodotti = ?, quantita = ? WHERE id = ?";
+        } else {
+            // Query per inserire un nuovo ordine
+            query = "INSERT INTO ordine (id, prodotti, quantita) VALUES (?, ?, ?)";
+        }
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            int parameterIndex = 1;
+
+            if (exists(ordine.getId())) { // Aggiornamento
+                stmt.setString(parameterIndex++, String.join(",", ordine.getProdotti())); // Serializza i prodotti
+                stmt.setString(parameterIndex++, ordine.getQuantita().toString()); // Serializza le quantità
+                stmt.setInt(parameterIndex, ordine.getId()); // WHERE clausola, l'ID
+            } else { // Inserimento
+                stmt.setInt(parameterIndex++, ordine.getId()); // L'ID dell'ordine
+                stmt.setString(parameterIndex++, String.join(",", ordine.getProdotti())); // Serializza i prodotti
+                stmt.setString(parameterIndex, ordine.getQuantita().toString()); // Serializza le quantità
+            }
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Inserimento dell'ordine fallito, nessuna riga aggiunta.");
-            }
-
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    ordine.setId(generatedKeys.getInt(1));
-                } else {
-                    throw new SQLException("Inserimento dell'ordine fallito, nessun ID generato.");
-                }
+                throw new SQLException("Operazione fallita: nessuna riga modificata.");
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il salvataggio dell'ordine");
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il salvataggio/aggiornamento dell'ordine");
+            throw new RuntimeException("Errore durante il salvataggio/aggiornamento dell'ordine", e);
         }
     }
 
@@ -95,18 +106,54 @@ public class DatabaseOrdineDao implements OrdineDao {
         }
     }
 
+    @Override
+    public Ordine getById(Integer id) {
+        String query = "SELECT id, prodotti, quantita FROM ordine WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToOrdine(rs); // Mappa i risultati in un oggetto Ordine
+                } else {
+                    throw new IllegalArgumentException("Ordine con ID " + id + " non trovato"); // ID non trovato
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il caricamento dell'ordine con ID: " + id);
+            throw new RuntimeException("Impossibile recuperare l'ordine con ID " + id, e); // Gestione dell'errore
+        }
+    }
+
+
+
     private Ordine mapResultSetToOrdine(ResultSet rs) throws SQLException {
-        // Ricostruisce i prodotti e le quantitÃ  dalle stringhe serializzate (consulta un eventuale specifico separatore)
+        // Ricostruisce i prodotti dalla stringa serializzata (usa un separatore predefinito)
         List<String> prodotti = List.of(rs.getString("prodotti").split(","));
+
+        // Ricostruisce le quantità
         List<Integer> quantita = new ArrayList<>();
-        for (String q : rs.getString("quantita").replace("[", "").replace("]", "").split(", ")) {
-            quantita.add(Integer.parseInt(q));
+        String quantitaString = rs.getString("quantita").replace("[", "").replace("]", "");
+
+        // Controlla se la stringa non è vuota e non contiene solo spazi
+        if (quantitaString != null && !quantitaString.trim().isEmpty()) {
+            for (String q : quantitaString.split(", ")) {
+                try {
+                    quantita.add(Integer.parseInt(q)); // Prova a fare il parsing
+                } catch (NumberFormatException e) {
+                    // Logga un avviso e salta i valori non validi
+                    LOGGER.log(Level.WARNING, "Valore non valido trovato nella quantità: " + q, e);
+                }
+            }
+        } else {
+            LOGGER.log(Level.WARNING, "La colonna 'quantita' è vuota o non valida per l'ordine con id: " + rs.getInt("id"));
         }
 
+        // Restituisce l'ordine
         return new Ordine(
-                rs.getInt("id"),
-                prodotti,
-                quantita
+                rs.getInt("id"),    // Carica l'ID
+                prodotti,           // Lista dei prodotti
+                quantita            // Lista delle quantità
         );
     }
+
 }

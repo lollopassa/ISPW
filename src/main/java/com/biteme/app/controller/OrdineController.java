@@ -45,15 +45,54 @@ public class OrdineController {
                 .collect(Collectors.toList());
     }
 
-    public void salvaOrdine(OrdineBean ordineBean) {
+    public void salvaOrdine(OrdineBean ordineBean, int id) {
         // Converti OrdineBean in un oggetto Ordine
         Ordine nuovoOrdine = new Ordine(
-                0, // ID generato automaticamente dal database
+                id,
                 ordineBean.getProdotti(), // Lista dei prodotti
-                ordineBean.getQuantita()  // Lista delle quantitÃ
+                ordineBean.getQuantita()  // Lista delle quantità
         );
 
         // Salva l'oggetto Ordine nel database
         ordineDao.store(nuovoOrdine);
     }
+    public OrdineBean load(int idOrdine) {
+        // Recupera l'ordine dalla DAO utilizzando l'ID fornito
+        Ordine ordine = ordineDao.getById(idOrdine);
+
+        if (ordine == null) {
+            throw new IllegalArgumentException("L'ordine con ID " + idOrdine + " non esiste.");
+        }
+
+        // Crea un oggetto OrdineBean per il livello di visualizzazione
+        OrdineBean ordineBean = new OrdineBean();
+        ordineBean.setId(ordine.getId());
+
+        // Supponendo che ordine.getProdotti() restituisca una lista di nomi dei prodotti
+        ordineBean.setProdotti(ordine.getProdotti());
+
+        // Supponendo che ordine.getQuantita() restituisca una lista di quantità per i prodotti
+        ordineBean.setQuantita(ordine.getQuantita());
+
+        return ordineBean;
+    }
+
+    public List<ProdottoBean> getTuttiProdotti() {
+        // Recupera tutti i prodotti da ProdottoDao
+        List<Prodotto> prodotti = prodottoDao.getAll();
+
+        // Converti la lista di Prodotto a ProdottoBean per il livello di visualizzazione
+        return prodotti.stream()
+                .map(prodotto -> {
+                    ProdottoBean prodottoBean = new ProdottoBean();
+                    prodottoBean.setId(prodotto.getId());
+                    prodottoBean.setNome(prodotto.getNome());
+                    prodottoBean.setPrezzo(prodotto.getPrezzo());
+                    prodottoBean.setCategoria(prodotto.getCategoria());
+                    prodottoBean.setDisponibile(prodotto.isDisponibile());
+                    return prodottoBean;
+                })
+                .collect(Collectors.toList());
+    }
+
 }

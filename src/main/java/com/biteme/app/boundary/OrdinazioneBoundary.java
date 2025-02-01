@@ -173,7 +173,7 @@ public class OrdinazioneBoundary {
         ordinazioneController.creaOrdine(ordinazioneBean);
 
         showAlert("Ordine Creato",
-                "L'ordine Ã¨ stato creato con successo per il cliente: " + nomeCliente,
+                "L'ordine è stato creato con successo per il cliente: " + nomeCliente,
                 Alert.AlertType.INFORMATION);
 
         clearFields();

@@ -142,6 +142,23 @@ public class DatabaseProdottoDao implements ProdottoDao {
     }
 
     @Override
+    public List<Prodotto> getAll() {
+        List<Prodotto> prodotti = new ArrayList<>();
+        String query = "SELECT * FROM prodotti"; // Supponiamo che la tabella si chiami 'prodotti'
+
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                Prodotto prodotto = mapResultSetToProdotto(rs);
+                prodotti.add(prodotto);
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Errore durante il recupero dei prodotti", ex);
+        }
+
+        return prodotti;
+    }
+
+    @Override
     public void update(Prodotto prodotto) {
         String query = "UPDATE prodotti SET nome = ?, prezzo = ?, categoria = ?, disponibile = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {

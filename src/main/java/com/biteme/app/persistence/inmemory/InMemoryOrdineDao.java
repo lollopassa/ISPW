@@ -21,13 +21,14 @@ public class InMemoryOrdineDao implements OrdineDao {
 
     @Override
     public void store(Ordine ordine) {
-        // Se l'ordine ha già un ID, effettua un aggiornamento
         if (ordine.getId() > 0) {
-            delete(ordine.getId());
+            // Se l'ID è già impostato, verifica che esista già un ordine con quell'ID e aggiorna
+            delete(ordine.getId()); // Rimuovi un eventuale ordine con lo stesso ID
         } else {
-            // Altrimenti assegna un nuovo ID unico
+            // Se l'ID non è impostato, genera un nuovo ID unico
             ordine.setId(currentId++);
         }
+        // Aggiungi l'ordine (nuovo o aggiornato) alla lista
         ordini.add(ordine);
     }
 
@@ -41,5 +42,14 @@ public class InMemoryOrdineDao implements OrdineDao {
     public boolean exists(Integer key) {
         // Controlla se esiste un ordine con l'ID specificato
         return ordini.stream().anyMatch(o -> o.getId() == key);
+    }
+
+    @Override
+    public Ordine getById(Integer id) {
+        // Cerca un ordine tramite il suo ID, senza restituire un Optional
+        return ordini.stream()
+                .filter(o -> o.getId() == id)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Ordine con ID " + id + " non trovato"));
     }
 }

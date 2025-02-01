@@ -3,6 +3,7 @@ package com.biteme.app.persistence.inmemory;
 import com.biteme.app.entity.Prodotto;
 import com.biteme.app.persistence.ProdottoDao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,6 +60,11 @@ public class InMemoryProdottoDao implements ProdottoDao {
         return prodotti.stream()
                 .filter(p -> p.isDisponibile() == disponibilita)
                 .toList();
+    }
+
+    @Override
+    public List<Prodotto> getAll() {
+        return new ArrayList<>(prodotti); // Restituiamo una copia della lista per evitare modifiche non desiderate
     }
 
     @Override
