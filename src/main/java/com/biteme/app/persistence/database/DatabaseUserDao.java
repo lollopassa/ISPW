@@ -27,19 +27,28 @@ public class DatabaseUserDao implements UserDao {
 
     @Override
     public Optional<User> load(String identifier) {
-        String query = "SELECT username, email, passwordHash, ruolo FROM user WHERE username = ? OR email = ?";
+        // Modifica la query SQL per includere is_google_user
+        String query = "SELECT username, email, passwordHash, ruolo, is_google_user FROM user WHERE username = ? OR email = ?";
+
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, identifier);
             stmt.setString(2, identifier);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     User user = new User(rs.getString("username"));
                     user.setEmail(rs.getString("email"));
                     user.setPassword(rs.getString("passwordHash"));
+
+                    // Imposta lo stato Google dell'utente
+                    user.setGoogleUser(rs.getBoolean("is_google_user"));
+
+                    // Imposta il ruolo
                     String ruolo = rs.getString("ruolo");
                     if (ruolo != null) {
                         user.setRuolo(UserRole.fromString(ruolo));
                     }
+
                     return Optional.of(user);
                 }
             }
@@ -48,7 +57,6 @@ public class DatabaseUserDao implements UserDao {
         }
         return Optional.empty();
     }
-
     @Override
     public void store(User user) {
         try {
@@ -68,12 +76,13 @@ public class DatabaseUserDao implements UserDao {
             String hashedPassword = HashingUtil.hashPassword(user.getPassword());
             user.setPassword(hashedPassword);
 
-            String query = "INSERT INTO user (username, email, passwordHash, ruolo) VALUES (?, ?, ?, ?)";
+            String query = "INSERT INTO user (username, email, passwordHash, ruolo, is_google_user) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.setString(1, user.getUsername());
                 stmt.setString(2, user.getEmail());
-                stmt.setString(3, hashedPassword);
+                stmt.setString(3, user.getPassword());
                 stmt.setString(4, user.getRuolo().name());
+                stmt.setBoolean(5, user.isGoogleUser());
                 stmt.executeUpdate();
                 LOGGER.log(Level.INFO, "Utente {0} registrato con successo", user.getUsername());
             }

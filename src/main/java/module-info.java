@@ -5,10 +5,12 @@ module demo {
 
     // Per InputStream e altre classi di sistema
 
-    requires java.sql;
-
-    requires java.logging;
-    requires java.desktop; // Aggiunge il supporto per il logging
+    requires java.desktop;
+    requires jdk.httpserver;
+    requires com.google.gson;
+    requires google.api.client;
+    requires com.google.api.client;
+    requires com.google.api.client.json.gson; // Aggiunge il supporto per il logging
     // Aggiungi altre dipendenze necessarie, se applicabile
 
     // Aprire il pacchetto FXML per JavaFX

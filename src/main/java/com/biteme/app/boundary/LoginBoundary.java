@@ -2,6 +2,7 @@ package com.biteme.app.boundary;
 
 import com.biteme.app.bean.LoginBean;
 import com.biteme.app.controller.LoginController;
+import com.biteme.app.entity.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
@@ -32,6 +33,17 @@ public class LoginBoundary {
         } else {
             // Credenziali non valide
             showAlert("Errore", "Credenziali non valide!", Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void onGoogleLoginButtonClick() {
+        try {
+            User user = loginController.authenticateWithGoogle();
+            showAlert("Benvenuto", "Accesso effettuato come " + user.getUsername(), Alert.AlertType.INFORMATION);
+            loginController.navigateToHome();
+        } catch (Exception e) {
+            showAlert("Errore Google", e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 

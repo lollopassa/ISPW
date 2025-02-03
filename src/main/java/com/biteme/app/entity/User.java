@@ -6,6 +6,7 @@ public class User {
     private String email;
     private String password;
     private UserRole ruolo; // Uso diretto di UserRole
+    private boolean googleUser;
 
     // Costruttori
     public User(String username) {
@@ -55,10 +56,12 @@ public class User {
         this.ruolo = ruolo;
     }
 
-    // Metodo per impostare il ruolo a partire da una stringa
-    public void setRoleByString(String roleName) {
-        this.ruolo = UserRole.fromString(roleName);
+    public boolean isGoogleUser() {
+        return googleUser;
     }
 
+    public void setGoogleUser(boolean googleUser) {
+        this.googleUser = googleUser;
+    }
 
 }

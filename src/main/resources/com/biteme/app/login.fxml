@@ -41,6 +41,18 @@
       <Label fx:id="createAccountMessage" layoutX="931.0" layoutY="564.0" style="-fx-font-size: 18;" text="Non hai un account?" textFill="#A1A1A1" />
       <Button fx:id="signupButton" layoutX="1097.0" layoutY="557.0" style="-fx-font-size: 18; -fx-background-color: transparent; -fx-text-fill: #3D55A1; -fx-border-color: transparent; -fx-cursor: hand;" text="Registrati" onAction="#onSignupButtonClick" underline="true" />
 
-
+      <Button fx:id="googleLoginButton" layoutX="865.0" layoutY="570.0" prefHeight="50.0" prefWidth="460.0"
+              style="-fx-background-color: #4285F4; -fx-text-fill: WHITE; -fx-font-size: 20; -fx-font-weight: bold; -fx-cursor: hand;"
+              text="Accedi con Google" onAction="#onGoogleLoginButtonClick">
+         <graphic>
+            <ImageView fitHeight="30.0" fitWidth="30.0">
+               <image>
+                  <Image url="@../../../images/google.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
    </children>
+
+
 </Pane>
