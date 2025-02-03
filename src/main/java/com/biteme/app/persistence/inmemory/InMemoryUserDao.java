@@ -31,8 +31,12 @@ public class InMemoryUserDao implements UserDao {
             user.setRuolo(UserRole.CAMERIERE);
         }
 
-        String hashedPassword = HashingUtil.hashPassword(user.getPassword());
-        user.setPassword(hashedPassword);
+        // Gestione utente Google
+        if (!user.isGoogleUser()) {
+            String hashedPassword = HashingUtil.hashPassword(user.getPassword());
+            user.setPassword(hashedPassword);
+        }
+
         users.put(user.getUsername(), user); // Usa ancora username come chiave
     }
 

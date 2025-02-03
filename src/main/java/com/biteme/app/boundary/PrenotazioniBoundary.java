@@ -351,13 +351,14 @@ public class PrenotazioniBoundary {
         calendarioGrid.getChildren().removeIf(node -> GridPane.getRowIndex(node) != null && GridPane.getRowIndex(node) > 0);
 
         // Calcolo della distribuzione dei giorni
-        LocalDate primoGiorno = mese.atDay(1);
+        LocalDate primoGiorno = mese.atDay(1); // Il primo giorno del mese
         int primoGiornoSettimana = primoGiorno.getDayOfWeek().getValue() % 7; // Con giorno Lunedì come primo giorno della settimana
-        int giorniNelMese = mese.lengthOfMonth();
+        int giorniNelMese = mese.lengthOfMonth(); // Giorni totali nel mese
+        LocalDate oggi = LocalDate.now(); // Data di oggi
 
         // Aggiunge i giorni del mese al calendario
         int giornoCorrente = 1;
-        for (int riga = 1; riga <= 6; riga++) { // Massimo 6 righe per un mese
+        for (int riga = 1; riga <= 6; riga++) { // Max 6 righe per un mese
             for (int colonna = 0; colonna < 7; colonna++) {
                 if (giornoCorrente > giorniNelMese) {
                     return; // Fine del mese
@@ -367,12 +368,18 @@ public class PrenotazioniBoundary {
                     continue; // Salta le celle prima del primo giorno del mese
                 }
 
-                LocalDate data = mese.atDay(giornoCorrente); // Data attuale del ciclo
+                LocalDate data = mese.atDay(giornoCorrente); // Calcola la data del giorno corrente
                 Label giorno = new Label(String.valueOf(giornoCorrente));
-                giorno.setStyle(DAY_LABEL_DEFAULT_STYLE); // Stile per i giorni non evidenziati
 
-                // Aggiungi un callback per selezionare il giorno
-                giorno.setOnMouseClicked(event -> selezionaGiorno(data, giorno));
+                if (data.isBefore(oggi)) {
+                    // Giorni precedenti a oggi (grigi e disabilitati)
+                    giorno.setStyle("-fx-font-size: 14; -fx-alignment: center; -fx-border-color: lightgray; -fx-border-width: 0.5;" +
+                            "-fx-background-color: lightgray; -fx-text-fill: darkgray; -fx-cursor: default;");
+                } else {
+                    // Giorni disponibili (cliccabili)
+                    giorno.setStyle(DAY_LABEL_DEFAULT_STYLE);
+                    giorno.setOnMouseClicked(event -> selezionaGiorno(data, giorno)); // Callback per selezionare il giorno
+                }
 
                 // Imposta dimensioni uniformi per i giorni del mese
                 giorno.setPrefSize(40, 40);

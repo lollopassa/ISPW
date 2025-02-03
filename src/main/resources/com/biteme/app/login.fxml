@@ -25,25 +25,8 @@
       <!-- Titolo - Bentornato -->
       <Label fx:id="bentornatoLabel" layoutX="936.0" layoutY="55.0" style="-fx-font-size: 48; -fx-font-weight: bold;" text="Bentornato 👋" textFill="#3D55A1" />
 
-
-      <!-- Campo email o nome utente -->
-      <Label layoutX="866.0" layoutY="276.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Email o Nome Utente:" textFill="#3D55A1" />
-      <TextField fx:id="emailOrUsernameTextField" layoutX="866.0" layoutY="306.0" prefHeight="50.0" prefWidth="460.0" style="-fx-font-size: 16;" promptText="Inserisci qui la tua email o nome utente" />
-
-      <!-- Campo password -->
-      <Label layoutX="866.0" layoutY="378.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Password:" textFill="#3D55A1" />
-      <PasswordField fx:id="passwordTextField" layoutX="866.0" layoutY="408.0" prefHeight="50.0" prefWidth="460.0" style="-fx-font-size: 16;" promptText="Inserisci la tua password" />
-
-      <!-- Bottone Accedi -->
-      <Button fx:id="loginButton" layoutX="865.0" layoutY="502.0" prefHeight="50.0" prefWidth="460.0" style="-fx-background-color: #3D55A1; -fx-text-fill: WHITE; -fx-font-size: 20; -fx-font-weight: bold; -fx-cursor: hand;" text="Accedi" onAction="#onLoginButtonClick" />
-
-      <!-- Non hai un account -->
-      <Label fx:id="createAccountMessage" layoutX="931.0" layoutY="564.0" style="-fx-font-size: 18;" text="Non hai un account?" textFill="#A1A1A1" />
-      <Button fx:id="signupButton" layoutX="1097.0" layoutY="557.0" style="-fx-font-size: 18; -fx-background-color: transparent; -fx-text-fill: #3D55A1; -fx-border-color: transparent; -fx-cursor: hand;" text="Registrati" onAction="#onSignupButtonClick" underline="true" />
-
-      <Button fx:id="googleLoginButton" layoutX="865.0" layoutY="570.0" prefHeight="50.0" prefWidth="460.0"
-              style="-fx-background-color: #4285F4; -fx-text-fill: WHITE; -fx-font-size: 20; -fx-font-weight: bold; -fx-cursor: hand;"
-              text="Accedi con Google" onAction="#onGoogleLoginButtonClick">
+      <!-- Bottone Google Login -->
+      <Button fx:id="googleLoginButton" layoutX="864.0" layoutY="206.0" onAction="#onGoogleLoginButtonClick" prefHeight="50.0" prefWidth="460.0" style="-fx-background-color: #3D55A1; -fx-text-fill: WHITE; -fx-font-size: 20; -fx-font-weight: bold; -fx-cursor: hand;" text="Accedi con Google">
          <graphic>
             <ImageView fitHeight="30.0" fitWidth="30.0">
                <image>
@@ -52,7 +35,24 @@
             </ImageView>
          </graphic>
       </Button>
-   </children>
 
+      <!-- Testo sotto il Bottone Google Login -->
+      <Label layoutX="992.0" layoutY="289.0" style="-fx-font-size: 18;" text="Oppure accedi con l'email" textFill="#A1A1A1" />
+
+      <!-- Campo email o nome utente -->
+      <Label layoutX="865.0" layoutY="334.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Email o Nome Utente:" textFill="#3D55A1" />
+      <TextField fx:id="emailOrUsernameTextField" layoutX="865.0" layoutY="364.0" prefHeight="50.0" prefWidth="460.0" promptText="Inserisci qui la tua email o nome utente" style="-fx-font-size: 16;" />
+
+      <!-- Campo password -->
+      <Label layoutX="865.0" layoutY="436.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Password:" textFill="#3D55A1" />
+      <PasswordField fx:id="passwordTextField" layoutX="865.0" layoutY="466.0" prefHeight="50.0" prefWidth="460.0" promptText="Inserisci la tua password" style="-fx-font-size: 16;" />
+
+      <!-- Bottone Accedi -->
+      <Button fx:id="loginButton" layoutX="864.0" layoutY="560.0" onAction="#onLoginButtonClick" prefHeight="50.0" prefWidth="460.0" style="-fx-background-color: #3D55A1; -fx-text-fill: WHITE; -fx-font-size: 20; -fx-font-weight: bold; -fx-cursor: hand;" text="Accedi" />
+
+      <!-- Non hai un account -->
+      <Label fx:id="createAccountMessage" layoutX="930.0" layoutY="622.0" style="-fx-font-size: 18;" text="Non hai un account?" textFill="#A1A1A1" />
+      <Button fx:id="signupButton" layoutX="1096.0" layoutY="615.0" onAction="#onSignupButtonClick" style="-fx-font-size: 18; -fx-background-color: transparent; -fx-text-fill: #3D55A1; -fx-border-color: transparent; -fx-cursor: hand;" text="Registrati" underline="true" />
+   </children>
 
 </Pane>
