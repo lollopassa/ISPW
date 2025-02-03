@@ -1,5 +1,6 @@
 package com.biteme.app.bean;
 
+import com.biteme.app.entity.StatoOrdine;
 import com.biteme.app.entity.TipoOrdine;
 
 public class OrdinazioneBean {
@@ -9,7 +10,7 @@ public class OrdinazioneBean {
     private String numeroClienti; // VARCHAR
     private TipoOrdine tipoOrdine; // VARCHAR
     private String infoTavolo; // VARCHAR
-    private String statoOrdine; // VARCHAR
+    private StatoOrdine statoOrdine; // Enum per lo stato dell'ordine
     private String orarioCreazione; // VARCHAR
 
     // Getter e Setter
@@ -53,11 +54,11 @@ public class OrdinazioneBean {
         this.infoTavolo = infoTavolo;
     }
 
-    public String getStatoOrdine() {
+    public StatoOrdine getStatoOrdine() {
         return statoOrdine;
     }
 
-    public void setStatoOrdine(String statoOrdine) {
+    public void setStatoOrdine(StatoOrdine statoOrdine) {
         this.statoOrdine = statoOrdine;
     }
 

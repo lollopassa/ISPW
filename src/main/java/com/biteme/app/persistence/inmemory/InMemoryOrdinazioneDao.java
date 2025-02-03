@@ -2,7 +2,7 @@ package com.biteme.app.persistence.inmemory;
 
 import com.biteme.app.entity.Ordinazione;
 import com.biteme.app.persistence.OrdinazioneDao;
-
+import com.biteme.app.entity.StatoOrdine;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,5 +48,19 @@ public class InMemoryOrdinazioneDao implements OrdinazioneDao {
     public List<Ordinazione> getAll() {
         // Ritorna la lista di tutti gli ordini
         return ordinazioni;
+    }
+
+    @Override
+    public void aggiornaStato(int id, StatoOrdine nuovoStato) {
+        // Trova l'ordinazione con l'ID specificato
+        ordinazioni.stream()
+                .filter(o -> o.getId() == id) // Cerca un'ordinazione corrispondente all'ID
+                .findFirst() // Ritorna la prima corrispondenza (se esiste)
+                .ifPresentOrElse(
+                        ordinazione -> ordinazione.setStatoOrdine(nuovoStato), // Aggiorna lo stato
+                        () -> {
+                            throw new IllegalArgumentException("Ordinazione con ID " + id + " non trovata.");
+                        }
+                );
     }
 }

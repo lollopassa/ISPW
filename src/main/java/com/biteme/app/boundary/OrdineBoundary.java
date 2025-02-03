@@ -2,7 +2,10 @@ package com.biteme.app.boundary;
 
 import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.bean.ProdottoBean;
+import com.biteme.app.controller.OrdinazioneController;
 import com.biteme.app.controller.OrdineController;
+import com.biteme.app.entity.StatoOrdine;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -20,7 +23,7 @@ import java.util.logging.Logger;
 public class OrdineBoundary {
 
     private final OrdineController controller = new OrdineController();
-
+    private final OrdinazioneController ordinazioneController = new OrdinazioneController();
 
     @FXML
     private FlowPane flowPaneProdotti; // Pane dove mostreremo i prodotti
@@ -42,34 +45,36 @@ public class OrdineBoundary {
 
 
     @FXML
-    private void handleIndietro() {
-        // Recupera i prodotti dal riepilogo
-        List<String> prodotti = recuperaProdottiDalRiepilogo();
-        List<Integer> quantita = new ArrayList<>();
+    private void handleSalva() {
+        // Ottieni l'ID dell'ordine selezionato e salva l'ordine con stato IN_CORSO
+        int ordineId = ordinazioneController.getIdOrdineSelezionato();
+        controller.salvaOrdineEStato(ordineId, StatoOrdine.IN_CORSO);
+        ordinazioneController.cambiaASchermataOrdinazione();
+    }
 
-        // Usa i prodotti per recuperare le quantità corrispondenti
-        for (String prodotto : prodotti) {
-            quantita.add(recuperaQuantitaDalRiepilogo(prodotto));
-        }
+    @FXML
+    public void handleCheckout(ActionEvent actionEvent) {
+        // Ottieni l'ID dell'ordine selezionato e salva l'ordine con stato COMPLETATO
+        int ordineId = ordinazioneController.getIdOrdineSelezionato();
+        controller.salvaOrdineEStato(ordineId, StatoOrdine.COMPLETATO);
+        ordinazioneController.cambiaASchermataOrdinazione();
+    }
 
-        // Crea un oggetto OrdineBean e imposta i prodotti e le quantità
-        OrdineBean ordineBean = new OrdineBean();
-        ordineBean.setProdotti(prodotti);
-        ordineBean.setQuantita(quantita);
-
-        // Salva l'ordine utilizzando OrdineController
-        OrdineController ordineController = new OrdineController();
-        OrdinazioneBean ordinazioneBean = OrdinazioneBoundary.getOrdineSelezionato();
-        int ordineId = ordinazioneBean.getId();
-        ordineController.salvaOrdine(ordineBean, ordineId);
-
+    @FXML
+    private void handleIndietro(){
         // Cambia scena e torna alla schermata di ordinazione
         SceneLoader.loadScene("/com/biteme/app/ordinazione.fxml", "Torna a Ordinazione");
+
     }
+
 
 
     @FXML
     public void initialize() {
+
+        // Configura il riferimento riepilogoContenuto nel controller
+        controller.setRiepilogoContenuto(this.riepilogoContenuto);
+
         // Recupera l'ordinazione selezionata tramite OrdinazioneBoundary
         OrdinazioneBean ordinazioneBean = OrdinazioneBoundary.getOrdineSelezionato();
 
@@ -88,9 +93,13 @@ public class OrdineBoundary {
                 } else {
                     this.nomeTavolo.setText("Tavolo: " + infoTavolo);
                 }
+
+                // Carica i prodotti e i dati associati
                 caricaProdottiAssociati();
-                // Carica i prodotti e le quantità nel riepilogo
                 caricaProdottiNelRiepilogo(ordineBean);
+            } else {
+                Logger.getLogger(OrdineBoundary.class.getName())
+                        .severe("OrdineBean non trovato per l'ID: " + ordineId);
             }
         } else {
             Logger.getLogger(OrdineBoundary.class.getName())
@@ -99,9 +108,6 @@ public class OrdineBoundary {
     }
 
 
-    /**
-     * Carica i prodotti e le quantità nel riepilogo utilizzando i dati di OrdineBean.
-     */
     private void caricaProdottiNelRiepilogo(OrdineBean ordineBean) {
         // Pulizia iniziale del contenitore per evitare duplicati
         riepilogoContenuto.getChildren().clear();
@@ -111,12 +117,6 @@ public class OrdineBoundary {
         List<Integer> quantita = ordineBean.getQuantita();
         List<ProdottoBean> prodottiDisponibili = controller.getTuttiProdotti(); // Ottieni tutti i prodotti disponibili
 
-        // Controllo della coerenza dei dati
-        if (prodotti.size() != quantita.size()) {
-            Logger.getLogger(OrdineBoundary.class.getName())
-                    .warning("I dati del bean ordine sono incoerenti: prodotti e quantità non corrispondono.");
-            return;
-        }
 
         // Itera su ogni prodotto per aggiungerlo al riepilogo
         for (int i = 0; i < prodotti.size(); i++) {
@@ -145,10 +145,6 @@ public class OrdineBoundary {
     }
 
 
-    /**
-     * Metodo per caricare dinamicamente i prodotti associati all'ordine.
-     * Recupera i prodotti tramite OrdineController e li aggiunge alla UI.
-     */
     private void caricaProdottiAssociati() {
         // Usa il controller per ottenere i prodotti per il tavolo corrente
         List<ProdottoBean> prodotti = controller.getProdottiByCategoria("Tutti"); // Inserisci una categoria generica o altro criterio
@@ -174,57 +170,37 @@ public class OrdineBoundary {
         }
     }
 
-    /**
-     * Metodo per gestire le bevande.
-     */
+
     @FXML
     private void handleCategoriaBevande() {
         caricaProdotti("Bevande");
     }
 
-    /**
-     * Metodo per gestire gli antipasti.
-     */
     @FXML
     private void handleCategoriaAntipasti() {
         caricaProdotti("Antipasti");
     }
 
-    /**
-     * Metodo per gestire le pizze.
-     */
     @FXML
     private void handleCategoriaPizze() {
         caricaProdotti("Pizze");
     }
 
-    /**
-     * Metodo per gestire i primi piatti.
-     */
     @FXML
     private void handleCategoriaPrimiPiatti() {
         caricaProdotti("Primi");
     }
 
-    /**
-     * Metodo per gestire i secondi piatti.
-     */
     @FXML
     private void handleCategoriaSecondiPiatti() {
         caricaProdotti("Secondi");
     }
 
-    /**
-     * Metodo per gestire i contorni.
-     */
     @FXML
     private void handleCategoriaContorni() {
         caricaProdotti("Contorni");
     }
 
-    /**
-     * Metodo per gestire i dolci.
-     */
     @FXML
     private void handleCategoriaDolci() {
         caricaProdotti("Dolci");
@@ -251,52 +227,6 @@ public class OrdineBoundary {
         }
     }
 
-    private int recuperaQuantitaDalRiepilogo(String nomeProdotto) {
-
-        for (javafx.scene.Node nodo : riepilogoContenuto.getChildren()) {
-            // Verifica direttamente se il nodo è un HBox e contiene una Label come primo elemento
-            if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
-                String testo = nomeEQuantitaLabel.getText(); // Es. "Pizza Margherita x 2"
-
-                // Verifica che il testo sia nel formato atteso ("NomeProdotto x Quantità")
-                if (testo.startsWith(nomeProdotto + " x")) {
-                    try {
-                        // Estrae la quantità dal testo
-                        String[] parti = testo.split(" x ");
-                        return Integer.parseInt(parti[1].trim()); // Converti in intero
-                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
-                        // In caso di errore nel parsing, restituisce 0
-                        return 0;
-                    }
-                }
-            }
-        }
-
-        // Se il prodotto non è trovato nel riepilogo, restituisce 0 (quantità iniziale)
-        return 0;
-    }
-
-
-    private List<String> recuperaProdottiDalRiepilogo() {
-        List<String> prodotti = new ArrayList<>();
-
-        for (javafx.scene.Node nodo : riepilogoContenuto.getChildren()) {
-            // Verifica direttamente se il nodo è un HBox e il suo primo elemento è una Label
-            if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
-                String testo = nomeEQuantitaLabel.getText(); // Es. "Pizza Margherita x 2"
-
-                // Verifica che il testo sia nel formato atteso ("NomeProdotto x Quantità")
-                String[] parti = testo.split(" x ");
-                if (parti.length > 1) { // Assumiamo che ci sia sempre il formato corretto
-                    String nomeProdotto = parti[0].trim();
-                    prodotti.add(nomeProdotto); // Aggiunge solo il nome del prodotto
-                }
-            }
-        }
-        return prodotti;
-    }
-
-
     private VBox creaBoxProdotto(ProdottoBean prodotto) {
         VBox boxProdotto = new VBox(10); // Spaziatura di 10px
         boxProdotto.setAlignment(Pos.CENTER); // Allineato centralmente
@@ -307,8 +237,8 @@ public class OrdineBoundary {
         // Nome del prodotto
         Label labelNome = creaLabelNome(prodotto.getNome());
 
-        // Recupera l'eventuale quantità dal riepilogo
-        int quantitaDalRiepilogo = recuperaQuantitaDalRiepilogo(prodotto.getNome());
+        // Recupera l'eventuale quantità dal riepilogo usando il controller
+        int quantitaDalRiepilogo = controller.recuperaQuantitaDalRiepilogo(prodotto.getNome()); // Utilizzo dell'istanza di OrdineController
 
         // Creazione dell'etichetta "Quantità:"
         Label labelQuantitaText = new Label("Quantità:");
@@ -338,7 +268,7 @@ public class OrdineBoundary {
         controlloQuantita.setAlignment(Pos.CENTER); // Centra gli elementi
 
         // Recupera l'eventuale quantità già presente nel riepilogo
-        int quantitaIniziale = recuperaQuantitaDalRiepilogo(prodotto.getNome());
+        int quantitaIniziale = controller.recuperaQuantitaDalRiepilogo(prodotto.getNome());
 
         // Crea una sola Label per rappresentare il contatore
         Label quantitaLabel = creaLabelQuantitaContatore(quantitaIniziale);
@@ -556,6 +486,7 @@ public class OrdineBoundary {
         // Imposta il valore aggiornato
         totaleOrdine.setText(String.format("Totale: €%.2f", totale));
     }
+
 
 
 }

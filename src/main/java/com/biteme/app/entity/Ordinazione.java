@@ -7,18 +7,18 @@ public class Ordinazione {
     private String numeroClienti; // VARCHAR (lasciato così com'è)
     private TipoOrdine tipoOrdine; // VARCHAR
     private String infoTavolo; // VARCHAR
-    private String statoOrdine; // VARCHAR
+    private StatoOrdine statoOrdine; // Enum StatoOrdine
     private String orarioCreazione; // VARCHAR
 
     // Costruttore completo
     public Ordinazione(int id, String nomeCliente, String numeroClienti, TipoOrdine tipoOrdine,
-                       String infoTavolo, String statoOrdine, String orarioCreazione) {
+                       String infoTavolo, StatoOrdine statoOrdine, String orarioCreazione) {
         this.id = id;
         this.nomeCliente = nomeCliente;
         this.numeroClienti = numeroClienti;
         this.tipoOrdine = tipoOrdine;
         this.infoTavolo = infoTavolo;
-        this.statoOrdine = statoOrdine;
+        this.statoOrdine = statoOrdine; // Cambiato a StatoOrdine
         this.orarioCreazione = orarioCreazione;
     }
 
@@ -63,11 +63,11 @@ public class Ordinazione {
         this.infoTavolo = infoTavolo;
     }
 
-    public String getStatoOrdine() {
+    public StatoOrdine getStatoOrdine() {
         return statoOrdine;
     }
 
-    public void setStatoOrdine(String statoOrdine) {
+    public void setStatoOrdine(StatoOrdine statoOrdine) {
         this.statoOrdine = statoOrdine;
     }
 

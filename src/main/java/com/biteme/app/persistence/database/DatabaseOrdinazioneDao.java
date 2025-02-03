@@ -3,14 +3,15 @@ package com.biteme.app.persistence.database;
 import com.biteme.app.entity.Ordinazione;
 import com.biteme.app.exception.DatabaseConfigurationException;
 import com.biteme.app.persistence.OrdinazioneDao;
+import com.biteme.app.entity.StatoOrdine;
 import com.biteme.app.entity.TipoOrdine;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 public class DatabaseOrdinazioneDao implements OrdinazioneDao {
 
@@ -49,7 +50,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
             stmt.setString(2, ordinazione.getNumeroClienti() == null ? null : ordinazione.getNumeroClienti());
             stmt.setString(3, ordinazione.getTipoOrdine().name());
             stmt.setString(4, ordinazione.getInfoTavolo() == null ? null : ordinazione.getInfoTavolo());
-            stmt.setString(5, ordinazione.getStatoOrdine() == null ? null : ordinazione.getStatoOrdine());
+            stmt.setString(5, ordinazione.getStatoOrdine().name()); // Usa .name() per la stringa
             stmt.setString(6, ordinazione.getOrarioCreazione() == null ? null : ordinazione.getOrarioCreazione());
 
             int affectedRows = stmt.executeUpdate();
@@ -115,6 +116,24 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
         return ordini;
     }
 
+    @Override
+    public void aggiornaStato(int id, StatoOrdine nuovoStato) {
+        String query = "UPDATE Ordinazione SET statoOrdine = ? WHERE id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, nuovoStato.name()); // Converte lo stato in stringa
+            preparedStatement.setInt(2, id); // Imposta l'ID dell'ordinazione
+
+            int rowsUpdated = preparedStatement.executeUpdate();
+            if (rowsUpdated == 0) {
+                LOGGER.log(Level.WARNING, "Nessuna ordinazione trovata con ID: " + id);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Errore nell'aggiornare lo stato dell'ordinazione con ID: " + id, e);
+            throw new DatabaseConfigurationException("Errore durante l'aggiornamento dello stato dell'ordinazione.", e);
+        }
+    }
+
     private Ordinazione mapResultSetToOrdinazione(ResultSet rs) throws SQLException {
         return new Ordinazione(
                 rs.getInt("id"),
@@ -122,8 +141,8 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
                 rs.getString("numeroClienti"),
                 TipoOrdine.valueOf(rs.getString("tipoOrdine").toUpperCase()),
                 rs.getString("infoTavolo"),
-                rs.getString("statoOrdine"),
-                rs.getString("orarioCreazione") // Ora Ã¨ gestito come String
+                StatoOrdine.valueOf(rs.getString("statoOrdine").toUpperCase()), // Conversione a enum
+                rs.getString("orarioCreazione")
         );
     }
 }
