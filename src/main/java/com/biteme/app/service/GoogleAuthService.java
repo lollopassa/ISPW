@@ -1,9 +1,13 @@
 package com.biteme.app.service;
 
 import com.biteme.app.entity.User;
+import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.persistence.UserDao;
 import com.biteme.app.util.GoogleAuthUtility;
 import com.biteme.app.util.HashingUtil;
+
+import java.security.SecureRandom;
+import java.util.Base64;
 
 public class GoogleAuthService {
 
@@ -13,10 +17,10 @@ public class GoogleAuthService {
         this.userDao = userDao;
     }
 
-    public User authenticateWithGoogle() throws Exception {
+    public User authenticateWithGoogle() throws GoogleAuthException {
         GoogleAuthUtility.GoogleUserData googleUser = GoogleAuthUtility.authenticate();
 
-        if (googleUser == null || googleUser.getEmail() == null) {
+        if (googleUser.getEmail() == null) {
             throw new IllegalStateException("Autenticazione Google fallita");
         }
 
@@ -51,8 +55,10 @@ public class GoogleAuthService {
         }
         return username;
     }
-
     private String generateRandomPassword() {
-        return Long.toHexString(Double.doubleToLongBits(Math.random()));
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[8];
+        random.nextBytes(bytes);
+        return Base64.getEncoder().encodeToString(bytes);
     }
 }

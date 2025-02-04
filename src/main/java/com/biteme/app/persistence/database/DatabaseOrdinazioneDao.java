@@ -126,10 +126,8 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
 
             int rowsUpdated = preparedStatement.executeUpdate();
             if (rowsUpdated == 0) {
-                LOGGER.log(Level.WARNING, "Nessuna ordinazione trovata con ID: " + id);
-            }
+                LOGGER.log(Level.WARNING, "Nessuna ordinazione trovata con ID: {0}", id);            }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Errore nell'aggiornare lo stato dell'ordinazione con ID: " + id, e);
             throw new DatabaseConfigurationException("Errore durante l'aggiornamento dello stato dell'ordinazione.", e);
         }
     }

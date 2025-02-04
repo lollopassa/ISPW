@@ -17,7 +17,8 @@ import java.util.List;
 import javafx.scene.layout.Region;
 import com.biteme.app.util.SceneLoader;
 import com.biteme.app.bean.OrdineBean;
-import java.util.ArrayList;
+
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class OrdineBoundary {
@@ -97,10 +98,8 @@ public class OrdineBoundary {
                 // Carica i prodotti e i dati associati
                 caricaProdottiAssociati();
                 caricaProdottiNelRiepilogo(ordineBean);
-            } else {
-                Logger.getLogger(OrdineBoundary.class.getName())
-                        .severe("OrdineBean non trovato per l'ID: " + ordineId);
-            }
+            } else {   Logger.getLogger(OrdineBoundary.class.getName())
+                    .log(Level.SEVERE, () -> "OrdineBean non trovato per l'ID: " + ordineId);}
         } else {
             Logger.getLogger(OrdineBoundary.class.getName())
                     .warning("Nessuna ordinazione selezionata.");
