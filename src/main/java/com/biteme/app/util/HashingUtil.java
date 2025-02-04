@@ -12,13 +12,6 @@ public class HashingUtil {
         throw new UnsupportedOperationException("Classe di utilità, non può essere istanziata.");
     }
 
-    /**
-     * Hasha una password utilizzando SHA-256.
-     *
-     * @param password la password in chiaro da hashare.
-     * @return la password hashata come stringa esadecimale.
-     * @throws PasswordHashingException se si verifica un errore durante l'hashing.
-     */
     public static String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -29,12 +22,6 @@ public class HashingUtil {
         }
     }
 
-    /**
-     * Converte un array di byte in una rappresentazione esadecimale.
-     *
-     * @param bytes l'array di byte da convertire.
-     * @return una stringa esadecimale.
-     */
     private static String bytesToHex(byte[] bytes) {
         StringBuilder hexString = new StringBuilder();
         for (byte b : bytes) {

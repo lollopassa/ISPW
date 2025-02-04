@@ -16,15 +16,12 @@ public class SceneLoader {
         throw new UnsupportedOperationException("Non è possibile istanziare la classe SceneLoader.");
     }
 
-    // Configura lo stage principale dell'applicazione
     public static void setPrimaryStage(Stage stage) {
         if (stage == null) {
             throw new IllegalArgumentException("Lo stage principale non può essere null.");
         }
         primaryStage = stage;
     }
-
-    // Carica una nuova scena nello stage specificato
     public static void loadScene(String fxmlPath, String title, Stage stage) {
         if (fxmlPath == null || fxmlPath.trim().isEmpty()) {
             throw new IllegalArgumentException("Il percorso del file FXML non può essere vuoto.");
@@ -38,7 +35,6 @@ public class SceneLoader {
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
-            // Rilancia una eccezione specifica con informazioni contestuali (S112) senza loggare qui (S2139)
             throw new com.biteme.app.exception.SceneLoadingException("Errore durante il caricamento del file FXML: " + fxmlPath, e);
         }
     }

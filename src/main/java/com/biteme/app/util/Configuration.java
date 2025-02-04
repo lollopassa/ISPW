@@ -2,7 +2,6 @@ package com.biteme.app.util;
 
 import com.biteme.app.persistence.PersistenceProvider;
 
-import javax.xml.parsers.SAXParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -36,16 +35,6 @@ public class Configuration {
     // Metodo per ottenere il provider di persistenza configurato.
     public static PersistenceProvider getPersistenceProvider() {
         return PersistenceProvider.getProviderByName(persistenceMode);
-    }
-
-    // Metodo per ottenere una proprietà configurata (es. App ID di Facebook)
-    public static String getFacebookAppId() {
-        return properties.getProperty("facebook.app.id");
-    }
-
-    // Metodo per ottenere il segreto dell'App di Facebook
-    public static String getFacebookAppSecret() {
-        return properties.getProperty("facebook.app.secret");
     }
 
     public static String getGoogleClientId() {

@@ -3,16 +3,15 @@ package com.biteme.app.entity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-// Classe aggiornata per includere "coperti" e rinominare "dettagli" in "note"
 public class Prenotazione {
 
     private int id;
     private String nomeCliente;
     private LocalTime orario;
     private LocalDate data;
-    private String note; // RINOMINATA
+    private String note;
     private String telefono;
-    private int coperti; // NUOVO CAMPO
+    private int coperti;
 
     public Prenotazione(int id, String nomeCliente, LocalTime orario, LocalDate data, String note, String telefono, int coperti) {
         this.id = id;
@@ -57,7 +56,7 @@ public class Prenotazione {
         this.data = data;
     }
 
-    public String getNote() { // RINOMINATO
+    public String getNote() {
         return note;
     }
 

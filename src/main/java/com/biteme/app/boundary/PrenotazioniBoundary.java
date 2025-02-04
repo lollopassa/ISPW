@@ -3,14 +3,12 @@ package com.biteme.app.boundary;
 import com.biteme.app.bean.PrenotazioniBean;
 import com.biteme.app.controller.PrenotazioniController;
 import com.biteme.app.entity.Prenotazione;
-
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.Node;
 import javafx.scene.control.cell.PropertyValueFactory;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
@@ -20,7 +18,6 @@ import java.util.Locale;
 
 public class PrenotazioniBoundary {
 
-    // Costanti
     private static final String SUCCESS_TITLE = "Successo";
     private static final String ERROR_TITLE = "Errore";
     private static final String DAY_LABEL_DEFAULT_STYLE = "-fx-font-size: 14; -fx-alignment: center; -fx-border-color: lightgray; -fx-border-width: 0.5;" +
@@ -28,7 +25,6 @@ public class PrenotazioniBoundary {
     private static final String DAY_LABEL_SELECTED_STYLE = "-fx-font-size: 14; -fx-alignment: center; -fx-border-color: lightgray; -fx-border-width: 0.5;" +
             "-fx-background-color: #E0218A; -fx-text-fill: white; -fx-cursor: hand;";
 
-    // Campi FXML
     @FXML
     private Label meseLabel;
     @FXML
@@ -71,7 +67,6 @@ public class PrenotazioniBoundary {
     @FXML
     private Button eliminaButton;
 
-    // Variabili
     private final PrenotazioniController prenotazioniController = new PrenotazioniController();
     private YearMonth meseCorrente;
     private Node casellaSelezionata;
@@ -79,13 +74,12 @@ public class PrenotazioniBoundary {
 
     @FXML
     private void initialize() {
+
         configureTableColumns();
-        // Configurazione calendario
         meseCorrente = YearMonth.now();
-        giornoSelezionato = null; // Nessun giorno selezionato all'inizio
+        giornoSelezionato = null;
         aggiornaCalendario();
 
-        // Tabella vuota all'inizio
         prenotazioniTableView.getItems().clear();
 
         modificaButton.setDisable(true);
@@ -97,13 +91,11 @@ public class PrenotazioniBoundary {
             eliminaButton.setDisable(!rigaSelezionata);  // Abilita/disabilita il pulsante "Elimina"
         });
 
-        // Gestione eventi per il cambio mese
         frecciaIndietro.setOnMouseClicked(event -> mesePrecedente());
         frecciaAvanti.setOnMouseClicked(event -> meseSuccessivo());
     }
 
     private void configureTableColumns() {
-        // Configurazione colonne della tabella
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         nomeColumn.setCellValueFactory(new PropertyValueFactory<>("nomeCliente"));
         dataColumn.setCellValueFactory(new PropertyValueFactory<>("data"));
@@ -112,6 +104,7 @@ public class PrenotazioniBoundary {
         telefonoColumn.setCellValueFactory(new PropertyValueFactory<>("telefono"));
         noteColumn.setCellValueFactory(new PropertyValueFactory<>("note"));
     }
+
     @FXML
     private void createBooking() {
         if (giornoSelezionato == null) {
@@ -122,7 +115,6 @@ public class PrenotazioniBoundary {
         PrenotazioniBean bean = new PrenotazioniBean();
         bean.setNomeCliente(nomeClienteField.getText().trim());
 
-        // Validazione orario
         try {
             bean.setOrario(LocalTime.parse(orarioField.getText().trim()));
         } catch (Exception e) {
@@ -131,7 +123,6 @@ public class PrenotazioniBoundary {
         }
         bean.setData(giornoSelezionato);
 
-        // Validazione telefono
         String telefono = telefonoField.getText().trim();
         if (!telefono.isBlank() && !telefono.matches("\\d+")) {
             showAlert(ERROR_TITLE, "Inserisci un numero di telefono valido.", Alert.AlertType.ERROR);
@@ -141,7 +132,6 @@ public class PrenotazioniBoundary {
 
         bean.setNote(noteField.getText().trim());
 
-        // Validazione coperti
         try {
             int coperti = Integer.parseInt(copertiField.getText().trim());
             if (coperti <= 0) throw new NumberFormatException();
@@ -151,7 +141,6 @@ public class PrenotazioniBoundary {
             return;
         }
 
-        // Creazione prenotazione tramite controller
         prenotazioniController.creaPrenotazione(bean);
 
         showAlert(SUCCESS_TITLE, "Prenotazione creata con successo!", Alert.AlertType.INFORMATION);
@@ -211,9 +200,8 @@ public class PrenotazioniBoundary {
         return grid;
     }
 
-    private void addFieldsToGrid(GridPane grid, TextField nomeField, DatePicker dataPicker,
-                                 TextField orarioInput, TextField copertiInput,
-                                 TextField telefonoInput, TextField noteInput) {
+    private void addFieldsToGrid(GridPane grid, TextField nomeField, DatePicker dataPicker, TextField orarioInput, TextField copertiInput, TextField telefonoInput,
+                                 TextField noteInput) {
         grid.add(new Label("Nome cliente:"), 0, 0);
         grid.add(nomeField, 1, 0);
         grid.add(new Label("Data:"), 0, 1);
@@ -227,8 +215,7 @@ public class PrenotazioniBoundary {
         grid.add(new Label("Note:"), 0, 5);
         grid.add(noteInput, 1, 5);
     }
-    private Prenotazione validateAndCreatePrenotazione(Prenotazione prenotazione, TextField nomeField, DatePicker dataPicker,
-                                                       TextField orarioInput, TextField copertiInput,
+    private Prenotazione validateAndCreatePrenotazione(Prenotazione prenotazione, TextField nomeField, DatePicker dataPicker, TextField orarioInput, TextField copertiInput,
                                                        TextField telefonoInput, TextField noteInput) {
         try {
             String nomeCliente = nomeField.getText().trim();
@@ -300,7 +287,6 @@ public class PrenotazioniBoundary {
 
     private void handleDialogResult(Prenotazione prenotazioneAggiornata) {
         if (prenotazioneAggiornata != null) {
-            // Aggiornamento nel database
             prenotazioniController.modificaPrenotazione(prenotazioneAggiornata);
             refreshTable(giornoSelezionato);
             showAlert(SUCCESS_TITLE, "Prenotazione aggiornata correttamente!", Alert.AlertType.INFORMATION);
@@ -308,14 +294,11 @@ public class PrenotazioniBoundary {
     }
     @FXML
     private void modificaPrenotazione() {
-        // Ottieni la prenotazione selezionata
         Prenotazione prenotazioneSelezionata = prenotazioniTableView.getSelectionModel().getSelectedItem();
         if (prenotazioneSelezionata == null) {
             showAlert(ERROR_TITLE, "Seleziona una prenotazione da modificare.", Alert.AlertType.ERROR);
             return;
         }
-
-        // Mostra il dialog di modifica per la prenotazione
         mostraDialogModifica(prenotazioneSelezionata);
     }
 
@@ -323,7 +306,7 @@ public class PrenotazioniBoundary {
         if (data != null) {
             List<Prenotazione> prenotazioni = prenotazioniController.getPrenotazioniByData(data);
             prenotazioniTableView.setItems(FXCollections.observableArrayList(prenotazioni));
-            prenotazioniTableView.refresh(); // Forza il refresh visivo
+            prenotazioniTableView.refresh();
         } else {
             prenotazioniTableView.getItems().clear();
         }
@@ -347,46 +330,36 @@ public class PrenotazioniBoundary {
     }
 
     private void popolaCalendario(YearMonth mese) {
-        // Rimuove i giorni esistenti (ma SENZA toccare l'intestazione dei giorni della settimana)
         calendarioGrid.getChildren().removeIf(node -> GridPane.getRowIndex(node) != null && GridPane.getRowIndex(node) > 0);
 
-        // Calcolo della distribuzione dei giorni
-        LocalDate primoGiorno = mese.atDay(1); // Il primo giorno del mese
-        int primoGiornoSettimana = primoGiorno.getDayOfWeek().getValue() % 7; // Con giorno Lunedì come primo giorno della settimana
-        int giorniNelMese = mese.lengthOfMonth(); // Giorni totali nel mese
-        LocalDate oggi = LocalDate.now(); // Data di oggi
+        LocalDate primoGiorno = mese.atDay(1);
+        int primoGiornoSettimana = primoGiorno.getDayOfWeek().getValue() % 7;
+        int giorniNelMese = mese.lengthOfMonth();
+        LocalDate oggi = LocalDate.now();
 
-        // Aggiunge i giorni del mese al calendario
         int giornoCorrente = 1;
-        for (int riga = 1; riga <= 6; riga++) { // Max 6 righe per un mese
+        for (int riga = 1; riga <= 6; riga++) {
             for (int colonna = 0; colonna < 7; colonna++) {
                 if (giornoCorrente > giorniNelMese) {
-                    return; // Fine del mese
+                    return;
                 }
 
                 if (riga == 1 && colonna < primoGiornoSettimana) {
-                    continue; // Salta le celle prima del primo giorno del mese
+                    continue;
                 }
 
-                LocalDate data = mese.atDay(giornoCorrente); // Calcola la data del giorno corrente
+                LocalDate data = mese.atDay(giornoCorrente);
                 Label giorno = new Label(String.valueOf(giornoCorrente));
 
                 if (data.isBefore(oggi)) {
-                    // Giorni precedenti a oggi (grigi e disabilitati)
                     giorno.setStyle("-fx-font-size: 14; -fx-alignment: center; -fx-border-color: lightgray; -fx-border-width: 0.5;" +
                             "-fx-background-color: lightgray; -fx-text-fill: darkgray; -fx-cursor: default;");
                 } else {
-                    // Giorni disponibili (cliccabili)
                     giorno.setStyle(DAY_LABEL_DEFAULT_STYLE);
-                    giorno.setOnMouseClicked(event -> selezionaGiorno(data, giorno)); // Callback per selezionare il giorno
+                    giorno.setOnMouseClicked(event -> selezionaGiorno(data, giorno));
                 }
-
-                // Imposta dimensioni uniformi per i giorni del mese
                 giorno.setPrefSize(40, 40);
-
-                // Aggiunge il giorno alla griglia
                 calendarioGrid.add(giorno, colonna, riga);
-
                 giornoCorrente++;
             }
         }
@@ -398,8 +371,6 @@ public class PrenotazioniBoundary {
         giorno.setStyle(DAY_LABEL_SELECTED_STYLE);
         casellaSelezionata = giorno;
         giornoSelezionato = data;
-
-        // Aggiorna la tabella solo se un giorno è selezionato
         refreshTable(data);
     }
 

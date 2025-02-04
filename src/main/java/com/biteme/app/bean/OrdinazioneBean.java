@@ -5,13 +5,13 @@ import com.biteme.app.entity.TipoOrdine;
 
 public class OrdinazioneBean {
 
-    private int id; // BIGINT
-    private String nome; // VARCHAR
-    private String numeroClienti; // VARCHAR
-    private TipoOrdine tipoOrdine; // VARCHAR
-    private String infoTavolo; // VARCHAR
-    private StatoOrdine statoOrdine; // Enum per lo stato dell'ordine
-    private String orarioCreazione; // VARCHAR
+    private int id;
+    private String nome;
+    private String numeroClienti;
+    private TipoOrdine tipoOrdine;
+    private String infoTavolo;
+    private StatoOrdine statoOrdine;
+    private String orarioCreazione;
 
     // Getter e Setter
     public int getId() {

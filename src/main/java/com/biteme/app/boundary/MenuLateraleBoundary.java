@@ -3,7 +3,6 @@ package com.biteme.app.boundary;
 import com.biteme.app.util.SceneLoader;
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

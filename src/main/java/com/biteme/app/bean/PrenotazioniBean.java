@@ -5,11 +5,11 @@ import java.time.LocalTime;
 
 public class PrenotazioniBean {
     private String nomeCliente;
-    private LocalDate data; // Nuovo campo per gestire la data della prenotazione
+    private LocalDate data;
     private LocalTime orario;
-    private String note; // Rinominato il campo da "dettagli" a "note"
+    private String note;
     private String telefono;
-    private Integer coperti; // Nuovo campo per il numero di coperti
+    private Integer coperti;
 
     // Getter e Setter
     public String getNomeCliente() {
