@@ -28,8 +28,13 @@ public class GoogleAuthService {
             return userDao.load(googleUser.getEmail())
                     .map(this::validateGoogleUser)
                     .orElseGet(() -> registerGoogleUser(googleUser));
+        } catch (InterruptedException e) {
+            // Reimposta lo stato di interruzione del thread
+            Thread.currentThread().interrupt();
+            // Puoi rilanciare l'eccezione se necessario o gestirla in altro modo
+            throw new GoogleAuthException("Il thread è stato interrotto durante l'autenticazione con Google.", e);
         } catch (Exception e) {
-            // Se qualsiasi eccezione viene lanciata, la incapsuliamo in GoogleAuthException
+            // Qualsiasi altra eccezione viene incapsulata in GoogleAuthException
             throw new GoogleAuthException("Errore durante l'autenticazione con Google", e);
         }
     }
