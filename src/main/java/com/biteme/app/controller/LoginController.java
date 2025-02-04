@@ -2,6 +2,7 @@ package com.biteme.app.controller;
 
 import com.biteme.app.bean.LoginBean;
 import com.biteme.app.entity.User;
+import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.service.GoogleAuthService;
 import com.biteme.app.util.Configuration;
 import com.biteme.app.persistence.UserDao;
@@ -44,10 +45,15 @@ public class LoginController {
         return user.getPassword().equals(HashingUtil.hashPassword(password));
     }
 
-    public User authenticateWithGoogle() throws Exception {
-        return googleAuthService.authenticateWithGoogle();
+    public User authenticateWithGoogle() throws GoogleAuthException {
+        try {
+            // Chiamata sicura al servizio di autenticazione Google
+            return googleAuthService.authenticateWithGoogle();
+        } catch (GoogleAuthException e) {
+            // Puoi aggiungere un log o trattare ulteriori dettagli dell'errore qui se necessario.
+            throw new GoogleAuthException("Autenticazione Google fallita. Verifica i dettagli e riprova.", e);
+        }
     }
-
     public void navigateToHome() {
         SceneLoader.loadScene("/com/biteme/app/home.fxml", "Home - BiteMe");
     }
