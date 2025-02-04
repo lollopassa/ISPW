@@ -39,10 +39,6 @@ public class OrdineBoundary {
 
     private static final String ASPORTO = "Asporto";
 
-    public OrdineBoundary() {//Costruttore vuoto
-    }
-
-
     @FXML
     private void handleSalva() {
         int ordineId = ordinazioneController.getIdOrdineSelezionato();

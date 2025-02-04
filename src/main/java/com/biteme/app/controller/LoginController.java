@@ -6,6 +6,7 @@ import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.service.GoogleAuthService;
 import com.biteme.app.util.Configuration;
 import com.biteme.app.persistence.UserDao;
+import com.biteme.app.util.GoogleAuthUtility;
 import com.biteme.app.util.HashingUtil;
 import com.biteme.app.util.SceneLoader;
 
@@ -18,7 +19,7 @@ public class LoginController {
 
     public LoginController() {
         this.userDao = Configuration.getPersistenceProvider().getDaoFactory().getUserDao();
-        this.googleAuthService = new GoogleAuthService(userDao);
+        this.googleAuthService = new GoogleAuthService();
     }
 
     public boolean authenticateUser(LoginBean loginBean) {
@@ -47,13 +48,26 @@ public class LoginController {
 
     public User authenticateWithGoogle() throws GoogleAuthException {
         try {
-            // Chiamata sicura al servizio di autenticazione Google
-            return googleAuthService.authenticateWithGoogle();
+            GoogleAuthUtility.GoogleUserData googleUser = googleAuthService.authenticateWithGoogle();
+            return userDao.load(googleUser.getEmail())
+                    .map(this::validateGoogleUser)
+                    .orElseGet(() -> {
+                        User newUser = googleAuthService.createGoogleUser(googleUser);
+                        userDao.store(newUser);
+                        return newUser;
+                    });
         } catch (GoogleAuthException e) {
-            // Puoi aggiungere un log o trattare ulteriori dettagli dell'errore qui se necessario.
             throw new GoogleAuthException("Autenticazione Google fallita. Verifica i dettagli e riprova.", e);
         }
     }
+
+    private User validateGoogleUser(User user) {
+        if (!user.isGoogleUser()) {
+            throw new IllegalStateException("Email già registrata con metodo tradizionale");
+        }
+        return user;
+    }
+
     public void navigateToHome() {
         SceneLoader.loadScene("/com/biteme/app/home.fxml", "Home - BiteMe");
     }
