@@ -18,15 +18,20 @@ public class GoogleAuthService {
     }
 
     public User authenticateWithGoogle() throws GoogleAuthException {
-        GoogleAuthUtility.GoogleUserData googleUser = GoogleAuthUtility.authenticate();
+        try {
+            GoogleAuthUtility.GoogleUserData googleUser = GoogleAuthUtility.authenticate();
 
-        if (googleUser.getEmail() == null) {
-            throw new IllegalStateException("Autenticazione Google fallita");
+            if (googleUser.getEmail() == null) {
+                throw new IllegalStateException("Autenticazione Google fallita");
+            }
+
+            return userDao.load(googleUser.getEmail())
+                    .map(this::validateGoogleUser)
+                    .orElseGet(() -> registerGoogleUser(googleUser));
+        } catch (Exception e) {
+            // Se qualsiasi eccezione viene lanciata, la incapsuliamo in GoogleAuthException
+            throw new GoogleAuthException("Errore durante l'autenticazione con Google", e);
         }
-
-        return userDao.load(googleUser.getEmail())
-                .map(this::validateGoogleUser)
-                .orElseGet(() -> registerGoogleUser(googleUser));
     }
 
     private User validateGoogleUser(User user) {
