@@ -72,17 +72,46 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
 
     @Override
     public void delete(Integer id) {
-        String query = "DELETE FROM ordinazione WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) {
-                LOGGER.log(Level.WARNING, () -> "Nessun ordinazione trovato con ID: " + id);
-            } else {
-                LOGGER.log(Level.INFO, () -> "Ordinazione con ID: " + id + " eliminato con successo");
+        // Prima, elimina le righe correlate nella tabella 'ordine'
+        String deleteFromOrdine = "DELETE FROM ordine WHERE id = ?";
+        String deleteFromOrdinazione = "DELETE FROM ordinazione WHERE id = ?";
+
+        try {
+            connection.setAutoCommit(false); // Disabilita il commit automatico per controllare la transazione
+
+            // Step 1: Elimina riferimenti correlati nella tabella figlia
+            try (PreparedStatement stmtOrdine = connection.prepareStatement(deleteFromOrdine)) {
+                stmtOrdine.setInt(1, id);
+                stmtOrdine.executeUpdate();
             }
+
+            // Step 2: Elimina l'ordinazione dalla tabella principale
+            try (PreparedStatement stmtOrdinazione = connection.prepareStatement(deleteFromOrdinazione)) {
+                stmtOrdinazione.setInt(1, id);
+                int affectedRows = stmtOrdinazione.executeUpdate();
+
+                if (affectedRows == 0) {
+                    LOGGER.log(Level.WARNING, () -> "Nessun ordinazione trovato con ID: " + id);
+                } else {
+                    LOGGER.log(Level.INFO, () -> "Ordinazione con ID: " + id + " eliminato con successo");
+                }
+            }
+
+            connection.commit(); // Conferma la transazione
         } catch (SQLException e) {
+            try {
+                connection.rollback(); // Esegui un rollback in caso di errore
+                LOGGER.log(Level.SEVERE, "Transazione rollback a causa di un errore: " + e.getMessage());
+            } catch (SQLException rollbackEx) {
+                LOGGER.log(Level.SEVERE, "Errore durante il rollback: " + rollbackEx.getMessage());
+            }
             LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'eliminazione dell'ordinazione con ID: " + id);
+        } finally {
+            try {
+                connection.setAutoCommit(true); // Ripristina il commit automatico
+            } catch (SQLException autoCommitEx) {
+                LOGGER.log(Level.SEVERE, "Errore durante il ripristino del commit automatico: " + autoCommitEx.getMessage());
+            }
         }
     }
 

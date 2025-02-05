@@ -159,6 +159,28 @@ public class DatabaseProdottoDao implements ProdottoDao {
     }
 
     @Override
+    public Prodotto findByNome(String nome) {
+        String query = "SELECT * FROM prodotti WHERE nome = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, nome);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Prodotto(
+                            rs.getInt("id"),
+                            rs.getString("nome"),
+                            rs.getBigDecimal("prezzo"),
+                            Categoria.valueOf(rs.getString("categoria")),
+                            rs.getBoolean("disponibile")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Errore ricerca prodotto per nome", e);
+        }
+        return null;
+    }
+
+    @Override
     public void update(Prodotto prodotto) {
         String query = "UPDATE prodotti SET nome = ?, prezzo = ?, categoria = ?, disponibile = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {

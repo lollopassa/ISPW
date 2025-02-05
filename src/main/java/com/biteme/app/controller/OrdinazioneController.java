@@ -41,12 +41,12 @@ public class OrdinazioneController {
 
         // Step 2: Crea OrdineBean correlato utilizzando l'ID dell'ordinazione
         OrdineBean ordineBean = new OrdineBean();
-        ordineBean.setId(ordinazione.getId()); // Imposta l'ID dell'ordinazione
+        ordineBean.setId(ordinazione.getId()); // Assegna l'ID dell'ordinazione all'ordine
         ordineBean.setProdotti(new ArrayList<>()); // Lista prodotti inizialmente vuota
         ordineBean.setQuantita(new ArrayList<>()); // Quantità inizialmente vuota
 
         // Step 3: Salva l'ordine nel database, collegandolo all'ordinazione
-        ordineController.salvaOrdine(ordineBean, ordinazione.getId());
+        ordineController.salvaOrdine(ordineBean, ordinazione.getId()); // Ora utilizza 2 parametri
     }
 
     public List<Ordinazione> getOrdini() {

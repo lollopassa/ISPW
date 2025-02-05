@@ -12,4 +12,7 @@ public abstract class DaoFactory {
     public abstract ProdottoDao getProdottoDao();
 
     public abstract OrdineDao getOrdineDao();
+
+    public abstract ArchivioDao getArchivioDao();
+
 }

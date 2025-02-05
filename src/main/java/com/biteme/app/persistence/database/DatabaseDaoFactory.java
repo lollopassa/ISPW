@@ -30,4 +30,9 @@ public class DatabaseDaoFactory extends DaoFactory {
         return new DatabaseOrdineDao();
     }
 
+    @Override
+    public DatabaseArchivioDao getArchivioDao() {
+        return new DatabaseArchivioDao();
+    }
+
 }

@@ -62,4 +62,10 @@ public class Storage {
     public Map<String, User> getUsers() {
         return users;
     }
+
+    private List<Archivio> archivi = new ArrayList<>();
+
+    public List<Archivio> getArchivi() {
+        return archivi;
+    }
 }

@@ -48,7 +48,6 @@ public class OrdineController {
         return ordineBean;
     }
 
-    // Metodo per salvare l'ordine e aggiornare lo stato
     public void salvaOrdineEStato(int ordineId, StatoOrdine stato) {
         // Recupera prodotti e quantità
         List<String> prodotti = recuperaProdottiDalRiepilogo();
@@ -69,7 +68,7 @@ public class OrdineController {
     public void salvaOrdine(OrdineBean ordineBean, int id) {
         // Converti OrdineBean in un oggetto Ordine
         Ordine nuovoOrdine = new Ordine(
-                id,
+                id,                // ID dell'ordine
                 ordineBean.getProdotti(), // Lista dei prodotti
                 ordineBean.getQuantita()  // Lista delle quantità
         );
@@ -138,6 +137,11 @@ public class OrdineController {
                     return prodottoBean;
                 })
                 .collect(Collectors.toList());
+    }
+
+    // OrdineController.java
+    public OrdineBean getOrdineById(int id) {
+        return load(id); // Riutilizza il metodo esistente load()
     }
 
     public OrdineBean load(int idOrdine) {
