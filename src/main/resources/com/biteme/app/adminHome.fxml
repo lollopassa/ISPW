@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.AdminHomeBoundary">
+    <children>
+
+        <!-- Inclusione del menu laterale -->
+        <fx:include source="menuLaterale.fxml" />
+
+        <!-- Etichetta Header -->
+        <Label layoutX="349.0" layoutY="24.0" text="Admin Home" textAlignment="CENTER" textFill="BLACK" wrapText="true">
+            <font>
+                <Font size="32.0" />
+            </font>
+        </Label>
+
+        <Label layoutX="359.0" layoutY="714.0" text="Seleziona intervallo di tempo:" />
+        <ComboBox fx:id="periodoComboBox" layoutX="529.0" layoutY="709.0" prefWidth="150.0">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Settimana" />
+                    <String fx:value="Mese" />
+                    <String fx:value="Trimestre" />
+                </FXCollections>
+            </items>
+        </ComboBox>
+
+        <!-- Pulsante per aggiornare i dati -->
+        <Button fx:id="aggiornaButton" layoutX="699.0" layoutY="709.0" onAction="#aggiornaDati" text="Aggiorna Dati" />
+
+        <!-- Pulsante per switchare viste -->
+        <Button fx:id="switchButton" text="Guadagni" layoutX="850.0" layoutY="75.0" onAction="#switchView"/>
+
+        <!-- Tabella per la classifica (abbassata di 20 unità) -->
+        <TableView fx:id="statisticheTable" layoutX="350.0" layoutY="120.0" prefHeight="580.0" prefWidth="450.0">
+            <columns>
+                <TableColumn fx:id="colonnaPiatto" prefWidth="300.0" text="Piatto" />
+                <TableColumn fx:id="colonnaOrdini" prefWidth="150.0" text="Totale Ordini" />
+            </columns>
+        </TableView>
+
+        <!-- BarChart allineato con il fondo della tabella -->
+        <BarChart fx:id="barChart" layoutX="818.0" layoutY="165.0" prefHeight="580.0" prefWidth="570.0">
+            <xAxis>
+                <CategoryAxis label="Piatto" fx:id="xAxis" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis fx:id="yAxis" label="Totale Ordini" />
+            </yAxis>
+        </BarChart>
+
+    </children>
+</Pane>

@@ -4,6 +4,7 @@ import com.biteme.app.entity.Archivio;
 import com.biteme.app.exception.DatabaseConfigurationException;
 import com.biteme.app.persistence.ArchivioDao;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -102,6 +103,27 @@ public class DatabaseArchivioDao implements ArchivioDao {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Errore recupero archivi", e);
+        }
+        return archivi;
+    }
+
+    @Override
+    public List<Archivio> findByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Archivio> archivi = new ArrayList<>();
+        String query = "SELECT id, id_ordine, prodotti, quantita, totale, data_archiviazione " +
+                "FROM archivio " +
+                "WHERE data_archiviazione BETWEEN ? AND ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setTimestamp(1, Timestamp.valueOf(startDate));
+            stmt.setTimestamp(2, Timestamp.valueOf(endDate));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    archivi.add(mapResultSetToArchivio(rs));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Errore recupero archivi per intervallo di tempo", e);
         }
         return archivi;
     }

@@ -3,6 +3,7 @@ package com.biteme.app.persistence.inmemory;
 import com.biteme.app.entity.Archivio;
 import com.biteme.app.persistence.ArchivioDao;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,5 +43,17 @@ public class InMemoryArchivioDao implements ArchivioDao {
     @Override
     public List<Archivio> getAll() {
         return new ArrayList<>(archivi);
+    }
+
+    @Override
+    public List<Archivio> findByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Archivio> filteredArchivi = new ArrayList<>();
+        for (Archivio archivio : archivi) {
+            if (!archivio.getDataArchiviazione().isBefore(startDate) &&
+                    !archivio.getDataArchiviazione().isAfter(endDate)) {
+                filteredArchivi.add(archivio);
+            }
+        }
+        return filteredArchivi;
     }
 }

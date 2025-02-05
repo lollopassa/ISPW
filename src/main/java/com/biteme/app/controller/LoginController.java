@@ -2,6 +2,7 @@ package com.biteme.app.controller;
 
 import com.biteme.app.bean.LoginBean;
 import com.biteme.app.entity.User;
+import com.biteme.app.entity.UserRole;
 import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.service.GoogleAuthService;
 import com.biteme.app.util.Configuration;
@@ -68,8 +69,29 @@ public class LoginController {
         return user;
     }
 
-    public void navigateToHome() {
-        SceneLoader.loadScene("/com/biteme/app/home.fxml", "Home - BiteMe");
+    public void navigateToHome(User user) {
+        if (user.getRuolo() == UserRole.ADMIN) {
+            SceneLoader.loadScene("/com/biteme/app/adminHome.fxml", "Admin Home - BiteMe");
+        } else {
+            SceneLoader.loadScene("/com/biteme/app/home.fxml", "Home - BiteMe");
+        }
+    }
+
+    public User authenticateUserAndGetUser(LoginBean loginBean) {
+        String emailOrUsername = loginBean.getEmailOrUsername();
+        String password = loginBean.getPassword();
+
+        if (emailOrUsername.isEmpty() || password.isEmpty()) {
+            return null;
+        }
+
+        if (emailOrUsername.contains("@") && !isValidEmail(emailOrUsername)) {
+            return null;
+        }
+
+        return userDao.load(emailOrUsername)
+                .filter(user -> validatePassword(user, password)) // Filtra solo gli utenti con credenziali valide
+                .orElse(null);
     }
 
     public void navigateToSignup() {

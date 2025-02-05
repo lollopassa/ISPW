@@ -24,9 +24,11 @@ public class LoginBoundary {
         loginBean.setEmailOrUsername(emailOrUsernameTextField.getText());
         loginBean.setPassword(passwordTextField.getText());
 
-        if (loginController.authenticateUser(loginBean)) {
+        User authenticatedUser = loginController.authenticateUserAndGetUser(loginBean);
+
+        if (authenticatedUser != null) {
             showAlert("Successo", "Login effettuato con successo!", Alert.AlertType.INFORMATION);
-            loginController.navigateToHome(); // Naviga alla home
+            loginController.navigateToHome(authenticatedUser);
         } else {
             showAlert("Errore", "Credenziali non valide!", Alert.AlertType.ERROR);
         }
@@ -37,7 +39,7 @@ public class LoginBoundary {
         try {
             User user = loginController.authenticateWithGoogle();
             showAlert("Benvenuto", "Accesso effettuato come " + user.getUsername(), Alert.AlertType.INFORMATION);
-            loginController.navigateToHome();
+            loginController.navigateToHome(user);
         } catch (Exception e) {
             showAlert("Errore Google", e.getMessage(), Alert.AlertType.ERROR);
         }

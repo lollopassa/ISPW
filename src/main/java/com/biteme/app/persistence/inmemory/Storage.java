@@ -27,6 +27,8 @@ public class Storage {
     // Mappa per memorizzare gli utenti
     private final Map<String, User> users = new HashMap<>();
 
+    private final List<Archivio> archivi = new ArrayList<>();
+
     private Storage() {
         // Costruttore privato per implementare il Singleton
     }
@@ -62,8 +64,6 @@ public class Storage {
     public Map<String, User> getUsers() {
         return users;
     }
-
-    private List<Archivio> archivi = new ArrayList<>();
 
     public List<Archivio> getArchivi() {
         return archivi;
