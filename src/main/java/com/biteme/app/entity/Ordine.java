@@ -4,9 +4,9 @@ import java.util.List;
 
 public class Ordine {
 
-    private int id; // Identificatore univoco
-    private List<String> prodotti; // Lista di prodotti
-    private List<Integer> quantita; // Quantità di ogni prodotto
+    private int id;
+    private List<String> prodotti;
+    private List<Integer> quantita;
 
     // Costruttore
     public Ordine(int id,  List<String> prodotti, List<Integer> quantita) {

@@ -2,13 +2,13 @@ package com.biteme.app.entity;
 
 public class Ordinazione {
 
-    private int id; // INT nel database
-    private String nomeCliente; // VARCHAR
-    private String numeroClienti; // VARCHAR (lasciato così com'è)
-    private TipoOrdine tipoOrdine; // VARCHAR
-    private String infoTavolo; // VARCHAR
-    private StatoOrdine statoOrdine; // Enum StatoOrdine
-    private String orarioCreazione; // VARCHAR
+    private int id;
+    private String nomeCliente;
+    private String numeroClienti;
+    private TipoOrdine tipoOrdine;
+    private String infoTavolo;
+    private StatoOrdine statoOrdine;
+    private String orarioCreazione;
 
     // Costruttore completo
     public Ordinazione(int id, String nomeCliente, String numeroClienti, TipoOrdine tipoOrdine,

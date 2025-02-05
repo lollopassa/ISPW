@@ -5,7 +5,7 @@ public class User {
     private String username;
     private String email;
     private String password;
-    private UserRole ruolo; // Uso diretto di UserRole
+    private UserRole ruolo;
     private boolean googleUser;
 
     // Costruttori

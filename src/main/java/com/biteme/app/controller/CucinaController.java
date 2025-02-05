@@ -5,8 +5,6 @@ import javafx.fxml.FXML;
 
 public class CucinaController {
 
-
-
     @FXML
     public void initialize() {
     }

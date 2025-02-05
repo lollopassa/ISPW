@@ -10,7 +10,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
-
 import java.math.BigDecimal;
 
 public class ProdottoBoundary {

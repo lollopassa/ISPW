@@ -20,18 +20,14 @@ public class LoginBoundary {
 
     @FXML
     private void onLoginButtonClick() {
-        // Crea il bean di login con le credenziali dell'utente
         LoginBean loginBean = new LoginBean();
         loginBean.setEmailOrUsername(emailOrUsernameTextField.getText());
         loginBean.setPassword(passwordTextField.getText());
 
-        // Chiede al controller se l'autenticazione è andata a buon fine
         if (loginController.authenticateUser(loginBean)) {
-            // Autenticazione riuscita
             showAlert("Successo", "Login effettuato con successo!", Alert.AlertType.INFORMATION);
             loginController.navigateToHome(); // Naviga alla home
         } else {
-            // Credenziali non valide
             showAlert("Errore", "Credenziali non valide!", Alert.AlertType.ERROR);
         }
     }
