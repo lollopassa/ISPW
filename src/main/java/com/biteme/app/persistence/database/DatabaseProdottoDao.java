@@ -160,11 +160,13 @@ public class DatabaseProdottoDao implements ProdottoDao {
 
     @Override
     public Prodotto findByNome(String nome) {
-        String query = "SELECT * FROM prodotti WHERE nome = ?";
+        // Elenca esplicitamente le colonne richieste
+        String query = "SELECT id, nome, prezzo, categoria, disponibile FROM prodotti WHERE nome = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, nome);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
+                    // Crea un oggetto Prodotto dai valori del ResultSet
                     return new Prodotto(
                             rs.getInt("id"),
                             rs.getString("nome"),

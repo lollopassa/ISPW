@@ -7,7 +7,6 @@ import com.biteme.app.controller.ArchivioController;
 import com.biteme.app.controller.OrdinazioneController;
 import com.biteme.app.controller.OrdineController;
 import com.biteme.app.controller.ProdottoController;
-import com.biteme.app.entity.Archivio;
 import com.biteme.app.entity.Ordinazione;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -84,6 +83,10 @@ public class OrdinazioneBoundary {
     @FXML
     private Button eliminaButton; // Pulsante per eliminare l'ordine
 
+    @FXML
+    private Button archiviaButton; // Pulsante per archiviare l'ordine
+
+
 
 
 
@@ -96,11 +99,13 @@ public class OrdinazioneBoundary {
 
         modificaButton.setDisable(true);
         eliminaButton.setDisable(true);
+        archiviaButton.setDisable(true); // Disabilita inizialmente anche il pulsante archivia
 
         ordinazioniTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             boolean isSelected = (newValue != null);
             modificaButton.setDisable(!isSelected);
             eliminaButton.setDisable(!isSelected);
+            archiviaButton.setDisable(!isSelected); // Abilita o disabilita il pulsante archivia
         });
     }
 
