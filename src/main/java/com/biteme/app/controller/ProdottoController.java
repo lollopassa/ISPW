@@ -26,6 +26,20 @@ public class ProdottoController {
         prodottoDao.store(prodotto);
     }
 
+    // ProdottoController.java
+    public ProdottoBean getProdottoByNome(String nome) {
+        Prodotto prodotto = prodottoDao.findByNome(nome);
+        if (prodotto == null) return null;
+
+        ProdottoBean bean = new ProdottoBean();
+        bean.setId(prodotto.getId());
+        bean.setNome(prodotto.getNome());
+        bean.setPrezzo(prodotto.getPrezzo());
+        bean.setCategoria(prodotto.getCategoria());
+        bean.setDisponibile(prodotto.isDisponibile());
+        return bean;
+    }
+
     public List<Prodotto> getProdotti() {
         return prodottoDao.getByDisponibilita(true);
     }

@@ -68,6 +68,14 @@ public class InMemoryProdottoDao implements ProdottoDao {
     }
 
     @Override
+    public Prodotto findByNome(String nome) {
+        return Storage.getInstance().getProdotti().stream()
+                .filter(p -> p.getNome().equalsIgnoreCase(nome))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
     public void update(Prodotto prodotto) {
         prodotti.stream()
                 .filter(p -> p.getId() == prodotto.getId())

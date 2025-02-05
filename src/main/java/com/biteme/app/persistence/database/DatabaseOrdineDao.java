@@ -125,30 +125,41 @@ public class DatabaseOrdineDao implements OrdineDao {
 
 
     private Ordine mapResultSetToOrdine(ResultSet rs) throws SQLException {
-        // Ricostruisce i prodotti dalla stringa serializzata (usa un separatore predefinito)
-        List<String> prodotti = List.of(rs.getString("prodotti").split(","));
+        // Estrai l'id dal ResultSet
+        int id = rs.getInt("id");
 
-        // Ricostruisce le quantità
+        // Gestione robusta per i prodotti
+        String prodottiString = rs.getString("prodotti");
+        List<String> prodotti = new ArrayList<>();
+        if (prodottiString != null && !prodottiString.trim().isEmpty()) {
+            prodotti = List.of(prodottiString.split(","));
+        }
+
+        // Gestione robusta per le quantità
+        String quantitaString = rs.getString("quantita");
         List<Integer> quantita = new ArrayList<>();
-        String quantitaString = rs.getString("quantita").replace("[", "").replace("]", "");
 
-        // Controlla se la stringa non è vuota e non contiene solo spazi
         if (quantitaString != null && !quantitaString.trim().isEmpty()) {
-            for (String q : quantitaString.split(", ")) {
-                try {
-                    quantita.add(Integer.parseInt(q)); // Prova a fare il parsing
-                } catch (NumberFormatException e) {
-                    // Logga un avviso e salta i valori non validi
-                    LOGGER.log(Level.WARNING, e, () -> "Valore non valido trovato nella quantità: " + q);                }
+            // Rimuove parentesti quadre (se esistono)
+            quantitaString = quantitaString.replace("[", "").replace("]", "");
+            for (String q : quantitaString.split(",\\s*")) { // Dividi la stringa su virgole, con o senza spazi
+                if (!q.trim().isEmpty()) { // Ignora valori vuoti
+                    try {
+                        quantita.add(Integer.parseInt(q.trim())); // Parsing di ciascun valore
+                    } catch (NumberFormatException e) {
+                        LOGGER.log(Level.WARNING, e, () -> "Valore non valido trovato nella quantità: " + q);
+                    }
+                }
             }
         }
 
-        // Restituisce l'ordine
-        return new Ordine(
-                rs.getInt("id"),    // Carica l'ID
-                prodotti,           // Lista dei prodotti
-                quantita            // Lista delle quantità
-        );
+        // Controllo finale di coerenza (facoltativo)
+        if (prodotti.size() != quantita.size()) {
+            LOGGER.log(Level.WARNING, () -> "Disallineamento tra prodotti e quantità per l'ordine con ID: " + id);
+        }
+
+        // Restituisce un nuovo oggetto Ordine
+        return new Ordine(id, prodotti, quantita);
     }
 
 }

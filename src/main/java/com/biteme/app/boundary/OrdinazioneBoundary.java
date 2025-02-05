@@ -1,17 +1,29 @@
 package com.biteme.app.boundary;
 
+import com.biteme.app.bean.ArchivioBean;
+import com.biteme.app.bean.OrdineBean;
+import com.biteme.app.bean.ProdottoBean;
+import com.biteme.app.controller.ArchivioController;
 import com.biteme.app.controller.OrdinazioneController;
+import com.biteme.app.controller.OrdineController;
+import com.biteme.app.controller.ProdottoController;
+import com.biteme.app.entity.Archivio;
 import com.biteme.app.entity.Ordinazione;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.util.SceneLoader;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import java.time.LocalTime;
+import java.util.logging.Logger;
+
 import com.biteme.app.entity.TipoOrdine;
 
 
@@ -57,6 +69,10 @@ public class OrdinazioneBoundary {
 
     @FXML
     private TableColumn<Ordinazione, String> statoOrdineColumn;
+
+    private final OrdineController ordineController = new OrdineController();
+    private final ArchivioController archivioController = new ArchivioController();
+    private final ProdottoController prodottoController = new ProdottoController();
 
     private static OrdinazioneBean ordineSelezionato;
     private final OrdinazioneController ordinazioneController = new OrdinazioneController();
@@ -241,6 +257,84 @@ public class OrdinazioneBoundary {
         }
     }
 
+    @FXML
+    public void archiviaOrdine(ActionEvent actionEvent) {
+        Ordinazione ordinazioneSelezionata = ordinazioniTableView.getSelectionModel().getSelectedItem();
+
+        if (ordinazioneSelezionata == null) {
+            showAlert(ERROR_TITLE, "Seleziona un ordine da archiviare.", Alert.AlertType.ERROR);
+            return;
+        }
+
+        boolean conferma = mostraDialogConferma("Sei sicuro di voler archiviare l'ordine " + ordinazioneSelezionata.getId() + "?");
+        if (conferma) {
+            try {
+                // Step 1: Recupera l'OrdineBean corrispondente
+                OrdineBean ordineBean = ordineController.getOrdineById(ordinazioneSelezionata.getId());
+
+                // Step 2: Calcola il totale
+                BigDecimal totale = calcolaTotaleOrdine(ordineBean);
+
+                // Step 3: Inizializza ArchivioBean
+                ArchivioBean archivioBean = new ArchivioBean();
+                archivioBean.setIdOrdine(ordineBean.getId());
+                archivioBean.setProdotti(ordineBean.getProdotti());
+                archivioBean.setQuantita(ordineBean.getQuantita());
+                archivioBean.setTotale(totale);
+                archivioBean.setDataArchiviazione(LocalDateTime.now());
+
+                // Passa i dettagli al controller per gestire l'archiviazione effettiva
+                archivioController.archiviaOrdine(archivioBean);
+
+                // Step 4: Elimina l'ordine dalla lista attiva
+                ordinazioneController.eliminaOrdine(ordinazioneSelezionata.getId());
+
+                refreshTable();
+                showAlert("Successo", "Ordine archiviato con successo.", Alert.AlertType.INFORMATION);
+            } catch (Exception e) {
+                showAlert(ERROR_TITLE, "Errore durante l'archiviazione: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        }
+    }
+
+    private BigDecimal calcolaTotaleOrdine(OrdineBean ordineBean) {
+        BigDecimal totale = BigDecimal.ZERO;
+
+        if (ordineBean == null) {
+            throw new IllegalArgumentException("OrdineBean non valido: null");
+        }
+
+        List<String> prodotti = ordineBean.getProdotti();
+        List<Integer> quantita = ordineBean.getQuantita();
+
+        // Controllo se prodotti o quantità sono null o vuoti
+        if (prodotti == null || quantita == null || prodotti.isEmpty() || quantita.isEmpty()) {
+            Logger.getLogger(this.getClass().getName())
+                    .warning("Lista prodotti o quantità vuota. Totale ordine: 0");
+            return totale; // Ritorna 0 come totale
+        }
+
+        // Verifica che la lunghezza delle liste prodotti e quantita sia congruente
+        if (prodotti.size() != quantita.size()) {
+            throw new IllegalStateException("Dimensioni di prodotti e quantità non corrispondenti");
+        }
+
+        for (int i = 0; i < prodotti.size(); i++) {
+            String nomeProdotto = prodotti.get(i);
+            ProdottoBean prodotto = prodottoController.getProdottoByNome(nomeProdotto);
+
+            if (prodotto == null) {
+                throw new RuntimeException("Prodotto non trovato: " + nomeProdotto);
+            }
+
+            BigDecimal prezzo = prodotto.getPrezzo();
+            totale = totale.add(prezzo.multiply(BigDecimal.valueOf(quantita.get(i))));
+        }
+
+        return totale;
+    }
+
+
     private void refreshTable() {
         List<Ordinazione> ordini = ordinazioneController.getOrdini();
         ordinazioniTableView.getItems().setAll(ordini);
@@ -272,4 +366,5 @@ public class OrdinazioneBoundary {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
 }

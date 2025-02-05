@@ -1,6 +1,7 @@
 package com.biteme.app.persistence.inmemory;
 
 import com.biteme.app.entity.Ordinazione;
+import com.biteme.app.entity.Ordine;
 import com.biteme.app.persistence.OrdinazioneDao;
 import com.biteme.app.entity.StatoOrdine;
 import java.util.List;
@@ -8,9 +9,9 @@ import java.util.Optional;
 
 
 public class InMemoryOrdinazioneDao implements OrdinazioneDao {
-
+    private final List<Ordine> ordini = Storage.getInstance().getOrdini(); // Lista ordini
+    private int currentId = 1; // ID univoco per le ordinazioni
     private final List<Ordinazione> ordinazioni = Storage.getInstance().getOrdinazioni(); // Usa lo storage condiviso
-    private int currentId = 1;
 
     @Override
     public Optional<Ordinazione> load(Integer key) {
@@ -34,8 +35,17 @@ public class InMemoryOrdinazioneDao implements OrdinazioneDao {
 
     @Override
     public void delete(Integer key) {
-        // Rimuove l'ordine tramite l'ID
-        ordinazioni.removeIf(o -> o.getId() == key); // Confronto diretto su `long`
+        // Prima, rimuovi tutti gli ordini collegati a questa ordinazione
+        ordini.removeIf(o -> o.getId() == key);
+
+        // Poi rimuovi l'ordinazione stessa
+        boolean removed = ordinazioni.removeIf(o -> o.getId() == key);
+
+        if (removed) {
+            System.out.println("Ordinazione con ID: " + key + " eliminata con successo.");
+        } else {
+            System.out.println("Nessuna ordinazione trovata con ID: " + key);
+        }
     }
 
     @Override

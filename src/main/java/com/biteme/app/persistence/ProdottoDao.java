@@ -8,4 +8,5 @@ public interface ProdottoDao extends Dao<Integer, Prodotto> {
     List<Prodotto> getByDisponibilita(boolean disponibilita);
     List<Prodotto> getAll(); // Nuovo metodo per ottenere tutti i prodotti
     void update(Prodotto prodotto);
+    Prodotto findByNome(String nome);
 }

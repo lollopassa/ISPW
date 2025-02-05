@@ -29,4 +29,9 @@ public class InMemoryDaoFactory extends DaoFactory {
         return new InMemoryOrdineDao();
     }
 
+    public  ArchivioDao getArchivioDao() {
+        return new InMemoryArchivioDao();
+    }
+
+
 }

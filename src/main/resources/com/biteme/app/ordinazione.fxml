@@ -31,7 +31,8 @@
       </TableView>
 
       <!-- Pulsanti fuori dalla tabella -->
-      <HBox alignment="CENTER" layoutX="878.0" layoutY="410.0" spacing="20">
+      <HBox alignment="CENTER" layoutX="800.0" layoutY="410.0" spacing="20">
+         <Button fx:id="archiviaButton" onAction="#archiviaOrdine" style="-fx-font-weight: bold; -fx-padding: 8px; -fx-background-color: #303d68; -fx-text-fill: white; -fx-cursor: hand;" text="Archivia" />
          <Button fx:id="modificaButton" onAction="#modificaOrdine" style="-fx-font-weight: bold; -fx-padding: 8px; -fx-background-color: #303d68; -fx-text-fill: white; -fx-cursor: hand;" text="Modifica" />
          <Button fx:id="eliminaButton" onAction="#eliminaOrdine" style="-fx-font-weight: bold; -fx-padding: 8px;-fx-background-color: #E0218A; -fx-text-fill: white; -fx-cursor: hand; " text="Elimina" />
       </HBox>
