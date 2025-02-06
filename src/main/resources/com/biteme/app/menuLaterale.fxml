@@ -73,19 +73,6 @@
                 </HBox>
             </StackPane>
 
-            <!-- Bottone Cucina -->
-            <StackPane fx:id="cucinaButton" prefHeight="52.0" prefWidth="302.0" style="-fx-cursor: hand;">
-                <Rectangle fill="#303d68" height="52.0" width="302.0" />
-                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 0 15;">
-                    <ImageView fx:id="cucinaImage" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
-                        <image>
-                            <Image url="@../../../images/cucina.png" />
-                        </image>
-                    </ImageView>
-                    <Label fx:id="cucinaLabel" style="-fx-font-size: 18;" text="Cucina" textFill="WHITE" />
-                </HBox>
-            </StackPane>
-
             <!-- Bottone Magazzino -->
             <StackPane fx:id="magazzinoButton" prefHeight="52.0" prefWidth="302.0" style="-fx-cursor: hand;">
                 <Rectangle fill="#303d68" height="52.0" width="302.0" />

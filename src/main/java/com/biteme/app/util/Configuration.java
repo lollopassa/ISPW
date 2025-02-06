@@ -46,4 +46,7 @@ public class Configuration {
     public static String getGoogleRedirectUri() {
         return properties.getProperty("google.redirect.uri");
     }
+    public static String getUiMode() {
+        return properties.getProperty("ui.mode", "fx").toLowerCase(); // Default: "fx"
+    }
 }
