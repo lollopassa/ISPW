@@ -1,7 +1,6 @@
 package com.biteme.app.view;
 
-import com.biteme.app.model.User;
-import com.biteme.app.model.UserRole;
+import com.biteme.app.controller.LoginController;
 import com.biteme.app.util.SceneLoader;
 import com.biteme.app.util.UserSession;
 import javafx.fxml.FXML;
@@ -10,6 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MenuLateraleView {
+
+    private LoginController loginController;
 
     private static final Logger LOGGER = Logger.getLogger(MenuLateraleView.class.getName());
 
@@ -42,9 +43,8 @@ public class MenuLateraleView {
 
     @FXML
     public void initialize() {
-        User currentUser = UserSession.getCurrentUser();
-
-        if (currentUser != null && currentUser.getRuolo() == UserRole.ADMIN) {
+        this.loginController = new LoginController();
+        if (loginController.isUserAdmin()) {
             homeButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/adminHome.fxml", "Admin Home"));
         } else {
             homeButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/home.fxml", "Home Page"));

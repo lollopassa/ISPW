@@ -32,34 +32,38 @@ public class LoginController {
             return false;
         }
 
-        return userDao.load(emailOrUsername)
-                .map(user -> validatePassword(user, password))
-                .orElse(false);
+        User user = userDao.load(emailOrUsername)
+                .filter(u -> validatePassword(u, password))
+                .orElse(null);
+
+        if (user != null) {
+            UserSession.setCurrentUser(user);
+            return true;
+        }
+        return false;
     }
 
     private boolean validatePassword(User user, String password) {
         if (user.isGoogleUser()) {
-            return false; // Utente Google non può fare login normale
+            return false;
         }
         return user.getPassword().equals(HashingUtil.hashPassword(password));
     }
 
-    public User authenticateWithGoogle() throws GoogleAuthException {
+    public void authenticateWithGoogle() throws GoogleAuthException {
         try {
-            // Ottieni l'access token tramite GoogleAuthService
             String accessToken = googleAuthService.authenticateWithGoogle();
-
-            // Usa l'access token per ottenere i dati dell'utente
             GoogleAuthUtility.GoogleUserData googleUser = googleAuthService.getGoogleUserData(accessToken);
 
-            // Carica o crea un nuovo utente
-            return userDao.load(googleUser.getEmail())
+            User user = userDao.load(googleUser.getEmail())
                     .map(this::validateGoogleUser)
                     .orElseGet(() -> {
                         User newUser = googleAuthService.createGoogleUser(googleUser);
                         userDao.store(newUser);
                         return newUser;
                     });
+
+            UserSession.setCurrentUser(user);
         } catch (GoogleAuthException e) {
             throw new GoogleAuthException("Autenticazione Google fallita. Verifica i dettagli e riprova.", e);
         }
@@ -72,32 +76,14 @@ public class LoginController {
         return user;
     }
 
-    public void navigateToHome(User user) {
-        // Salva l'utente loggato nella sessione
-        UserSession.setCurrentUser(user);
+    public void navigateToHome() {
+        User user = UserSession.getCurrentUser();
 
         if (user.getRuolo() == UserRole.ADMIN) {
             SceneLoader.loadScene("/com/biteme/app/adminHome.fxml", "Admin Home - BiteMe");
         } else {
             SceneLoader.loadScene("/com/biteme/app/home.fxml", "Home - BiteMe");
         }
-    }
-
-    public User authenticateUserAndGetUser(LoginBean loginBean) {
-        String emailOrUsername = loginBean.getEmailOrUsername();
-        String password = loginBean.getPassword();
-
-        if (emailOrUsername.isEmpty() || password.isEmpty()) {
-            return null;
-        }
-
-        if (emailOrUsername.contains("@") && !isValidEmail(emailOrUsername)) {
-            return null;
-        }
-
-        return userDao.load(emailOrUsername)
-                .filter(user -> validatePassword(user, password)) // Filtra solo gli utenti con credenziali valide
-                .orElse(null);
     }
 
     public void navigateToSignup() {
@@ -109,11 +95,14 @@ public class LoginController {
         return Pattern.compile(emailRegex).matcher(email).matches();
     }
 
-    public boolean isUserAdmin() {
+    public String getCurrentUsername() {
+        User currentUser = UserSession.getCurrentUser();
+        return currentUser != null ? currentUser.getUsername() : "";
+    }
+    public boolean isUserAdmin(){
         User currentUser = UserSession.getCurrentUser();
         return currentUser != null && currentUser.getRuolo() == UserRole.ADMIN;
     }
-
     public void logout() {
         UserSession.clear();
     }
