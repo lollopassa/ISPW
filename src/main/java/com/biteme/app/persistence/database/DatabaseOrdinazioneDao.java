@@ -1,10 +1,10 @@
 package com.biteme.app.persistence.database;
 
-import com.biteme.app.entity.Ordinazione;
+import com.biteme.app.model.Ordinazione;
 import com.biteme.app.exception.DatabaseConfigurationException;
 import com.biteme.app.persistence.OrdinazioneDao;
-import com.biteme.app.entity.StatoOrdine;
-import com.biteme.app.entity.TipoOrdine;
+import com.biteme.app.model.StatoOrdine;
+import com.biteme.app.model.TipoOrdine;
 
 import java.sql.*;
 import java.util.ArrayList;

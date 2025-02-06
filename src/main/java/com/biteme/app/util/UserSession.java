@@ -1,6 +1,6 @@
 package com.biteme.app.util;
 
-import com.biteme.app.entity.User;
+import com.biteme.app.model.User;
 
 public class UserSession {
     private static User currentUser;

@@ -1,9 +1,9 @@
-package com.biteme.app.boundary;
+package com.biteme.app.view;
 
 import javafx.fxml.FXML;
 
 
-public class HomeBoundary {
+public class HomeView {
 
     @FXML
     public void initialize() {

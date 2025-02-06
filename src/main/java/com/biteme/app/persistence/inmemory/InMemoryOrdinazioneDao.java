@@ -1,9 +1,9 @@
 package com.biteme.app.persistence.inmemory;
 
-import com.biteme.app.entity.Ordinazione;
-import com.biteme.app.entity.Ordine;
+import com.biteme.app.model.Ordinazione;
+import com.biteme.app.model.Ordine;
 import com.biteme.app.persistence.OrdinazioneDao;
-import com.biteme.app.entity.StatoOrdine;
+import com.biteme.app.model.StatoOrdine;
 import java.util.List;
 import java.util.Optional;
 

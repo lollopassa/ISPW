@@ -1,6 +1,6 @@
 package com.biteme.app.service;
 
-import com.biteme.app.entity.User;
+import com.biteme.app.model.User;
 import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.util.GoogleAuthUtility;
 import com.biteme.app.util.HashingUtil;

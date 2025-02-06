@@ -1,7 +1,7 @@
-package com.biteme.app.boundary;
+package com.biteme.app.view;
 
-import com.biteme.app.entity.User;
-import com.biteme.app.entity.UserRole;
+import com.biteme.app.model.User;
+import com.biteme.app.model.UserRole;
 import com.biteme.app.util.SceneLoader;
 import com.biteme.app.util.UserSession;
 import javafx.fxml.FXML;
@@ -9,9 +9,9 @@ import javafx.scene.layout.StackPane;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MenuLateraleBoundary {
+public class MenuLateraleView {
 
-    private static final Logger LOGGER = Logger.getLogger(MenuLateraleBoundary.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MenuLateraleView.class.getName());
 
     @FXML
     private StackPane homeButton;
@@ -52,7 +52,6 @@ public class MenuLateraleBoundary {
 
         prenotazioniButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/prenotazioni.fxml", "Prenotazioni"));
         ordiniButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/ordinazione.fxml", "Ordini"));
-        cucinaButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/cucina.fxml", "Cucina"));
         magazzinoButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/prodotto.fxml", "Magazzino"));
         logoutButton.setOnMouseClicked(_ -> onLogout());
     }

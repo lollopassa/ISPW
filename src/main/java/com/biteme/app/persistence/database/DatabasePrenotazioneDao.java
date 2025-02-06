@@ -1,6 +1,6 @@
 package com.biteme.app.persistence.database;
 
-import com.biteme.app.entity.Prenotazione;
+import com.biteme.app.model.Prenotazione;
 import com.biteme.app.exception.DatabaseConfigurationException;
 import com.biteme.app.persistence.PrenotazioneDao;
 

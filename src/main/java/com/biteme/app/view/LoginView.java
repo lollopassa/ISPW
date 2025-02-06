@@ -1,14 +1,14 @@
-package com.biteme.app.boundary;
+package com.biteme.app.view;
 
 import com.biteme.app.bean.LoginBean;
 import com.biteme.app.controller.LoginController;
-import com.biteme.app.entity.User;
+import com.biteme.app.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
-public class LoginBoundary {
+public class LoginView {
 
     @FXML
     private TextField emailOrUsernameTextField;

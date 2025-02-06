@@ -1,6 +1,6 @@
 package com.biteme.app.persistence;
 
-import com.biteme.app.entity.Archivio;
+import com.biteme.app.model.Archivio;
 
 import java.time.LocalDateTime;
 import java.util.List;

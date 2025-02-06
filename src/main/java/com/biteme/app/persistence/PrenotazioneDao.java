@@ -1,7 +1,7 @@
 package com.biteme.app.persistence;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import com.biteme.app.entity.Prenotazione;
+import com.biteme.app.model.Prenotazione;
 
 import java.util.List;
 

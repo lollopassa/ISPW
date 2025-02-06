@@ -1,4 +1,4 @@
-package com.biteme.app.boundary;
+package com.biteme.app.view;
 
 import com.biteme.app.bean.ArchivioBean;
 import com.biteme.app.bean.OrdineBean;
@@ -7,7 +7,7 @@ import com.biteme.app.controller.ArchivioController;
 import com.biteme.app.controller.OrdinazioneController;
 import com.biteme.app.controller.OrdineController;
 import com.biteme.app.controller.ProdottoController;
-import com.biteme.app.entity.Ordinazione;
+import com.biteme.app.model.Ordinazione;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,10 +23,10 @@ import java.util.List;
 import java.time.LocalTime;
 import java.util.logging.Logger;
 
-import com.biteme.app.entity.TipoOrdine;
+import com.biteme.app.model.TipoOrdine;
 
 
-public class OrdinazioneBoundary {
+public class OrdinazioneView {
 
     // Campi UI
     @FXML

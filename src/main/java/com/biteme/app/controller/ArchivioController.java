@@ -1,7 +1,7 @@
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.ArchivioBean;
-import com.biteme.app.entity.Archivio;
+import com.biteme.app.model.Archivio;
 import com.biteme.app.persistence.ArchivioDao;
 import com.biteme.app.util.Configuration;
 import java.util.LinkedHashMap;

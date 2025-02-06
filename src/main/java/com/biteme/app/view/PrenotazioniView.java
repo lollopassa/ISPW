@@ -1,8 +1,8 @@
-package com.biteme.app.boundary;
+package com.biteme.app.view;
 
 import com.biteme.app.bean.PrenotazioniBean;
 import com.biteme.app.controller.PrenotazioniController;
-import com.biteme.app.entity.Prenotazione;
+import com.biteme.app.model.Prenotazione;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -16,7 +16,7 @@ import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 
-public class PrenotazioniBoundary {
+public class PrenotazioniView {
 
     private static final String SUCCESS_TITLE = "Successo";
     private static final String ERROR_TITLE = "Errore";

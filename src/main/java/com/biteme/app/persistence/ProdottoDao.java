@@ -1,6 +1,6 @@
 package com.biteme.app.persistence;
 
-import com.biteme.app.entity.Prodotto;
+import com.biteme.app.model.Prodotto;
 import java.util.List;
 
 public interface ProdottoDao extends Dao<Integer, Prodotto> {

@@ -1,6 +1,6 @@
 package com.biteme.app.bean;
 
-import com.biteme.app.entity.Categoria;
+import com.biteme.app.model.Categoria;
 
 import java.math.BigDecimal;
 

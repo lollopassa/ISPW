@@ -1,8 +1,8 @@
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.LoginBean;
-import com.biteme.app.entity.User;
-import com.biteme.app.entity.UserRole;
+import com.biteme.app.model.User;
+import com.biteme.app.model.UserRole;
 import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.service.GoogleAuthService;
 import com.biteme.app.util.*;

@@ -1,4 +1,4 @@
-package com.biteme.app.boundary;
+package com.biteme.app.view;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,7 +17,7 @@ import java.util.Map;
 import com.biteme.app.controller.ArchivioController;
 import javafx.scene.layout.Pane;
 
-public class AdminHomeBoundary {
+public class AdminHomeView {
 
     @FXML
     private ComboBox<String> periodoComboBox;
@@ -46,7 +46,7 @@ public class AdminHomeBoundary {
 
     private boolean mostraGuadagni; // Flag per gestione dello switch
 
-    public AdminHomeBoundary() {
+    public AdminHomeView() {
         this.archivioController = new ArchivioController();
         this.mostraGuadagni = false; // Default: mostra prodotti più ordinati
     }

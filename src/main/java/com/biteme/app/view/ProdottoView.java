@@ -1,9 +1,9 @@
-package com.biteme.app.boundary;
+package com.biteme.app.view;
 
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.controller.ProdottoController;
-import com.biteme.app.entity.Categoria;
-import com.biteme.app.entity.Prodotto;
+import com.biteme.app.model.Categoria;
+import com.biteme.app.model.Prodotto;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -11,13 +11,13 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
 import java.math.BigDecimal;
-import com.biteme.app.entity.User;
-import com.biteme.app.entity.UserRole;
+import com.biteme.app.model.User;
+import com.biteme.app.model.UserRole;
 import com.biteme.app.util.UserSession;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class ProdottoBoundary {
+public class ProdottoView {
     private static final String ALERT_ERROR_TITLE = "Errore";
     private static final String ALERT_SUCCESS_TITLE = "Successo";
 
@@ -62,7 +62,7 @@ public class ProdottoBoundary {
 
     private final ProdottoController prodottoController;
 
-    public ProdottoBoundary() {
+    public ProdottoView() {
         this.prodottoController = new ProdottoController();
     }
 

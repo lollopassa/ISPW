@@ -1,7 +1,7 @@
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.PrenotazioniBean;
-import com.biteme.app.entity.Prenotazione;
+import com.biteme.app.model.Prenotazione;
 import com.biteme.app.persistence.PrenotazioneDao;
 import com.biteme.app.util.Configuration;
 

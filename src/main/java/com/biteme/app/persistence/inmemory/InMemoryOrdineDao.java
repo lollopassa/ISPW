@@ -1,6 +1,6 @@
 package com.biteme.app.persistence.inmemory;
 
-import com.biteme.app.entity.Ordine;
+import com.biteme.app.model.Ordine;
 import com.biteme.app.persistence.OrdineDao;
 
 import java.util.List;

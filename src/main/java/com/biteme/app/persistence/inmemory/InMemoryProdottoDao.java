@@ -1,6 +1,6 @@
 package com.biteme.app.persistence.inmemory;
 
-import com.biteme.app.entity.Prodotto;
+import com.biteme.app.model.Prodotto;
 import com.biteme.app.persistence.ProdottoDao;
 
 import java.util.ArrayList;

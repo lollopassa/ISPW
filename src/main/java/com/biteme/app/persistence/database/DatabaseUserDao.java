@@ -1,7 +1,7 @@
 package com.biteme.app.persistence.database;
 
-import com.biteme.app.entity.User;
-import com.biteme.app.entity.UserRole;
+import com.biteme.app.model.User;
+import com.biteme.app.model.UserRole;
 import com.biteme.app.exception.*;
 import com.biteme.app.persistence.UserDao;
 import com.biteme.app.util.HashingUtil;

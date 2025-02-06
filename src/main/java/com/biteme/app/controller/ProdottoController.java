@@ -1,7 +1,7 @@
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.ProdottoBean;
-import com.biteme.app.entity.Prodotto;
+import com.biteme.app.model.Prodotto;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.util.Configuration;
 

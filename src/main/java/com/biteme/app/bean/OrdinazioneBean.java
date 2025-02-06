@@ -1,7 +1,7 @@
 package com.biteme.app.bean;
 
-import com.biteme.app.entity.StatoOrdine;
-import com.biteme.app.entity.TipoOrdine;
+import com.biteme.app.model.StatoOrdine;
+import com.biteme.app.model.TipoOrdine;
 
 public class OrdinazioneBean {
 

@@ -1,7 +1,7 @@
 package com.biteme.app.persistence;
 
-import com.biteme.app.entity.Ordinazione;
-import com.biteme.app.entity.StatoOrdine; // Import dell'enum StatoOrdine
+import com.biteme.app.model.Ordinazione;
+import com.biteme.app.model.StatoOrdine; // Import dell'enum StatoOrdine
 
 import java.util.List;
 

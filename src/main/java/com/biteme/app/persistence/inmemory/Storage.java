@@ -1,6 +1,6 @@
 package com.biteme.app.persistence.inmemory;
 
-import com.biteme.app.entity.*;
+import com.biteme.app.model.*;
 
 import java.util.ArrayList;
 import java.util.Collections;

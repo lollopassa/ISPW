@@ -1,4 +1,4 @@
-package com.biteme.app.entity;
+package com.biteme.app.model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

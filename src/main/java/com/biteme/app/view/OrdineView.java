@@ -1,10 +1,10 @@
-package com.biteme.app.boundary;
+package com.biteme.app.view;
 
 import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.controller.OrdinazioneController;
 import com.biteme.app.controller.OrdineController;
-import com.biteme.app.entity.StatoOrdine;
+import com.biteme.app.model.StatoOrdine;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -20,7 +20,7 @@ import com.biteme.app.bean.OrdineBean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class OrdineBoundary {
+public class OrdineView {
 
     private final OrdineController controller = new OrdineController();
     private final OrdinazioneController ordinazioneController = new OrdinazioneController();
@@ -63,7 +63,7 @@ public class OrdineBoundary {
     @FXML
     public void initialize() {
         controller.setRiepilogoContenuto(this.riepilogoContenuto);
-        OrdinazioneBean ordinazioneBean = OrdinazioneBoundary.getOrdineSelezionato();
+        OrdinazioneBean ordinazioneBean = OrdinazioneView.getOrdineSelezionato();
 
         if (ordinazioneBean != null) {
             int ordineId = ordinazioneBean.getId();
@@ -77,10 +77,10 @@ public class OrdineBoundary {
                 }
                 caricaProdottiAssociati();
                 caricaProdottiNelRiepilogo(ordineBean);
-            } else {   Logger.getLogger(OrdineBoundary.class.getName())
+            } else {   Logger.getLogger(OrdineView.class.getName())
                     .log(Level.SEVERE, () -> "OrdineBean non trovato per l'ID: " + ordineId);}
         } else {
-            Logger.getLogger(OrdineBoundary.class.getName())
+            Logger.getLogger(OrdineView.class.getName())
                     .warning("Nessuna ordinazione selezionata.");
         }
     }

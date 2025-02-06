@@ -2,9 +2,9 @@ package com.biteme.app.controller;
 
 import com.biteme.app.bean.OrdineBean;
 import com.biteme.app.bean.ProdottoBean;
-import com.biteme.app.entity.Ordine;
-import com.biteme.app.entity.Prodotto;
-import com.biteme.app.entity.StatoOrdine;
+import com.biteme.app.model.Ordine;
+import com.biteme.app.model.Prodotto;
+import com.biteme.app.model.StatoOrdine;
 import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.util.Configuration;

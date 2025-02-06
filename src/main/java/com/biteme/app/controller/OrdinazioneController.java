@@ -2,9 +2,9 @@ package com.biteme.app.controller;
 
 import com.biteme.app.bean.OrdineBean;
 import com.biteme.app.bean.OrdinazioneBean;
-import com.biteme.app.boundary.OrdinazioneBoundary;
-import com.biteme.app.entity.Ordinazione;
-import com.biteme.app.entity.StatoOrdine;
+import com.biteme.app.view.OrdinazioneView;
+import com.biteme.app.model.Ordinazione;
+import com.biteme.app.model.StatoOrdine;
 import com.biteme.app.persistence.OrdinazioneDao;
 import com.biteme.app.util.Configuration;
 import com.biteme.app.util.SceneLoader;
@@ -64,7 +64,7 @@ public class OrdinazioneController {
 
     // Metodo per ottenere l'ID dell'ordine selezionato
     public int getIdOrdineSelezionato() {
-        OrdinazioneBean ordinazioneBean = OrdinazioneBoundary.getOrdineSelezionato();
+        OrdinazioneBean ordinazioneBean = OrdinazioneView.getOrdineSelezionato();
         return ordinazioneBean.getId();
     }
 
