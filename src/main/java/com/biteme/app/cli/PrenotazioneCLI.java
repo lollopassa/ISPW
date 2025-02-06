@@ -10,6 +10,11 @@ import com.biteme.app.controller.PrenotazioneController;
 import java.time.LocalTime;
 
 public class PrenotazioneCLI {
+
+    private PrenotazioneCLI() {
+        //costruttore privato
+    }
+
     private static PrenotazioneController prenotazioneController = new PrenotazioneController();
 
     public static void start() {

@@ -5,6 +5,11 @@ import com.biteme.app.bean.LoginBean;
 import com.biteme.app.controller.LoginController;
 
 public class LoginCLI {
+
+    private LoginCLI() {
+        //costruttore privato
+    }
+
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void login() {

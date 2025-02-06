@@ -19,11 +19,11 @@ import javafx.scene.layout.Pane;
 
 public class AdminHomeView {
 
-    @FXML
-    private ComboBox<String> periodoComboBox;
+    // Definizione della costante per "Guadagni"
+    private static final String GUADAGNI_LABEL = "Guadagni";
 
     @FXML
-    private Button aggiornaButton;
+    private ComboBox<String> periodoComboBox;
 
     @FXML
     private Button switchButton;
@@ -92,7 +92,7 @@ public class AdminHomeView {
 
         // Aggiunge i dati al nuovo grafico
         XYChart.Series<String, Number> serie = new XYChart.Series<>();
-        serie.setName(mostraGuadagni ? "Guadagni" : "Totale Ordini");
+        serie.setName(mostraGuadagni ? GUADAGNI_LABEL : "Totale Ordini");
         statistiche.forEach((key, value) -> serie.getData().add(new XYChart.Data<>(key, value)));
         newChart.getData().add(serie);
 
@@ -109,7 +109,7 @@ public class AdminHomeView {
         mostraGuadagni = !mostraGuadagni; // Cambia lo stato
 
         // Cambia il testo del pulsante
-        switchButton.setText(mostraGuadagni ? "Prodotti Ordinati" : "Guadagni");
+        switchButton.setText(mostraGuadagni ? "Prodotti Ordinati" : GUADAGNI_LABEL);
 
         // Aggiorna i dati per riflettere lo stato corrente
         aggiornaDati();
@@ -138,7 +138,7 @@ public class AdminHomeView {
         if (isGuadagni) {
             newXAxis.setCategories(FXCollections.observableArrayList("Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"));
             newXAxis.setLabel("Giorno della settimana");
-            newYAxis.setLabel("Guadagni");
+            newYAxis.setLabel(GUADAGNI_LABEL);
         } else {
             newXAxis.setLabel("Piatto");
             newYAxis.setLabel("Totale Ordini");

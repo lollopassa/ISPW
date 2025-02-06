@@ -9,7 +9,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class OrdineCLI {
-    // Utilizza i controller per lavorare con gli ordini e i prodotti
+
+    private OrdineCLI() {
+        //costruttore privato
+    }
+
     private static OrdineController ordineController = new OrdineController();
     private static ProdottoController prodottoController = new ProdottoController();
 
@@ -113,9 +117,6 @@ public class OrdineCLI {
         String nomeProdottoInput = scanner.nextLine();
         // Normalizza l'input: rimuove spazi superflui
         String nomeProdotto = nomeProdottoInput.trim();
-
-        // Se necessario, puoi forzare il formato (ad es. toUpperCase) in base a come sono memorizzati i nomi nel database:
-        // nomeProdotto = nomeProdotto.toUpperCase();
 
         // Recupera il ProdottoBean tramite il ProdottoController
         ProdottoBean prodotto = prodottoController.getProdottoByNome(nomeProdotto);

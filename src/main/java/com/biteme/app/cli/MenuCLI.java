@@ -4,9 +4,12 @@ import com.biteme.app.controller.LoginController;
 
 public class MenuCLI {
 
-    // Instead of main(), we create a start() method that receives the logged-in user.
+    private MenuCLI() {
+        //costruttore privato
+    }
+
     public static void start() {
-        // Instead of saving user directly, check using the LoginController
+
         LoginController loginController = new LoginController();
 
         var scanner = CLIUtils.getScanner();

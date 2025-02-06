@@ -4,6 +4,12 @@ import com.biteme.app.bean.SignupBean;
 import com.biteme.app.controller.SignupController;
 
 public class SignupCLI {
+
+    private SignupCLI() {
+        //costruttore privato
+    }
+
+    private static final String RETRY_MESSAGE = "Riprova la registrazione.\n";
     public static void start() {
         var scanner = CLIUtils.getScanner();
         System.out.println("========== Signup CLI ==========");
@@ -25,23 +31,22 @@ public class SignupCLI {
         SignupController signupController = new SignupController();
         if (!signupController.isValid(signupBean)) {
             System.out.println("Errore di Validazione: " + signupController.getErrorMessage());
-            System.out.println("Riprova la registrazione.\n");
-            start(); // Richiama la registrazione
+            System.out.println(RETRY_MESSAGE);
+            start();
         } else {
             try {
                 if (signupController.registerUser(signupBean)) {
                     System.out.println("Registrazione completata con successo!");
-                    // Dopo la registrazione, invia l'utente al login
                     LoginCLI.login();
                 } else {
                     System.out.println("Errore: " + signupController.getErrorMessage());
-                    System.out.println("Riprova la registrazione.\n");
-                    start(); // Richiama la registrazione in caso di errore
+                    System.out.println(RETRY_MESSAGE);
+                    start();
                 }
             } catch (IllegalArgumentException ex) {
                 System.out.println("Errore di Registrazione: " + ex.getMessage());
-                System.out.println("Riprova la registrazione.\n");
-                start(); // Richiama la registrazione in caso di eccezione
+                System.out.println(RETRY_MESSAGE);
+                start();
             }
         }
     }
