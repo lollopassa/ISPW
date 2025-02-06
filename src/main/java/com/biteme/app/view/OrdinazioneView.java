@@ -8,6 +8,7 @@ import com.biteme.app.controller.ArchivioController;
 import com.biteme.app.controller.OrdinazioneController;
 import com.biteme.app.controller.OrdineController;
 import com.biteme.app.controller.ProdottoController;
+import com.biteme.app.exception.ProdottoNotFoundException;
 import com.biteme.app.model.TipoOrdine;
 import com.biteme.app.util.SceneLoader;
 import javafx.collections.FXCollections;
@@ -283,14 +284,13 @@ public class OrdinazioneView {
             String nomeProdotto = prodotti.get(i);
             ProdottoBean prodotto = prodottoController.getProdottoByNome(nomeProdotto);
             if (prodotto == null) {
-                throw new RuntimeException("Prodotto non trovato: " + nomeProdotto);
+                throw new ProdottoNotFoundException("Prodotto non trovato: " + nomeProdotto);
             }
             BigDecimal prezzo = prodotto.getPrezzo();
             totale = totale.add(prezzo.multiply(BigDecimal.valueOf(quantita.get(i))));
         }
         return totale;
     }
-
     private void refreshTable() {
         List<OrdinazioneBean> ordini = ordinazioneController.getOrdini();
         ordinazioniTableView.getItems().setAll(ordini);

@@ -101,12 +101,13 @@ public class PrenotazioneView {
         PrenotazioneBean bean = new PrenotazioneBean();
         bean.setNomeCliente(nomeClienteField.getText().trim());
 
-        try {
-            bean.setOrario(LocalTime.parse(orarioField.getText().trim()));
-        } catch (Exception e) {
-            showAlert(ERROR_TITLE, "Inserisci un orario valido (hh:mm).", Alert.AlertType.ERROR);
+        // Parsing dell'orario (estratto in un metodo separato)
+        LocalTime orario = parseOrario(orarioField.getText());
+        if (orario == null) {
             return;
         }
+        bean.setOrario(orario);
+
         bean.setData(giornoSelezionato);
 
         String telefono = telefonoField.getText().trim();
@@ -118,14 +119,12 @@ public class PrenotazioneView {
 
         bean.setNote(noteField.getText().trim());
 
-        try {
-            int coperti = Integer.parseInt(copertiField.getText().trim());
-            if (coperti <= 0) throw new NumberFormatException();
-            bean.setCoperti(coperti);
-        } catch (NumberFormatException e) {
-            showAlert(ERROR_TITLE, "Inserisci un numero valido per i coperti.", Alert.AlertType.ERROR);
+        // Parsing dei coperti (estratto in un metodo separato)
+        Integer coperti = parseCoperti(copertiField.getText());
+        if (coperti == null) {
             return;
         }
+        bean.setCoperti(coperti);
 
         prenotazioneController.creaPrenotazione(bean);
 
@@ -221,20 +220,13 @@ public class PrenotazioneView {
                 return null;
             }
 
-            LocalTime orario;
-            try {
-                orario = LocalTime.parse(orarioInput.getText().trim());
-            } catch (Exception e) {
-                showAlert(ERROR_TITLE, "Inserisci un orario valido (hh:mm).", Alert.AlertType.ERROR);
+            LocalTime orario = parseOrario(orarioInput.getText());
+            if (orario == null) {
                 return null;
             }
 
-            int coperti;
-            try {
-                coperti = Integer.parseInt(copertiInput.getText().trim());
-                if (coperti <= 0) throw new NumberFormatException();
-            } catch (NumberFormatException e) {
-                showAlert(ERROR_TITLE, "Inserisci un numero valido per i coperti.", Alert.AlertType.ERROR);
+            Integer coperti = parseCoperti(copertiInput.getText());
+            if (coperti == null) {
                 return null;
             }
 
@@ -257,6 +249,34 @@ public class PrenotazioneView {
             return bean;
         } catch (Exception e) {
             showAlert(ERROR_TITLE, "Errore durante la modifica della prenotazione.", Alert.AlertType.ERROR);
+            return null;
+        }
+    }
+
+    /**
+     * Estrae il parsing dell'orario in un metodo separato.
+     */
+    private LocalTime parseOrario(String orarioText) {
+        try {
+            return LocalTime.parse(orarioText.trim());
+        } catch (Exception e) {
+            showAlert(ERROR_TITLE, "Inserisci un orario valido (hh:mm).", Alert.AlertType.ERROR);
+            return null;
+        }
+    }
+
+    /**
+     * Estrae il parsing dei coperti in un metodo separato.
+     */
+    private Integer parseCoperti(String copertiText) {
+        try {
+            int coperti = Integer.parseInt(copertiText.trim());
+            if (coperti <= 0) {
+                throw new NumberFormatException();
+            }
+            return coperti;
+        } catch (NumberFormatException e) {
+            showAlert(ERROR_TITLE, "Inserisci un numero valido per i coperti.", Alert.AlertType.ERROR);
             return null;
         }
     }
@@ -378,14 +398,13 @@ public class PrenotazioneView {
 
     private void selezionaGiorno(LocalDate data, Label giorno) {
         if (casellaSelezionata instanceof Label) {
-            ((Label) casellaSelezionata).setStyle(DAY_LABEL_DEFAULT_STYLE);
+            (casellaSelezionata).setStyle(DAY_LABEL_DEFAULT_STYLE);
         }
         giorno.setStyle(DAY_LABEL_SELECTED_STYLE);
         casellaSelezionata = giorno;
         giornoSelezionato = data;
         refreshTable(data);
     }
-
 
     private void resetForm() {
         nomeClienteField.clear();
