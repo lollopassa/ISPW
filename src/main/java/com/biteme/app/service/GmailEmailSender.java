@@ -15,6 +15,10 @@ import java.io.IOException;
 
 public class GmailEmailSender {
 
+    private GmailEmailSender() {
+        //costruttore privato
+    }
+
     private static final String APPLICATION_NAME = "BiteMeApp";
     private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();

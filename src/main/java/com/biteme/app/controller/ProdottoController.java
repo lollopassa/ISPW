@@ -6,7 +6,6 @@ import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.util.Configuration;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ProdottoController {
 
@@ -48,7 +47,7 @@ public class ProdottoController {
         List<Prodotto> prodotti = prodottoDao.getByDisponibilita(true);
         return prodotti.stream()
                 .map(this::mapProdottoToBean)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**

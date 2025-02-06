@@ -1,16 +1,16 @@
 package com.biteme.app.view;
 
 import com.biteme.app.bean.EmailBean;
-import com.biteme.app.bean.PrenotazioniBean;
-import com.biteme.app.controller.PrenotazioniController;
+import com.biteme.app.bean.PrenotazioneBean;
 import com.biteme.app.controller.EmailController;
-import com.biteme.app.model.Prenotazione;
+import com.biteme.app.controller.PrenotazioneController;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
 import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
@@ -18,7 +18,7 @@ import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 
-public class PrenotazioniView {
+public class PrenotazioneView {
 
     private static final String SUCCESS_TITLE = "Successo";
     private static final String ERROR_TITLE = "Errore";
@@ -38,20 +38,20 @@ public class PrenotazioniView {
     @FXML private TextField noteField;
     @FXML private TextField telefonoField;
 
-    @FXML private TableView<Prenotazione> prenotazioniTableView;
-    @FXML private TableColumn<Prenotazione, Integer> idColumn;
-    @FXML private TableColumn<Prenotazione, String> nomeColumn;
-    @FXML private TableColumn<Prenotazione, LocalDate> dataColumn;
-    @FXML private TableColumn<Prenotazione, LocalTime> orarioColumn;
-    @FXML private TableColumn<Prenotazione, Integer> copertiColumn;
-    @FXML private TableColumn<Prenotazione, String> telefonoColumn;
-    @FXML private TableColumn<Prenotazione, String> noteColumn;
+    @FXML private TableView<PrenotazioneBean> prenotazioniTableView;
+    @FXML private TableColumn<PrenotazioneBean, Integer> idColumn;
+    @FXML private TableColumn<PrenotazioneBean, String> nomeColumn;
+    @FXML private TableColumn<PrenotazioneBean, LocalDate> dataColumn;
+    @FXML private TableColumn<PrenotazioneBean, LocalTime> orarioColumn;
+    @FXML private TableColumn<PrenotazioneBean, Integer> copertiColumn;
+    @FXML private TableColumn<PrenotazioneBean, String> telefonoColumn;
+    @FXML private TableColumn<PrenotazioneBean, String> noteColumn;
 
     @FXML private Button modificaButton;
     @FXML private Button eliminaButton;
     @FXML private Button emailButton;  // Pulsante per inviare l'email della prenotazione
 
-    private final PrenotazioniController prenotazioniController = new PrenotazioniController();
+    private final PrenotazioneController prenotazioneController = new PrenotazioneController();
     private final EmailController emailController = new EmailController();
     private YearMonth meseCorrente;
     private Node casellaSelezionata;
@@ -98,7 +98,7 @@ public class PrenotazioniView {
             return;
         }
 
-        com.biteme.app.bean.PrenotazioniBean bean = new com.biteme.app.bean.PrenotazioniBean();
+        PrenotazioneBean bean = new PrenotazioneBean();
         bean.setNomeCliente(nomeClienteField.getText().trim());
 
         try {
@@ -127,7 +127,7 @@ public class PrenotazioniView {
             return;
         }
 
-        prenotazioniController.creaPrenotazione(bean);
+        prenotazioneController.creaPrenotazione(bean);
 
         showAlert(SUCCESS_TITLE, "Prenotazione creata con successo!", Alert.AlertType.INFORMATION);
         resetForm();
@@ -136,20 +136,20 @@ public class PrenotazioniView {
 
     @FXML
     private void eliminaPrenotazione() {
-        Prenotazione selected = prenotazioniTableView.getSelectionModel().getSelectedItem();
+        PrenotazioneBean selected = prenotazioniTableView.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert(ERROR_TITLE, "Seleziona una prenotazione dalla tabella.", Alert.AlertType.ERROR);
             return;
         }
 
-        prenotazioniController.eliminaPrenotazione(selected.getId());
+        prenotazioneController.eliminaPrenotazione(selected.getId());
         showAlert(SUCCESS_TITLE, "Prenotazione eliminata con successo.", Alert.AlertType.INFORMATION);
         refreshTable(giornoSelezionato);
     }
 
     @FXML
     private void modificaPrenotazione() {
-        Prenotazione prenotazioneSelezionata = prenotazioniTableView.getSelectionModel().getSelectedItem();
+        PrenotazioneBean prenotazioneSelezionata = prenotazioniTableView.getSelectionModel().getSelectedItem();
         if (prenotazioneSelezionata == null) {
             showAlert(ERROR_TITLE, "Seleziona una prenotazione da modificare.", Alert.AlertType.ERROR);
             return;
@@ -157,8 +157,8 @@ public class PrenotazioniView {
         mostraDialogModifica(prenotazioneSelezionata);
     }
 
-    private void mostraDialogModifica(Prenotazione prenotazione) {
-        Dialog<Prenotazione> dialog = new Dialog<>();
+    private void mostraDialogModifica(PrenotazioneBean prenotazione) {
+        Dialog<PrenotazioneBean> dialog = new Dialog<>();
         dialog.setTitle("Modifica Prenotazione");
         dialog.setHeaderText("Modifica i dati della prenotazione");
 
@@ -199,16 +199,15 @@ public class PrenotazioniView {
 
         dialog.showAndWait().ifPresent(updatedPrenotazione -> {
             if (updatedPrenotazione != null) {
-                prenotazioniController.modificaPrenotazione(updatedPrenotazione);
+                prenotazioneController.modificaPrenotazione(updatedPrenotazione);
                 refreshTable(giornoSelezionato);
                 showAlert(SUCCESS_TITLE, "Prenotazione aggiornata correttamente!", Alert.AlertType.INFORMATION);
             }
         });
     }
 
-
-    private Prenotazione validateAndCreatePrenotazione(Prenotazione prenotazione, TextField nomeField, DatePicker dataPicker, TextField orarioInput, TextField copertiInput,
-                                                       TextField telefonoInput, TextField noteInput) {
+    private PrenotazioneBean validateAndCreatePrenotazione(PrenotazioneBean prenotazione, TextField nomeField, DatePicker dataPicker, TextField orarioInput, TextField copertiInput,
+                                                           TextField telefonoInput, TextField noteInput) {
         try {
             String nomeCliente = nomeField.getText().trim();
             if (nomeCliente.isEmpty()) {
@@ -247,31 +246,30 @@ public class PrenotazioniView {
 
             String note = noteInput.getText().trim();
 
-            return new Prenotazione(
-                    prenotazione.getId(),
-                    nomeCliente,
-                    orario,
-                    data,
-                    note,
-                    telefono,
-                    coperti
-            );
+            PrenotazioneBean bean = new PrenotazioneBean();
+            bean.setId(prenotazione.getId());
+            bean.setNomeCliente(nomeCliente);
+            bean.setData(data);
+            bean.setOrario(orario);
+            bean.setCoperti(coperti);
+            bean.setTelefono(telefono);
+            bean.setNote(note);
+            return bean;
         } catch (Exception e) {
             showAlert(ERROR_TITLE, "Errore durante la modifica della prenotazione.", Alert.AlertType.ERROR);
             return null;
         }
     }
 
-
     @FXML
     private void inviaEmail() {
-        Prenotazione selected = prenotazioniTableView.getSelectionModel().getSelectedItem();
+        PrenotazioneBean selected = prenotazioniTableView.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert(ERROR_TITLE, "Seleziona una prenotazione dalla tabella.", Alert.AlertType.ERROR);
             return;
         }
-        // Conversione in PrenotazioniBean
-        PrenotazioniBean bean = new PrenotazioniBean();
+        // Uso il bean per comporre l'email
+        PrenotazioneBean bean = new PrenotazioneBean();
         bean.setNomeCliente(selected.getNomeCliente());
         bean.setData(selected.getData());
         bean.setOrario(selected.getOrario());
@@ -321,7 +319,7 @@ public class PrenotazioniView {
 
     private void refreshTable(LocalDate data) {
         if (data != null) {
-            List<Prenotazione> prenotazioni = prenotazioniController.getPrenotazioniByData(data);
+            List<PrenotazioneBean> prenotazioni = prenotazioneController.getPrenotazioniByData(data);
             prenotazioniTableView.setItems(FXCollections.observableArrayList(prenotazioni));
             prenotazioniTableView.refresh();
         } else {
@@ -359,14 +357,11 @@ public class PrenotazioniView {
                 if (giornoCorrente > giorniNelMese) {
                     return;
                 }
-
                 if (riga == 1 && colonna < primoGiornoSettimana) {
                     continue;
                 }
-
                 LocalDate data = mese.atDay(giornoCorrente);
                 Label giorno = new Label(String.valueOf(giornoCorrente));
-
                 if (data.isBefore(oggi)) {
                     giorno.setStyle("-fx-font-size: 14; -fx-alignment: center; -fx-border-color: lightgray; -fx-border-width: 0.5;" +
                             "-fx-background-color: lightgray; -fx-text-fill: darkgray; -fx-cursor: default;");
@@ -390,6 +385,7 @@ public class PrenotazioniView {
         giornoSelezionato = data;
         refreshTable(data);
     }
+
 
     private void resetForm() {
         nomeClienteField.clear();

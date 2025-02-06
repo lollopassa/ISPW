@@ -4,16 +4,20 @@ import com.biteme.app.bean.ArchivioBean;
 import com.biteme.app.model.Archivio;
 import com.biteme.app.persistence.ArchivioDao;
 import com.biteme.app.util.Configuration;
-import java.util.LinkedHashMap;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import java.util.stream.Collectors;
 
 public class ArchivioController {
     private ArchivioDao archivioDao;
+
+    // Definizione delle costanti
+    private static final String PERIODO_SETTIMANA = "settimana";
+    private static final String PERIODO_MESE = "mese";
+    private static final String PERIODO_TRIMESTRE = "trimestre";
 
     public ArchivioController() {
         this.archivioDao = Configuration.getPersistenceProvider()
@@ -64,13 +68,13 @@ public class ArchivioController {
         LocalDateTime endDate = LocalDateTime.now();
 
         switch (periodo.toLowerCase()) {
-            case "settimana":
+            case PERIODO_SETTIMANA:
                 startDate = endDate.minusWeeks(1);
                 break;
-            case "mese":
+            case PERIODO_MESE:
                 startDate = endDate.minusMonths(1);
                 break;
-            case "trimestre":
+            case PERIODO_TRIMESTRE:
                 startDate = endDate.minusMonths(3);
                 break;
             default:
@@ -85,13 +89,13 @@ public class ArchivioController {
         LocalDateTime endDate = LocalDateTime.now();
 
         switch (periodo.toLowerCase()) {
-            case "settimana":
+            case PERIODO_SETTIMANA:
                 startDate = endDate.minusWeeks(1);
                 break;
-            case "mese":
+            case PERIODO_MESE:
                 startDate = endDate.minusMonths(1);
                 break;
-            case "trimestre":
+            case PERIODO_TRIMESTRE:
                 startDate = endDate.minusMonths(3);
                 break;
             default:
@@ -119,18 +123,19 @@ public class ArchivioController {
                         LinkedHashMap::new
                 ));
     }
+
     public Map<String, Number> guadagniPerGiorno(String periodo) {
         LocalDateTime startDate;
         LocalDateTime endDate = LocalDateTime.now();
 
         switch (periodo.toLowerCase()) {
-            case "settimana":
+            case PERIODO_SETTIMANA:
                 startDate = endDate.minusWeeks(1);
                 break;
-            case "mese":
+            case PERIODO_MESE:
                 startDate = endDate.minusMonths(1);
                 break;
-            case "trimestre":
+            case PERIODO_TRIMESTRE:
                 startDate = endDate.minusMonths(3);
                 break;
             default:

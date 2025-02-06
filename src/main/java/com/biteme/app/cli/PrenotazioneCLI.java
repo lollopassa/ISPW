@@ -2,17 +2,19 @@ package com.biteme.app.cli;
 
 import java.time.LocalDate;
 import java.util.List;
-import com.biteme.app.bean.PrenotazioniBean;
-import com.biteme.app.controller.PrenotazioniController;
-import com.biteme.app.model.Prenotazione;
+import java.util.Scanner;
+
+import com.biteme.app.bean.PrenotazioneBean;
+import com.biteme.app.controller.PrenotazioneController;
+
 import java.time.LocalTime;
 
-public class PrenotazioniCLI {
-    private static PrenotazioniController prenotazioniController = new PrenotazioniController();
+public class PrenotazioneCLI {
+    private static PrenotazioneController prenotazioneController = new PrenotazioneController();
 
     public static void start() {
-        var scanner = CLIUtils.getScanner();
-        while(true) {
+        Scanner scanner = CLIUtils.getScanner();
+        while (true) {
             System.out.println("========== Prenotazioni CLI ==========");
             System.out.println("1. Crea Prenotazione");
             System.out.println("2. Elimina Prenotazione");
@@ -21,8 +23,8 @@ public class PrenotazioniCLI {
             System.out.print("Scegli un'opzione: ");
             String scelta = scanner.nextLine();
 
-            if(scelta.equals("1")) {
-                PrenotazioniBean bean = new PrenotazioniBean();
+            if (scelta.equals("1")) {
+                PrenotazioneBean bean = new PrenotazioneBean();
                 System.out.print("Nome Cliente: ");
                 bean.setNomeCliente(scanner.nextLine().trim());
                 System.out.print("Data (YYYY-MM-DD): ");
@@ -35,26 +37,26 @@ public class PrenotazioniCLI {
                 bean.setTelefono(scanner.nextLine().trim());
                 System.out.print("Note: ");
                 bean.setNote(scanner.nextLine().trim());
-                prenotazioniController.creaPrenotazione(bean);
+                prenotazioneController.creaPrenotazione(bean);
                 System.out.println("Prenotazione creata con successo.");
-            } else if(scelta.equals("2")) {
+            } else if (scelta.equals("2")) {
                 System.out.print("Inserisci l'ID della prenotazione da eliminare: ");
                 int id = Integer.parseInt(scanner.nextLine());
-                prenotazioniController.eliminaPrenotazione(id);
+                prenotazioneController.eliminaPrenotazione(id);
                 System.out.println("Prenotazione eliminata.");
-            } else if(scelta.equals("3")) {
+            } else if (scelta.equals("3")) {
                 System.out.print("Inserisci la data (YYYY-MM-DD): ");
                 LocalDate data = LocalDate.parse(scanner.nextLine().trim());
-                List<Prenotazione> prenotazioni = prenotazioniController.getPrenotazioniByData(data);
-                if(prenotazioni.isEmpty()) {
+                List<PrenotazioneBean> prenotazioni = prenotazioneController.getPrenotazioniByData(data);
+                if (prenotazioni.isEmpty()) {
                     System.out.println("Nessuna prenotazione per la data specificata.");
                 } else {
                     System.out.println("Prenotazioni per il " + data + ":");
-                    for(Prenotazione p : prenotazioni) {
+                    for (PrenotazioneBean p : prenotazioni) {
                         System.out.println(p.getId() + " - " + p.getNomeCliente() + " alle " + p.getOrario());
                     }
                 }
-            } else if(scelta.equals("4")) {
+            } else if (scelta.equals("4")) {
                 break;
             } else {
                 System.out.println("Opzione non valida.");

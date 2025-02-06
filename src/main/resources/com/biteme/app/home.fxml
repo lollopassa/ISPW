@@ -13,7 +13,7 @@
       <fx:include source="menuLaterale.fxml" />
 
       <!-- Etichetta "Home" nel Header -->
-      <Label fx:id="homeLabelG" layoutX="349.0" layoutY="24.0" text="Home" textAlignment="CENTER" textFill="BLACK" wrapText="true">
+      <Label fx:id="homeLabelG" layoutX="349.0" layoutY="24.0" text="Home" textAlignment="CENTER" textFill="BLACK" wrapText="true" >
          <font>
             <Font size="32.0" />
          </font>
@@ -33,7 +33,12 @@
          </font>
       </Label>
 
-
+      <!-- Etichetta Messaggio di Benvenuto -->
+      <Label fx:id="welcomeMessageLabel" layoutX="600.0" layoutY="600.0" text="" textAlignment="CENTER" textFill="BLACK" wrapText="true">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
 
    </children>
 </Pane>

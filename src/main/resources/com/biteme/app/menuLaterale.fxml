@@ -6,7 +6,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.biteme.app.view.MenuLateraleView">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.14-internal" fx:controller="com.biteme.app.view.MenuLateraleView">
     <children>
 
         <!-- Rettangolo Grigio (Header Superiore) -->
@@ -15,8 +15,10 @@
         <!-- Rettangolo Blu (Sfondo del Menu Laterale) -->
         <Rectangle fill="#303d68" height="800.0" layoutX="-1.0" layoutY="-1.0" stroke="BLACK" strokeType="OUTSIDE" width="302.0" />
 
-        <!-- Rettangolo Grigio (Header Superiore) -->
-        <Rectangle fill="#D9D9D9" height="106.0" layoutX="302.0" layoutY="-3.0" stroke="BLACK" strokeType="OUTSIDE" width="1139.0" />
+        <!-- Header with Username Label -->
+        <HBox layoutX="302.0" layoutY="0.0" prefHeight="106.0" prefWidth="1139.0" alignment="CENTER_RIGHT" spacing="10" style="-fx-padding: 15 20 10 0;">
+            <Label fx:id="usernameLabel" style="-fx-font-size: 32px; -fx-text-fill: black;" text="Username" />
+        </HBox>
 
         <!-- Immagine Coltello e Forchetta -->
         <ImageView fx:id="colEforImagine" fitHeight="100.0" fitWidth="100.0" layoutX="100.0" layoutY="30.0" pickOnBounds="true" preserveRatio="true">

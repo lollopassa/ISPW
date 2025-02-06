@@ -3,10 +3,10 @@ package com.biteme.app.cli;
 import java.util.List;
 import java.util.Scanner;
 
+import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.controller.ArchivioController;
 import com.biteme.app.controller.OrdineController;
 import com.biteme.app.controller.OrdinazioneController;
-import com.biteme.app.model.Ordinazione;
 
 public class OrdinazioneCLI {
 
@@ -53,12 +53,12 @@ public class OrdinazioneCLI {
                     break;
 
                 case "2":
-                    List<Ordinazione> ordini = ordinazioneController.getOrdini();
+                    List<OrdinazioneBean> ordini = ordinazioneController.getOrdini();
                     if (ordini.isEmpty()) {
                         System.out.println("Nessun ordine disponibile.");
                     } else {
-                        for (Ordinazione o : ordini) {
-                            System.out.println(o.getId() + " - " + o.getNomeCliente());
+                        for (OrdinazioneBean o : ordini) {
+                            System.out.println(o.getId() + " - " + o.getNome());
                         }
                         System.out.print("Inserisci l'ID dell'ordine da modificare: ");
                         try {
@@ -72,12 +72,12 @@ public class OrdinazioneCLI {
                     break;
 
                 case "3":
-                    List<Ordinazione> ordiniDaEliminare = ordinazioneController.getOrdini();
+                    List<OrdinazioneBean> ordiniDaEliminare = ordinazioneController.getOrdini();
                     if (ordiniDaEliminare.isEmpty()) {
                         System.out.println("Nessun ordine disponibile.");
                     } else {
-                        for (Ordinazione o : ordiniDaEliminare) {
-                            System.out.println(o.getId() + " - " + o.getNomeCliente());
+                        for (OrdinazioneBean o : ordiniDaEliminare) {
+                            System.out.println(o.getId() + " - " + o.getNome());
                         }
                         System.out.print("Inserisci l'ID dell'ordine da eliminare: ");
                         try {
@@ -91,12 +91,12 @@ public class OrdinazioneCLI {
                     break;
 
                 case "4":
-                    List<Ordinazione> ordiniDaArchiviare = ordinazioneController.getOrdini();
+                    List<OrdinazioneBean> ordiniDaArchiviare = ordinazioneController.getOrdini();
                     if (ordiniDaArchiviare.isEmpty()) {
                         System.out.println("Nessun ordine disponibile.");
                     } else {
-                        for (Ordinazione o : ordiniDaArchiviare) {
-                            System.out.println(o.getId() + " - " + o.getNomeCliente());
+                        for (OrdinazioneBean o : ordiniDaArchiviare) {
+                            System.out.println(o.getId() + " - " + o.getNome());
                         }
                         System.out.print("Inserisci l'ID dell'ordine da archiviare: ");
                         try {
@@ -116,13 +116,13 @@ public class OrdinazioneCLI {
                     break;
 
                 case "5":
-                    List<Ordinazione> listaOrdini = ordinazioneController.getOrdini();
+                    List<OrdinazioneBean> listaOrdini = ordinazioneController.getOrdini();
                     if (listaOrdini.isEmpty()) {
                         System.out.println("Nessun ordine disponibile.");
                     } else {
                         System.out.println("Lista Ordini:");
-                        for (Ordinazione o : listaOrdini) {
-                            System.out.println(o.getId() + " - " + o.getNomeCliente() + " (" + o.getTipoOrdine() + ")");
+                        for (OrdinazioneBean o : listaOrdini) {
+                            System.out.println(o.getId() + " - " + o.getNome() + " (" + o.getTipoOrdine() + ")");
                         }
                     }
                     break;

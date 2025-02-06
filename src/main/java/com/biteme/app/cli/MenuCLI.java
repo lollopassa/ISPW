@@ -35,7 +35,7 @@ public class MenuCLI {
                     }
                     break;
                 case "2":
-                    PrenotazioniCLI.start();
+                    PrenotazioneCLI.start();
                     break;
                 case "3":
                     OrdinazioneCLI.start();

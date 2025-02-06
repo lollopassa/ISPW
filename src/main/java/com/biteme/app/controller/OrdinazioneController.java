@@ -15,7 +15,7 @@ import java.util.List;
 public class OrdinazioneController {
 
     private final OrdinazioneDao ordinazioneDao;
-    private final OrdineController ordineController; // Aggiunto per chiamare salvaOrdine
+    private final OrdineController ordineController; // Per salvare l'ordine collegato
 
     public OrdinazioneController() {
         this.ordinazioneDao = Configuration.getPersistenceProvider()
@@ -25,68 +25,62 @@ public class OrdinazioneController {
     }
 
     public void creaOrdine(OrdinazioneBean ordinazioneBean) {
-        // Step 1: Crea oggetto Ordinazione e setta lo stato iniziale a StatoOrdine.NUOVO
-        Ordinazione ordinazione = new Ordinazione(
-                0, // ID assegnato automaticamente dal DAO
-                ordinazioneBean.getNome(),
-                ordinazioneBean.getNumeroClienti(),
-                ordinazioneBean.getTipoOrdine(),
-                ordinazioneBean.getInfoTavolo(),
-                StatoOrdine.NUOVO, // Usa direttamente l'enum StatoOrdine
-                ordinazioneBean.getOrarioCreazione()
-        );
-
+        // Creazione dell'oggetto model a partire dal bean
+        Ordinazione ordinazione = convertToModel(ordinazioneBean);
+        // Imposta lo stato iniziale se necessario (ad esempio, NUOVO)
+        ordinazione.setStatoOrdine(StatoOrdine.NUOVO);
         // Salva l'ordinazione nel database
         ordinazioneDao.store(ordinazione);
 
-        // Step 2: Crea OrdineBean correlato utilizzando l'ID dell'ordinazione
-        OrdineBean ordineBean = new OrdineBean();
-        ordineBean.setId(ordinazione.getId()); // Assegna l'ID dell'ordinazione all'ordine
-        ordineBean.setProdotti(new ArrayList<>()); // Lista prodotti inizialmente vuota
-        ordineBean.setQuantita(new ArrayList<>()); // Quantità inizialmente vuota
+        // Imposta l'ID generato nel bean
+        ordinazioneBean.setId(ordinazione.getId());
 
-        // Step 3: Salva l'ordine nel database, collegandolo all'ordinazione
-        ordineController.salvaOrdine(ordineBean, ordinazione.getId()); // Ora utilizza 2 parametri
+        // Crea l'OrdineBean collegato e lo salva
+        OrdineBean ordineBean = new OrdineBean();
+        ordineBean.setId(ordinazione.getId());
+        ordineBean.setProdotti(new ArrayList<>());
+        ordineBean.setQuantita(new ArrayList<>());
+        ordineController.salvaOrdine(ordineBean, ordinazione.getId());
     }
 
-    public List<Ordinazione> getOrdini() {
-        // Recupera tutti gli ordini tramite il DAO
-        return ordinazioneDao.getAll();
+    /**
+     * Restituisce tutti gli ordini come bean.
+     */
+    public List<OrdinazioneBean> getOrdini() {
+        List<Ordinazione> listaModel = ordinazioneDao.getAll();
+        return listaModel.stream()
+                .map(this::convertToBean)
+                .toList();
     }
 
     public void eliminaOrdine(int id) {
         if (ordinazioneDao.exists(id)) {
-            ordinazioneDao.delete(id); // Cancella l'ordine dal database
+            ordinazioneDao.delete(id);
         } else {
             throw new IllegalArgumentException("L'ordine con ID " + id + " non esiste.");
         }
     }
 
-    // Metodo per ottenere l'ID dell'ordine selezionato
+    // Metodo per ottenere l'ID dell'ordine selezionato dalla view
     public int getIdOrdineSelezionato() {
         OrdinazioneBean ordinazioneBean = OrdinazioneView.getOrdineSelezionato();
         return ordinazioneBean.getId();
     }
 
-    // Metodo per aggiornare lo stato dell'ordinazione
+    // Metodo per aggiornare lo stato dell'ordinazione (se necessario)
     public void aggiornaStatoOrdinazione(int ordineId, StatoOrdine nuovoStato) {
-        // Usa OrdinazioneDao per aggiornare lo stato nel database
         ordinazioneDao.aggiornaStato(ordineId, nuovoStato);
     }
 
-    // Metodo per cambiare scena e tornare alla schermata ordine
     public void cambiaASchermataOrdinazione() {
         SceneLoader.loadScene("/com/biteme/app/ordinazione.fxml", "Torna a Ordinazione");
     }
 
     public boolean isValidTime(String time) {
-        // Verifica il formato HH:mm tramite una regex
         String timePattern = "([01]\\d|2[0-3]):([0-5]\\d)";
         if (!time.matches(timePattern)) {
             return false;
         }
-
-        // Validazione aggiuntiva: verifica se è parsabile come LocalTime
         try {
             java.time.LocalTime.parse(time);
             return true;
@@ -96,7 +90,30 @@ public class OrdinazioneController {
     }
 
     public void eliminaOrdinazione(Integer id) {
-        // Cancella un'ordinazione
         ordinazioneDao.delete(id);
+    }
+
+    private Ordinazione convertToModel(OrdinazioneBean bean) {
+        return new Ordinazione(
+                bean.getId(),
+                bean.getNome(),
+                bean.getNumeroClienti(),
+                bean.getTipoOrdine(),
+                bean.getInfoTavolo(),
+                bean.getStatoOrdine(),
+                bean.getOrarioCreazione()
+        );
+    }
+
+    private OrdinazioneBean convertToBean(Ordinazione model) {
+        OrdinazioneBean bean = new OrdinazioneBean();
+        bean.setId(model.getId());
+        bean.setNome(model.getNomeCliente());
+        bean.setNumeroClienti(model.getNumeroClienti());
+        bean.setTipoOrdine(model.getTipoOrdine());
+        bean.setInfoTavolo(model.getInfoTavolo());
+        bean.setStatoOrdine(model.getStatoOrdine());
+        bean.setOrarioCreazione(model.getOrarioCreazione());
+        return bean;
     }
 }

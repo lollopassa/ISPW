@@ -1,7 +1,8 @@
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.EmailBean;
-import com.biteme.app.bean.PrenotazioniBean;
+import com.biteme.app.bean.PrenotazioneBean;
+import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.service.GmailEmailSender;
 import com.biteme.app.util.GoogleAuthUtility;
 import javax.mail.MessagingException;
@@ -23,10 +24,11 @@ public class EmailController {
             if (userData != null) {
                 fromEmail = userData.getEmail();
             } else {
+                throw new IllegalArgumentException("I dati dell'utente autenticato non sono disponibili.");
             }
-        } catch (Exception e) {
-
-            throw new IllegalStateException("Errore durante il processo di autenticazione con Google", e);
+        } catch (InterruptedException | GoogleAuthException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Il processo di autenticazione è stato interrotto", e);
         }
 
         // Esegui i controlli sui valori recuperati
@@ -44,13 +46,16 @@ public class EmailController {
                     emailBean.getDestinatario(),
                     emailBean.getSubject(),
                     emailBean.getBody());
+        } catch (MessagingException e) {
+            throw new MessagingException("Errore durante l'invio dell'email: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw e;
+            throw new IllegalStateException("Errore generico durante l'invio dell'email", e);
+
         }
     }
 
 
-    public EmailBean composeEmailFromPrenotazione(PrenotazioniBean bean) {
+    public EmailBean composeEmailFromPrenotazione(PrenotazioneBean bean) {
         String subject = "Conferma Prenotazione per " + bean.getNomeCliente();
         StringBuilder body = new StringBuilder();
         body.append("Gentile ").append(bean.getNomeCliente()).append(",\n\n");

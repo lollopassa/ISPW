@@ -9,6 +9,10 @@ import javax.mail.internet.MimeMessage;
 
 public class CreateMessage {
 
+    private CreateMessage() {
+        //costruttore privato
+    }
+
     public static Message createMessageWithEmail(MimeMessage emailContent)
             throws MessagingException, IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();

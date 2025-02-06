@@ -4,6 +4,7 @@ import com.biteme.app.controller.LoginController;
 import com.biteme.app.util.SceneLoader;
 import com.biteme.app.util.UserSession;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,6 +14,9 @@ public class MenuLateraleView {
     private LoginController loginController;
 
     private static final Logger LOGGER = Logger.getLogger(MenuLateraleView.class.getName());
+
+    @FXML
+    private Label usernameLabel; // Collegamento all'etichetta dell'username
 
     @FXML
     private StackPane homeButton;
@@ -32,7 +36,6 @@ public class MenuLateraleView {
     @FXML
     private StackPane logoutButton;
 
-
     private void onLogout() {
         if (LOGGER.isLoggable(Level.INFO)) {
             LOGGER.info("Effettuato il logout");
@@ -44,6 +47,10 @@ public class MenuLateraleView {
     @FXML
     public void initialize() {
         this.loginController = new LoginController();
+
+        // Imposta il nome utente in alto a destra
+        setUsernameLabel();
+
         if (loginController.isUserAdmin()) {
             homeButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/adminHome.fxml", "Admin Home"));
         } else {
@@ -54,5 +61,15 @@ public class MenuLateraleView {
         ordiniButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/ordinazione.fxml", "Ordini"));
         magazzinoButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/prodotto.fxml", "Magazzino"));
         logoutButton.setOnMouseClicked(_ -> onLogout());
+    }
+
+    private void setUsernameLabel() {
+        String username = loginController.getCurrentUsername();
+
+        if (username != null && !username.isEmpty()) {
+            usernameLabel.setText("Benvenuto, " + username);
+        } else {
+            usernameLabel.setText("Benvenuto!");
+        }
     }
 }

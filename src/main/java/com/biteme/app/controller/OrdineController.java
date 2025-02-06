@@ -15,7 +15,6 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class OrdineController {
 
@@ -136,7 +135,7 @@ public class OrdineController {
                     prodottoBean.setDisponibile(prodotto.isDisponibile());
                     return prodottoBean;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // OrdineController.java
@@ -180,6 +179,6 @@ public class OrdineController {
                     prodottoBean.setDisponibile(prodotto.isDisponibile());
                     return prodottoBean;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 }

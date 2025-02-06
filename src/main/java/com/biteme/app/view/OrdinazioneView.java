@@ -3,28 +3,25 @@ package com.biteme.app.view;
 import com.biteme.app.bean.ArchivioBean;
 import com.biteme.app.bean.OrdineBean;
 import com.biteme.app.bean.ProdottoBean;
+import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.controller.ArchivioController;
 import com.biteme.app.controller.OrdinazioneController;
 import com.biteme.app.controller.OrdineController;
 import com.biteme.app.controller.ProdottoController;
-import com.biteme.app.model.Ordinazione;
+import com.biteme.app.model.TipoOrdine;
+import com.biteme.app.util.SceneLoader;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import com.biteme.app.bean.OrdinazioneBean;
-import com.biteme.app.util.SceneLoader;
+import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-
 import java.time.LocalTime;
+import java.util.List;
 import java.util.logging.Logger;
-
-import com.biteme.app.model.TipoOrdine;
-
 
 public class OrdinazioneView {
 
@@ -34,7 +31,6 @@ public class OrdinazioneView {
 
     @FXML
     private ComboBox<TipoOrdine> tipoOrdineComboBox;
-
 
     @FXML
     private TextField orarioField;
@@ -46,50 +42,45 @@ public class OrdinazioneView {
     private TextField tavoloField;
 
     @FXML
-    private TableView<Ordinazione> ordinazioniTableView;
+    private TableView<OrdinazioneBean> ordinazioniTableView;
 
     @FXML
-    private TableColumn<Ordinazione, Integer> idColumn;
+    private TableColumn<OrdinazioneBean, Integer> idColumn;
 
     @FXML
-    private TableColumn<Ordinazione, String> nomeColumn;
+    private TableColumn<OrdinazioneBean, String> nomeColumn;
 
     @FXML
-    private TableColumn<Ordinazione, String> tipoOrdineColumn;
+    private TableColumn<OrdinazioneBean, TipoOrdine> tipoOrdineColumn;
 
     @FXML
-    private TableColumn<Ordinazione, String> orarioColumn;
+    private TableColumn<OrdinazioneBean, String> orarioColumn;
 
     @FXML
-    private TableColumn<Ordinazione, String> copertiColumn;
+    private TableColumn<OrdinazioneBean, String> copertiColumn;
 
     @FXML
-    private TableColumn<Ordinazione, String> infoTavoloColumn;
+    private TableColumn<OrdinazioneBean, String> infoTavoloColumn;
 
     @FXML
-    private TableColumn<Ordinazione, String> statoOrdineColumn;
+    private TableColumn<OrdinazioneBean, String> statoOrdineColumn;
+
+    @FXML
+    private Button modificaButton; // Per modificare l'ordine
+
+    @FXML
+    private Button eliminaButton; // Per eliminare l'ordine
+
+    @FXML
+    private Button archiviaButton; // Per archiviare l'ordine
 
     private final OrdineController ordineController = new OrdineController();
     private final ArchivioController archivioController = new ArchivioController();
     private final ProdottoController prodottoController = new ProdottoController();
+    private final OrdinazioneController ordinazioneController = new OrdinazioneController();
 
     private static OrdinazioneBean ordineSelezionato;
-    private final OrdinazioneController ordinazioneController = new OrdinazioneController();
     private static final String ERROR_TITLE = "Errore";
-
-    @FXML
-    private Button modificaButton; // Pulsante per modificare l'ordine
-
-    @FXML
-    private Button eliminaButton; // Pulsante per eliminare l'ordine
-
-    @FXML
-    private Button archiviaButton; // Pulsante per archiviare l'ordine
-
-
-
-
-
 
     @FXML
     public void initialize() {
@@ -99,13 +90,13 @@ public class OrdinazioneView {
 
         modificaButton.setDisable(true);
         eliminaButton.setDisable(true);
-        archiviaButton.setDisable(true); // Disabilita inizialmente anche il pulsante archivia
+        archiviaButton.setDisable(true);
 
         ordinazioniTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             boolean isSelected = (newValue != null);
             modificaButton.setDisable(!isSelected);
             eliminaButton.setDisable(!isSelected);
-            archiviaButton.setDisable(!isSelected); // Abilita o disabilita il pulsante archivia
+            archiviaButton.setDisable(!isSelected);
         });
     }
 
@@ -115,27 +106,22 @@ public class OrdinazioneView {
         tipoOrdineComboBox.getItems().addAll(TipoOrdine.values());
         tipoOrdineComboBox.setPromptText("Al Tavolo o Asporto?");
         tipoOrdineComboBox.setValue(null);
-        tipoOrdineComboBox.setCellFactory(lv -> createOrderCell());
-        tipoOrdineComboBox.setButtonCell(createOrderCell());
-    }
-
-    // Metodo per creare una ListCell personalizzata
-    private ListCell<TipoOrdine> createOrderCell() {
-        return new ListCell<>() {
+        // Imposta una StringConverter per mostrare il testo formattato
+        tipoOrdineComboBox.setConverter(new StringConverter<>() {
             @Override
-            protected void updateItem(TipoOrdine item, boolean empty) {
-                super.updateItem(item, empty);
-                setText((empty || item == null) ? "Al Tavolo o Asporto?" : item.name().replace("_", " "));
+            public String toString(TipoOrdine object) {
+                return (object == null) ? "Al Tavolo o Asporto?" : object.name().replace("_", " ");
             }
-        };
+            @Override
+            public TipoOrdine fromString(String string) {
+                return TipoOrdine.valueOf(string.replace(" ", "_"));
+            }
+        });
     }
-
-
-
 
     private void initTableColumns() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        nomeColumn.setCellValueFactory(new PropertyValueFactory<>("nomeCliente"));
+        nomeColumn.setCellValueFactory(new PropertyValueFactory<>("nome"));
         tipoOrdineColumn.setCellValueFactory(new PropertyValueFactory<>("tipoOrdine"));
         orarioColumn.setCellValueFactory(new PropertyValueFactory<>("orarioCreazione"));
         copertiColumn.setCellValueFactory(new PropertyValueFactory<>("numeroClienti"));
@@ -163,14 +149,12 @@ public class OrdinazioneView {
         } else if (tipoOrdine == TipoOrdine.ASPORTO) {
             coperti = null;
             tavolo = null;
-
             if (orario.isEmpty()) {
                 showAlert("Campi Mancanti",
                         "Il campo Orario deve essere compilato in caso di Asporto.",
                         Alert.AlertType.WARNING);
                 return;
             }
-
             if (!ordinazioneController.isValidTime(orario)) {
                 showAlert("Formato Orario Non Valido",
                         "Il campo 'Orario' deve essere nel formato HH:mm, ad esempio '12:20'.",
@@ -201,7 +185,6 @@ public class OrdinazioneView {
         refreshTable();
     }
 
-    // Metodo Getter per ottenere l'oggetto statico OrdineSelezionato
     public static OrdinazioneBean getOrdineSelezionato() {
         return ordineSelezionato;
     }
@@ -212,48 +195,39 @@ public class OrdinazioneView {
 
     @FXML
     private void modificaOrdine() {
-        Ordinazione ordinazione = ordinazioniTableView.getSelectionModel().getSelectedItem();
+        OrdinazioneBean ordinazione = ordinazioniTableView.getSelectionModel().getSelectedItem();
         if (ordinazione == null) {
             showAlert(ERROR_TITLE, "Seleziona un ordine da modificare.", Alert.AlertType.ERROR);
             return;
         }
-
         try {
-            // Creiamo un nuovo OrdinazioneBean e usiamo il setter statico per impostarlo
             OrdinazioneBean ordine = new OrdinazioneBean();
             ordine.setId(ordinazione.getId());
-            ordine.setNome(ordinazione.getNomeCliente());
+            ordine.setNome(ordinazione.getNome());
             ordine.setNumeroClienti(ordinazione.getNumeroClienti());
             ordine.setTipoOrdine(ordinazione.getTipoOrdine());
             ordine.setInfoTavolo(ordinazione.getInfoTavolo());
             ordine.setStatoOrdine(ordinazione.getStatoOrdine());
             ordine.setOrarioCreazione(ordinazione.getOrarioCreazione());
 
-            // Utilizzo del metodo statico per impostare l'ordine selezionato
             setOrdineSelezionato(ordine);
-
-            // Carichiamo la nuova scena
             SceneLoader.loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
-
         } catch (Exception e) {
             showAlert(ERROR_TITLE, "Errore durante il caricamento della schermata di modifica.", Alert.AlertType.ERROR);
         }
     }
 
-
-    // Metodo per eliminare l'ordine selezionato
     @FXML
     private void eliminaOrdine() {
-        Ordinazione ordinazioneSelezionato = ordinazioniTableView.getSelectionModel().getSelectedItem();
-        if (ordinazioneSelezionato == null) {
+        OrdinazioneBean ordinazioneSelezionata = ordinazioniTableView.getSelectionModel().getSelectedItem();
+        if (ordinazioneSelezionata == null) {
             showAlert(ERROR_TITLE, "Seleziona un ordine da eliminare.", Alert.AlertType.ERROR);
             return;
         }
-
-        boolean conferma = mostraDialogConferma("Sei sicuro di voler eliminare l'ordine " + ordinazioneSelezionato.getId() + "?");
+        boolean conferma = mostraDialogConferma("Sei sicuro di voler eliminare l'ordine " + ordinazioneSelezionata.getId() + "?");
         if (conferma) {
             try {
-                ordinazioneController.eliminaOrdine(ordinazioneSelezionato.getId());
+                ordinazioneController.eliminaOrdine(ordinazioneSelezionata.getId());
                 refreshTable();
                 showAlert("Successo", "Ordine eliminato con successo.", Alert.AlertType.INFORMATION);
             } catch (Exception e) {
@@ -264,36 +238,24 @@ public class OrdinazioneView {
 
     @FXML
     public void archiviaOrdine(ActionEvent actionEvent) {
-        Ordinazione ordinazioneSelezionata = ordinazioniTableView.getSelectionModel().getSelectedItem();
-
+        OrdinazioneBean ordinazioneSelezionata = ordinazioniTableView.getSelectionModel().getSelectedItem();
         if (ordinazioneSelezionata == null) {
             showAlert(ERROR_TITLE, "Seleziona un ordine da archiviare.", Alert.AlertType.ERROR);
             return;
         }
-
         boolean conferma = mostraDialogConferma("Sei sicuro di voler archiviare l'ordine " + ordinazioneSelezionata.getId() + "?");
         if (conferma) {
             try {
-                // Step 1: Recupera l'OrdineBean corrispondente
                 OrdineBean ordineBean = ordineController.getOrdineById(ordinazioneSelezionata.getId());
-
-                // Step 2: Calcola il totale
                 BigDecimal totale = calcolaTotaleOrdine(ordineBean);
-
-                // Step 3: Inizializza ArchivioBean
                 ArchivioBean archivioBean = new ArchivioBean();
                 archivioBean.setIdOrdine(ordineBean.getId());
                 archivioBean.setProdotti(ordineBean.getProdotti());
                 archivioBean.setQuantita(ordineBean.getQuantita());
                 archivioBean.setTotale(totale);
                 archivioBean.setDataArchiviazione(LocalDateTime.now());
-
-                // Passa i dettagli al controller per gestire l'archiviazione effettiva
                 archivioController.archiviaOrdine(archivioBean);
-
-                // Step 4: Elimina l'ordine dalla lista attiva
                 ordinazioneController.eliminaOrdine(ordinazioneSelezionata.getId());
-
                 refreshTable();
                 showAlert("Successo", "Ordine archiviato con successo.", Alert.AlertType.INFORMATION);
             } catch (Exception e) {
@@ -304,59 +266,44 @@ public class OrdinazioneView {
 
     private BigDecimal calcolaTotaleOrdine(OrdineBean ordineBean) {
         BigDecimal totale = BigDecimal.ZERO;
-
         if (ordineBean == null) {
             throw new IllegalArgumentException("OrdineBean non valido: null");
         }
-
         List<String> prodotti = ordineBean.getProdotti();
         List<Integer> quantita = ordineBean.getQuantita();
-
-        // Controllo se prodotti o quantità sono null o vuoti
         if (prodotti == null || quantita == null || prodotti.isEmpty() || quantita.isEmpty()) {
             Logger.getLogger(this.getClass().getName())
                     .warning("Lista prodotti o quantità vuota. Totale ordine: 0");
-            return totale; // Ritorna 0 come totale
+            return totale;
         }
-
-        // Verifica che la lunghezza delle liste prodotti e quantita sia congruente
         if (prodotti.size() != quantita.size()) {
             throw new IllegalStateException("Dimensioni di prodotti e quantità non corrispondenti");
         }
-
         for (int i = 0; i < prodotti.size(); i++) {
             String nomeProdotto = prodotti.get(i);
             ProdottoBean prodotto = prodottoController.getProdottoByNome(nomeProdotto);
-
             if (prodotto == null) {
                 throw new RuntimeException("Prodotto non trovato: " + nomeProdotto);
             }
-
             BigDecimal prezzo = prodotto.getPrezzo();
             totale = totale.add(prezzo.multiply(BigDecimal.valueOf(quantita.get(i))));
         }
-
         return totale;
     }
 
-
     private void refreshTable() {
-        List<Ordinazione> ordini = ordinazioneController.getOrdini();
+        List<OrdinazioneBean> ordini = ordinazioneController.getOrdini();
         ordinazioniTableView.getItems().setAll(ordini);
     }
 
     private void clearFields() {
-        // Ripulisci i campi
         nomeClienteField.clear();
         orarioField.clear();
         copertiField.clear();
         tavoloField.clear();
-
-        // Resetta la ComboBox al placeholder
         tipoOrdineComboBox.getSelectionModel().clearSelection();
         tipoOrdineComboBox.setValue(null);
     }
-
 
     private boolean mostraDialogConferma(String messaggio) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -371,5 +318,4 @@ public class OrdinazioneView {
         alert.setContentText(content);
         alert.showAndWait();
     }
-
 }
