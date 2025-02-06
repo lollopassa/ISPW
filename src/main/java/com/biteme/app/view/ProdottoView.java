@@ -1,23 +1,22 @@
 package com.biteme.app.view;
 
 import com.biteme.app.bean.ProdottoBean;
+import com.biteme.app.controller.LoginController;
 import com.biteme.app.controller.ProdottoController;
 import com.biteme.app.model.Categoria;
-import com.biteme.app.model.Prodotto;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
-import java.math.BigDecimal;
-import com.biteme.app.model.User;
-import com.biteme.app.model.UserRole;
-import com.biteme.app.util.UserSession;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.math.BigDecimal;
+
 public class ProdottoView {
+
     private static final String ALERT_ERROR_TITLE = "Errore";
     private static final String ALERT_SUCCESS_TITLE = "Successo";
 
@@ -36,23 +35,24 @@ public class ProdottoView {
     @FXML
     private TextField prezzoField;
 
+    // La TableView ora utilizza ProdottoBean
     @FXML
-    private TableView<Prodotto> prodottiTableView;
+    private TableView<ProdottoBean> prodottiTableView;
 
     @FXML
-    private TableColumn<Prodotto, Integer> idColumn;
+    private TableColumn<ProdottoBean, Integer> idColumn;
 
     @FXML
-    private TableColumn<Prodotto, String> nomeColumn;
+    private TableColumn<ProdottoBean, String> nomeColumn;
 
     @FXML
-    private TableColumn<Prodotto, Categoria> categoriaColumn;
+    private TableColumn<ProdottoBean, Categoria> categoriaColumn;
 
     @FXML
-    private TableColumn<Prodotto, BigDecimal> prezzoColumn;
+    private TableColumn<ProdottoBean, BigDecimal> prezzoColumn;
 
     @FXML
-    private TableColumn<Prodotto, Boolean> disponibileColumn;
+    private TableColumn<ProdottoBean, Boolean> disponibileColumn;
 
     @FXML
     private Button modificaButton;
@@ -61,9 +61,11 @@ public class ProdottoView {
     private Button eliminaButton;
 
     private final ProdottoController prodottoController;
+    private final LoginController loginController;
 
     public ProdottoView() {
         this.prodottoController = new ProdottoController();
+        this.loginController = new LoginController();
     }
 
     @FXML
@@ -72,27 +74,23 @@ public class ProdottoView {
         configureTableColumns();
         refreshTable();
 
-        // Recupera l'utente loggato dalla sessione
-        User currentUser = UserSession.getCurrentUser();
-        boolean isAdmin = currentUser != null && currentUser.getRuolo() == UserRole.ADMIN;
+        // Verifica il ruolo dell'utente tramite LoginController
+        boolean isAdmin = loginController.isUserAdmin();
 
-        // Se l'utente NON è admin, nascondi l'intera sezione "aggiungi prodotto" e i pulsanti admin
         if (!isAdmin) {
             aggiungiProdottoVBox.setVisible(false);
             aggiungiProdottoVBox.setManaged(false);
             adminButtonsHBox.setVisible(false);
             adminButtonsHBox.setManaged(false);
-
-            // Inoltre, se non admin, disabilita l'editing della tabella (se lo desideri)
+            // Disabilita l'editing della tabella per utenti non admin
             prodottiTableView.setEditable(false);
         } else {
-            // Se admin, mostra le sezioni e imposta correttamente i pulsanti di modifica/eliminazione
             aggiungiProdottoVBox.setVisible(true);
             aggiungiProdottoVBox.setManaged(true);
             adminButtonsHBox.setVisible(true);
             adminButtonsHBox.setManaged(true);
 
-            // Gestione della selezione della tabella per abilitare/disabilitare i pulsanti
+            // Gestione della selezione per abilitare/disabilitare i pulsanti
             modificaButton.setDisable(true);
             eliminaButton.setDisable(true);
             prodottiTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -108,12 +106,11 @@ public class ProdottoView {
         categoriaComboBox.getItems().add(null); // Placeholder
         categoriaComboBox.getItems().addAll(Categoria.values());
         categoriaComboBox.setPromptText("Seleziona una categoria");
-        categoriaComboBox.setValue(null); // Imposta il valore iniziale al placeholder
+        categoriaComboBox.setValue(null); // Imposta il placeholder
         categoriaComboBox.setCellFactory(lv -> createCategoryCell());
         categoriaComboBox.setButtonCell(createCategoryCell());
     }
 
-    // Metodo per creare una ListCell personalizzata
     private ListCell<Categoria> createCategoryCell() {
         return new ListCell<>() {
             @Override
@@ -125,17 +122,16 @@ public class ProdottoView {
     }
 
     private void configureTableColumns() {
-        // Configurazione delle colonne della tabella
+        // Configurazione delle colonne della tabella tramite PropertyValueFactory sui bean
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         nomeColumn.setCellValueFactory(new PropertyValueFactory<>("nome"));
         categoriaColumn.setCellValueFactory(new PropertyValueFactory<>("categoria"));
         prezzoColumn.setCellValueFactory(new PropertyValueFactory<>("prezzo"));
         disponibileColumn.setCellValueFactory(new PropertyValueFactory<>("disponibile"));
 
-        // Permetti modifiche in linea (se necessario) per la colonna del nome
+        // Se vuoi permettere l'editing inline, puoi configurare la colonna del nome in questo modo:
         nomeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
     }
-
 
     private boolean isNumeric(String str) {
         try {
@@ -149,19 +145,17 @@ public class ProdottoView {
     @FXML
     private void aggiungiProdotto() {
         try {
-            // Controlla che il nome del prodotto non sia vuoto
+            // Verifica che il nome non sia vuoto
             if (nomeProdottoField.getText().isBlank()) {
                 showAlert(ALERT_ERROR_TITLE, "Il nome del prodotto non può essere vuoto!", Alert.AlertType.ERROR);
                 return;
             }
-
-            // Controlla che sia stata selezionata una categoria valida
-            if (categoriaComboBox.getValue() == null) { // 'null' rappresenta il placeholder
+            // Verifica che sia selezionata una categoria valida
+            if (categoriaComboBox.getValue() == null) {
                 showAlert(ALERT_ERROR_TITLE, "Seleziona una categoria!", Alert.AlertType.ERROR);
                 return;
             }
-
-            // Controlla che il prezzo sia numerico e valido
+            // Verifica che il prezzo sia numerico e valido
             if (prezzoField.getText().isBlank() || !isNumeric(prezzoField.getText())) {
                 showAlert(ALERT_ERROR_TITLE, "Inserisci un valore numerico valido per il prezzo!", Alert.AlertType.ERROR);
                 return;
@@ -170,15 +164,14 @@ public class ProdottoView {
             // Creazione del bean Prodotto
             ProdottoBean prodottoBean = new ProdottoBean();
             prodottoBean.setNome(nomeProdottoField.getText());
-            prodottoBean.setCategoria(categoriaComboBox.getValue()); // Categoria valida selezionata
+            prodottoBean.setCategoria(categoriaComboBox.getValue());
             prodottoBean.setPrezzo(new BigDecimal(prezzoField.getText()));
-            prodottoBean.setDisponibile(true); // Di default è disponibile
+            prodottoBean.setDisponibile(true); // Di default, il prodotto è disponibile
 
-            // Salva attraverso il controller
+            // Salva il prodotto tramite il controller
             prodottoController.aggiungiProdotto(prodottoBean);
             showAlert(ALERT_SUCCESS_TITLE, "Prodotto aggiunto correttamente!", Alert.AlertType.INFORMATION);
 
-            // Pulisce i campi dopo il salvataggio
             clearFields();
             refreshTable();
         } catch (NumberFormatException e) {
@@ -212,15 +205,18 @@ public class ProdottoView {
         return alert.getResult() == ButtonType.YES;
     }
 
-    private void mostraDialogModifica(Prodotto prodotto) {
-        Dialog<Prodotto> dialog = new Dialog<>();
+    /**
+     * Mostra la dialog per modificare un prodotto. La dialog lavora con il bean.
+     */
+    private void mostraDialogModifica(ProdottoBean bean) {
+        Dialog<ProdottoBean> dialog = new Dialog<>();
         dialog.setTitle("Modifica Prodotto");
 
-        // Configuriamo i campi di input per la modifica
-        TextField nomeField = new TextField(prodotto.getNome());
+        // Configura i campi di input per la modifica
+        TextField nomeField = new TextField(bean.getNome());
         ComboBox<Categoria> categoriaField = new ComboBox<>(FXCollections.observableArrayList(Categoria.values()));
-        categoriaField.setValue(prodotto.getCategoria());
-        TextField priceField = new TextField(prodotto.getPrezzo().toString());
+        categoriaField.setValue(bean.getCategoria());
+        TextField priceField = new TextField(bean.getPrezzo().toString());
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -234,32 +230,29 @@ public class ProdottoView {
 
         dialog.getDialogPane().setContent(grid);
 
-        // Pulsanti di azione per il dialogo
         ButtonType salvaButtonType = new ButtonType("Salva", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(salvaButtonType, ButtonType.CANCEL);
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == salvaButtonType) {
                 try {
-                    // Ritorna il prodotto aggiornato
-                    return new Prodotto(
-                            prodotto.getId(),
-                            nomeField.getText(),
-                            new BigDecimal(priceField.getText()),
-                            categoriaField.getValue(),
-                            prodotto.isDisponibile() // Mantieni la disponibilità invariata
-                    );
+                    ProdottoBean beanAggiornato = new ProdottoBean();
+                    beanAggiornato.setId(bean.getId());
+                    beanAggiornato.setNome(nomeField.getText());
+                    beanAggiornato.setCategoria(categoriaField.getValue());
+                    beanAggiornato.setPrezzo(new BigDecimal(priceField.getText()));
+                    beanAggiornato.setDisponibile(bean.getDisponibile());
+                    return beanAggiornato;
                 } catch (NumberFormatException e) {
                     showAlert(ALERT_ERROR_TITLE, "Inserisci un valore valido per il prezzo!", Alert.AlertType.ERROR);
-                    return null;
                 }
             }
             return null;
         });
 
-        // Otteniamo il risultato del dialogo
-        dialog.showAndWait().ifPresent(prodottoAggiornato -> {
-            prodottoController.modificaProdotto(prodottoAggiornato);
+        dialog.showAndWait().ifPresent(beanAggiornato -> {
+            // Chiedi al controller di aggiornare il prodotto (il controller si occuperà della conversione)
+            prodottoController.modificaProdotto(beanAggiornato);
             refreshTable();
             showAlert(ALERT_SUCCESS_TITLE, "Prodotto aggiornato con successo!", Alert.AlertType.INFORMATION);
         });
@@ -267,26 +260,23 @@ public class ProdottoView {
 
     @FXML
     private void modificaProdotto() {
-        // Prendere il prodotto selezionato
-        Prodotto prodottoSelezionato = prodottiTableView.getSelectionModel().getSelectedItem();
+        ProdottoBean prodottoSelezionato = prodottiTableView.getSelectionModel().getSelectedItem();
         if (prodottoSelezionato == null) {
             showAlert(ALERT_ERROR_TITLE, "Seleziona un prodotto da modificare.", Alert.AlertType.ERROR);
             return;
         }
-
         mostraDialogModifica(prodottoSelezionato);
     }
 
     @FXML
     private void eliminaProdotto() {
-        // Prendere il prodotto selezionato
-        Prodotto prodottoSelezionato = prodottiTableView.getSelectionModel().getSelectedItem();
+        ProdottoBean prodottoSelezionato = prodottiTableView.getSelectionModel().getSelectedItem();
         if (prodottoSelezionato == null) {
             showAlert(ALERT_ERROR_TITLE, "Seleziona un prodotto da eliminare.", Alert.AlertType.ERROR);
             return;
         }
-
-        boolean confermato = mostraDialogConferma("Sei sicuro di voler eliminare il prodotto " + prodottoSelezionato.getNome() + "?");
+        boolean confermato = mostraDialogConferma("Sei sicuro di voler eliminare il prodotto "
+                + prodottoSelezionato.getNome() + "?");
         if (confermato) {
             prodottoController.eliminaProdotto(prodottoSelezionato.getId());
             refreshTable();
