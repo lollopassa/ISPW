@@ -10,21 +10,21 @@ import java.util.Base64;
 
 public class GoogleAuthService {
 
-    public GoogleAuthUtility.GoogleUserData authenticateWithGoogle() throws GoogleAuthException {
+    // Modifichiamo il metodo per restituire l'access token
+    public String authenticateWithGoogle() throws GoogleAuthException {
         try {
-            GoogleAuthUtility.GoogleUserData googleUser = GoogleAuthUtility.authenticate();
-
-            if (googleUser.getEmail() == null) {
-                throw new IllegalStateException("Autenticazione Google fallita");
-            }
-
-            return googleUser;
+            return GoogleAuthUtility.authenticate();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new GoogleAuthException("Il thread è stato interrotto durante l'autenticazione con Google.", e);
         } catch (Exception e) {
             throw new GoogleAuthException("Errore durante l'autenticazione con Google", e);
         }
+    }
+
+    // Aggiungiamo un nuovo metodo per ottenere i dati utente
+    public GoogleAuthUtility.GoogleUserData getGoogleUserData(String accessToken) throws GoogleAuthException {
+        return GoogleAuthUtility.getGoogleUserData(accessToken);
     }
 
     public User createGoogleUser(GoogleAuthUtility.GoogleUserData googleUser) {

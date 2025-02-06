@@ -46,7 +46,13 @@ public class LoginController {
 
     public User authenticateWithGoogle() throws GoogleAuthException {
         try {
-            GoogleAuthUtility.GoogleUserData googleUser = googleAuthService.authenticateWithGoogle();
+            // Ottieni l'access token tramite GoogleAuthService
+            String accessToken = googleAuthService.authenticateWithGoogle();
+
+            // Usa l'access token per ottenere i dati dell'utente
+            GoogleAuthUtility.GoogleUserData googleUser = googleAuthService.getGoogleUserData(accessToken);
+
+            // Carica o crea un nuovo utente
             return userDao.load(googleUser.getEmail())
                     .map(this::validateGoogleUser)
                     .orElseGet(() -> {
@@ -101,5 +107,14 @@ public class LoginController {
     private boolean isValidEmail(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,7}$";
         return Pattern.compile(emailRegex).matcher(email).matches();
+    }
+
+    public boolean isUserAdmin() {
+        User currentUser = UserSession.getCurrentUser();
+        return currentUser != null && currentUser.getRuolo() == UserRole.ADMIN;
+    }
+
+    public void logout() {
+        UserSession.clear();
     }
 }
