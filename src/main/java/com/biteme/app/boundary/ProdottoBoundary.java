@@ -11,10 +11,21 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
 import java.math.BigDecimal;
+import com.biteme.app.entity.User;
+import com.biteme.app.entity.UserRole;
+import com.biteme.app.util.UserSession;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 public class ProdottoBoundary {
     private static final String ALERT_ERROR_TITLE = "Errore";
     private static final String ALERT_SUCCESS_TITLE = "Successo";
+
+    @FXML
+    private HBox adminButtonsHBox;
+
+    @FXML
+    private VBox aggiungiProdottoVBox;
 
     @FXML
     private TextField nomeProdottoField;
@@ -61,14 +72,35 @@ public class ProdottoBoundary {
         configureTableColumns();
         refreshTable();
 
-        modificaButton.setDisable(true);
-        eliminaButton.setDisable(true);
+        // Recupera l'utente loggato dalla sessione
+        User currentUser = UserSession.getCurrentUser();
+        boolean isAdmin = currentUser != null && currentUser.getRuolo() == UserRole.ADMIN;
 
-        prodottiTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            boolean isSelected = (newValue != null);
-            modificaButton.setDisable(!isSelected);
-            eliminaButton.setDisable(!isSelected);
-        });
+        // Se l'utente NON è admin, nascondi l'intera sezione "aggiungi prodotto" e i pulsanti admin
+        if (!isAdmin) {
+            aggiungiProdottoVBox.setVisible(false);
+            aggiungiProdottoVBox.setManaged(false);
+            adminButtonsHBox.setVisible(false);
+            adminButtonsHBox.setManaged(false);
+
+            // Inoltre, se non admin, disabilita l'editing della tabella (se lo desideri)
+            prodottiTableView.setEditable(false);
+        } else {
+            // Se admin, mostra le sezioni e imposta correttamente i pulsanti di modifica/eliminazione
+            aggiungiProdottoVBox.setVisible(true);
+            aggiungiProdottoVBox.setManaged(true);
+            adminButtonsHBox.setVisible(true);
+            adminButtonsHBox.setManaged(true);
+
+            // Gestione della selezione della tabella per abilitare/disabilitare i pulsanti
+            modificaButton.setDisable(true);
+            eliminaButton.setDisable(true);
+            prodottiTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                boolean isSelected = (newValue != null);
+                modificaButton.setDisable(!isSelected);
+                eliminaButton.setDisable(!isSelected);
+            });
+        }
     }
 
     private void configureComboBox() {

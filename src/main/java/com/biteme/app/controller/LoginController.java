@@ -5,11 +5,8 @@ import com.biteme.app.entity.User;
 import com.biteme.app.entity.UserRole;
 import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.service.GoogleAuthService;
-import com.biteme.app.util.Configuration;
+import com.biteme.app.util.*;
 import com.biteme.app.persistence.UserDao;
-import com.biteme.app.util.GoogleAuthUtility;
-import com.biteme.app.util.HashingUtil;
-import com.biteme.app.util.SceneLoader;
 
 import java.util.regex.Pattern;
 
@@ -70,6 +67,9 @@ public class LoginController {
     }
 
     public void navigateToHome(User user) {
+        // Salva l'utente loggato nella sessione
+        UserSession.setCurrentUser(user);
+
         if (user.getRuolo() == UserRole.ADMIN) {
             SceneLoader.loadScene("/com/biteme/app/adminHome.fxml", "Admin Home - BiteMe");
         } else {

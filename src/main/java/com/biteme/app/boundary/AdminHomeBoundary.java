@@ -15,6 +15,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.Map;
 import com.biteme.app.controller.ArchivioController;
+import javafx.scene.layout.Pane;
 
 public class AdminHomeBoundary {
 
@@ -61,6 +62,9 @@ public class AdminHomeBoundary {
         if (periodoComboBox != null) {
             periodoComboBox.setValue("Settimana");
         }
+
+        // Impostiamo il category gap per rendere le colonne più strette
+        barChart.setCategoryGap(10); // Puoi ridurre ulteriormente il valore se necessario
     }
 
     @FXML
@@ -71,22 +75,33 @@ public class AdminHomeBoundary {
             return;
         }
 
-        // Recupera i dati dal controller
-        Map<String, Number> statistiche = mostraGuadagni
-                ? archivioController.guadagniPerPeriodo(periodoSelezionato.toLowerCase())
-                : archivioController.piattiPiuOrdinatiPerPeriodo(periodoSelezionato.toLowerCase());
+        Map<String, Number> statistiche;
+        if (mostraGuadagni) {
+            statistiche = archivioController.guadagniPerGiorno(periodoSelezionato.toLowerCase());
+        } else {
+            statistiche = archivioController.piattiPiuOrdinatiPerPeriodo(periodoSelezionato.toLowerCase());
+        }
 
         // Aggiorna la tabella
         ObservableList<PiattoStatistiche> data = FXCollections.observableArrayList();
-        statistiche.forEach((piatto, totale) -> data.add(new PiattoStatistiche(piatto, totale)));
+        statistiche.forEach((key, value) -> data.add(new PiattoStatistiche(key, value)));
         statisticheTable.setItems(data);
 
-        // Aggiorna il BarChart
-        barChart.getData().clear();
+        // Crea un nuovo BarChart in base allo stato corrente
+        BarChart<String, Number> newChart = createNewBarChart(mostraGuadagni);
+
+        // Aggiunge i dati al nuovo grafico
         XYChart.Series<String, Number> serie = new XYChart.Series<>();
         serie.setName(mostraGuadagni ? "Guadagni" : "Totale Ordini");
-        statistiche.forEach((piatto, totale) -> serie.getData().add(new XYChart.Data<>(piatto, totale)));
-        barChart.getData().add(serie);
+        statistiche.forEach((key, value) -> serie.getData().add(new XYChart.Data<>(key, value)));
+        newChart.getData().add(serie);
+
+        // Sostituisci il vecchio grafico con il nuovo
+        Pane parent = (Pane) barChart.getParent();
+        int index = parent.getChildren().indexOf(barChart);
+        parent.getChildren().remove(barChart);
+        parent.getChildren().add(index, newChart);
+        barChart = newChart;  // aggiorna il riferimento
     }
 
     @FXML
@@ -117,4 +132,26 @@ public class AdminHomeBoundary {
             return totale;
         }
     }
+    private BarChart<String, Number> createNewBarChart(boolean isGuadagni) {
+        CategoryAxis newXAxis = new CategoryAxis();
+        NumberAxis newYAxis = new NumberAxis();
+        if (isGuadagni) {
+            newXAxis.setCategories(FXCollections.observableArrayList("Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"));
+            newXAxis.setLabel("Giorno della settimana");
+            newYAxis.setLabel("Guadagni");
+        } else {
+            newXAxis.setLabel("Piatto");
+            newYAxis.setLabel("Totale Ordini");
+        }
+        BarChart<String, Number> newChart = new BarChart<>(newXAxis, newYAxis);
+        newChart.setCategoryGap(10);
+        newChart.setAnimated(false);
+        // Imposta dimensioni e posizione uguali al vecchio grafico
+        newChart.setPrefHeight(barChart.getPrefHeight());
+        newChart.setPrefWidth(barChart.getPrefWidth());
+        newChart.setLayoutX(barChart.getLayoutX());
+        newChart.setLayoutY(barChart.getLayoutY());
+        return newChart;
+    }
+
 }

@@ -32,12 +32,14 @@
             </TableView>
         </VBox>
 
-        <HBox alignment="BOTTOM_RIGHT" layoutX="658.0" layoutY="620.0" spacing="20">
+        <!-- HBox dei pulsanti per modifica ed eliminazione (sezione admin) -->
+        <HBox fx:id="adminButtonsHBox" alignment="BOTTOM_RIGHT" layoutX="658.0" layoutY="620.0" spacing="20">
             <Button fx:id="modificaButton" onAction="#modificaProdotto" style="-fx-font-weight: bold; -fx-padding: 8px; -fx-background-color: #303d68; -fx-text-fill: white; -fx-cursor: hand;" text="Modifica" />
             <Button fx:id="eliminaButton" onAction="#eliminaProdotto" style="-fx-font-weight: bold; -fx-padding: 8px;-fx-background-color: #E0218A; -fx-text-fill: white; -fx-cursor: hand; " text="Elimina" />
         </HBox>
-        <!-- Modulo per aggiungere nuovi prodotti -->
-        <VBox alignment="TOP_CENTER" layoutX="1070.0" layoutY="150.0" spacing="15.0" style="-fx-padding: 15px; -fx-border-color: lightgray; -fx-border-width: 1.5px; -fx-background-color: #f9f9f9; -fx-border-radius: 8px;">
+
+        <!-- Modulo per aggiungere nuovi prodotti (sezione admin) -->
+        <VBox fx:id="aggiungiProdottoVBox" alignment="TOP_CENTER" layoutX="1070.0" layoutY="150.0" spacing="15.0" style="-fx-padding: 15px; -fx-border-color: lightgray; -fx-border-width: 1.5px; -fx-background-color: #f9f9f9; -fx-border-radius: 8px;">
             <!-- Titolo del modulo -->
             <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Aggiungi Prodotto" />
 

@@ -119,4 +119,56 @@ public class ArchivioController {
                         LinkedHashMap::new
                 ));
     }
+    public Map<String, Number> guadagniPerGiorno(String periodo) {
+        LocalDateTime startDate;
+        LocalDateTime endDate = LocalDateTime.now();
+
+        switch (periodo.toLowerCase()) {
+            case "settimana":
+                startDate = endDate.minusWeeks(1);
+                break;
+            case "mese":
+                startDate = endDate.minusMonths(1);
+                break;
+            case "trimestre":
+                startDate = endDate.minusMonths(3);
+                break;
+            default:
+                throw new IllegalArgumentException("Periodo non valido. Usa 'settimana', 'mese' o 'trimestre'.");
+        }
+
+        List<Archivio> archivi = archivioDao.findByDateRange(startDate, endDate);
+
+        // Creiamo una mappa ordinata con i giorni della settimana abbreviati
+        Map<String, BigDecimal> guadagniGiorno = new LinkedHashMap<>();
+        // Inizializziamo con zero per ogni giorno abbreviato
+        String[] giorni = { "Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom" };
+        for (String giorno : giorni) {
+            guadagniGiorno.put(giorno, BigDecimal.ZERO);
+        }
+
+        // Raggruppiamo i totali in base al giorno della settimana, usando le abbreviazioni
+        for (Archivio archivio : archivi) {
+            String giornoAbbreviato = "";
+            switch (archivio.getDataArchiviazione().getDayOfWeek()) {
+                case MONDAY:    giornoAbbreviato = "Lun"; break;
+                case TUESDAY:   giornoAbbreviato = "Mar"; break;
+                case WEDNESDAY: giornoAbbreviato = "Mer"; break;
+                case THURSDAY:  giornoAbbreviato = "Gio"; break;
+                case FRIDAY:    giornoAbbreviato = "Ven"; break;
+                case SATURDAY:  giornoAbbreviato = "Sab"; break;
+                case SUNDAY:    giornoAbbreviato = "Dom"; break;
+            }
+            BigDecimal totaleGiorno = guadagniGiorno.get(giornoAbbreviato);
+            if (totaleGiorno == null) {
+                totaleGiorno = BigDecimal.ZERO;
+            }
+            guadagniGiorno.put(giornoAbbreviato, totaleGiorno.add(archivio.getTotale()));
+        }
+
+        // Convertiamo in Map<String, Number>
+        Map<String, Number> result = new LinkedHashMap<>();
+        guadagniGiorno.forEach((g, tot) -> result.put(g, tot.doubleValue()));
+        return result;
+    }
 }
