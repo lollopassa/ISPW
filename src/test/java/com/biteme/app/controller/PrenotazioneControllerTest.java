@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 //@author Kevin Hoxha
 
-public class PrenotazioneControllerTest {
+class PrenotazioneControllerTest {
 
     private PrenotazioneController controller;
     private InMemoryPrenotazioneDao inMemoryDao;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         // Pulisce lo storage condiviso per garantire test indipendenti
         Storage.getInstance().getPrenotazioni().clear();
 
@@ -41,7 +41,7 @@ public class PrenotazioneControllerTest {
     }
 
     @Test
-    public void testCreaPrenotazione() {
+    void testCreaPrenotazione() {
         controller.creaPrenotazione(
                 "Mario Rossi",
                 "20:00",
@@ -66,13 +66,18 @@ public class PrenotazioneControllerTest {
         assertEquals(4, p.getCoperti());
     }
 
+    // ===============================
+    // Test per i casi d'errore (runtime exception)
+    // Ogni assertThrows invoca un singolo metodo helper
+    // ===============================
+
     @Test
-    public void testCreaPrenotazioneConNomeVuoto() {
+    void testCreaPrenotazioneConNomeVuoto() {
         Exception ex = assertThrows(ValidationException.class, this::creaPrenotazioneConNomeVuoto);
         assertTrue(ex.getMessage().contains("Il nome del cliente non puÃ² essere vuoto."));
     }
 
-    private void creaPrenotazioneConNomeVuoto() {
+    void creaPrenotazioneConNomeVuoto() {
         controller.creaPrenotazione(
                 "   ", // Nome vuoto
                 "20:00",
@@ -84,12 +89,12 @@ public class PrenotazioneControllerTest {
     }
 
     @Test
-    public void testCreaPrenotazioneConDataNulla() {
+    void testCreaPrenotazioneConDataNulla() {
         Exception ex = assertThrows(ValidationException.class, this::creaPrenotazioneConDataNulla);
         assertTrue(ex.getMessage().contains("Seleziona una data valida."));
     }
 
-    private void creaPrenotazioneConDataNulla() {
+    void creaPrenotazioneConDataNulla() {
         controller.creaPrenotazione(
                 "Mario Rossi",
                 "20:00",
@@ -101,12 +106,12 @@ public class PrenotazioneControllerTest {
     }
 
     @Test
-    public void testCreaPrenotazioneConOrarioVuoto() {
+    void testCreaPrenotazioneConOrarioVuoto() {
         Exception ex = assertThrows(ValidationException.class, this::creaPrenotazioneConOrarioVuoto);
         assertTrue(ex.getMessage().contains("Inserisci un orario valido."));
     }
 
-    private void creaPrenotazioneConOrarioVuoto() {
+    void creaPrenotazioneConOrarioVuoto() {
         controller.creaPrenotazione(
                 "Mario Rossi",
                 "   ", // Orario vuoto
@@ -118,12 +123,12 @@ public class PrenotazioneControllerTest {
     }
 
     @Test
-    public void testCreaPrenotazioneConTelefonoNonValido() {
+    void testCreaPrenotazioneConTelefonoNonValido() {
         Exception ex = assertThrows(ValidationException.class, this::creaPrenotazioneConTelefonoNonValido);
         assertTrue(ex.getMessage().contains("Il telefono deve contenere solo numeri."));
     }
 
-    private void creaPrenotazioneConTelefonoNonValido() {
+    void creaPrenotazioneConTelefonoNonValido() {
         controller.creaPrenotazione(
                 "Mario Rossi",
                 "20:00",
@@ -135,12 +140,12 @@ public class PrenotazioneControllerTest {
     }
 
     @Test
-    public void testCreaPrenotazioneConCopertiNegativi() {
+    void testCreaPrenotazioneConCopertiNegativi() {
         Exception ex = assertThrows(ValidationException.class, this::creaPrenotazioneConCopertiNegativi);
         assertTrue(ex.getMessage().contains("I coperti devono essere maggiori di 0."));
     }
 
-    private void creaPrenotazioneConCopertiNegativi() {
+    void creaPrenotazioneConCopertiNegativi() {
         controller.creaPrenotazione(
                 "Mario Rossi",
                 "20:00",
@@ -152,17 +157,21 @@ public class PrenotazioneControllerTest {
     }
 
     @Test
-    public void testEliminaPrenotazioneNonEsistente() {
+    void testEliminaPrenotazioneNonEsistente() {
         Exception ex = assertThrows(IllegalArgumentException.class, this::eliminaPrenotazioneNonEsistente);
         assertTrue(ex.getMessage().contains("non esiste"));
     }
 
-    private void eliminaPrenotazioneNonEsistente() {
+    void eliminaPrenotazioneNonEsistente() {
         controller.eliminaPrenotazione(999);
     }
 
+    // ===============================
+    // Test per i metodi non eccezionali
+    // ===============================
+
     @Test
-    public void testGetPrenotazioniByData() {
+    void testGetPrenotazioniByData() {
         // Inserisce una prenotazione direttamente tramite il DAO in-memory
         Prenotazione p = new Prenotazione(
                 0,
@@ -190,7 +199,8 @@ public class PrenotazioneControllerTest {
     }
 
     @Test
-    public void testModificaPrenotazione() {
+    void testModificaPrenotazione() {
+        // Inserisce una prenotazione iniziale
         Prenotazione p = new Prenotazione(
                 0,
                 "Anna Verdi",
@@ -203,6 +213,7 @@ public class PrenotazioneControllerTest {
         inMemoryDao.store(p);
         int storedId = p.getId();
 
+        // Esegue la modifica con parametri validi
         PrenotazioneBean updatedBean = controller.modificaPrenotazione(
                 storedId,
                 "Anna Verdi Modificata",
@@ -235,7 +246,7 @@ public class PrenotazioneControllerTest {
     }
 
     @Test
-    public void testEliminaPrenotazioneEsistente() {
+    void testEliminaPrenotazioneEsistente() {
         // Inserisce una prenotazione
         Prenotazione p = new Prenotazione(
                 0,
