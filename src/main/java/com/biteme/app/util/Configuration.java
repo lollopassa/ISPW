@@ -14,12 +14,9 @@ public class Configuration {
     // Caricamento delle proprietà dal file config.properties
     static {
         try (InputStream input = Configuration.class.getClassLoader().getResourceAsStream("config.properties")) {
-            if (input != null) {
                 properties.load(input);
-
                 // Leggere la modalità di persistenza dal file config.properties
                 persistenceMode = properties.getProperty("persistence.mode", "inmemory").toLowerCase(); // Predefinito "inmemory"
-            }
         } catch (IOException e) {
             System.err.println("[AVVISO] Errore nel caricamento del file di configurazione, avvio con persistenza in-memory.");
         }
