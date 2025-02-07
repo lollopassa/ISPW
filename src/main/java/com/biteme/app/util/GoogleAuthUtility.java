@@ -11,7 +11,7 @@ import com.google.gson.JsonParser;
 
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
+
 import java.util.Scanner;
 
 public class GoogleAuthUtility {
@@ -23,9 +23,14 @@ public class GoogleAuthUtility {
     // Autenticazione che restituisce direttamente l'access token
     public static String authenticate() throws GoogleAuthException, InterruptedException {
         try {
-            return performAuthentication(); // Restituisce l'access token
+            String accessToken = performAuthentication();
+            if (accessToken == null) {
+                throw new GoogleAuthException("Autenticazione Google fallita. Verifica i dettagli e riprova.");
+            }
+            return accessToken;
         } catch (InterruptedException e) {
-            throw e;
+            Thread.currentThread().interrupt();
+            throw new GoogleAuthException("Il thread è stato interrotto durante l'autenticazione con Google.", e);
         } catch (Exception e) {
             throw new GoogleAuthException("Errore durante l'autenticazione con Google", e);
         }
