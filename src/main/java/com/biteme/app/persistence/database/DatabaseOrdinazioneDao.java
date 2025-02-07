@@ -37,7 +37,8 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il caricamento dell'ordinazione con ID: " + id);
+            LOGGER.log(Level.SEVERE, e, () ->
+                    String.format("Errore durante il caricamento dell'ordinazione con ID: %d", id));
         }
         return Optional.empty();
     }
@@ -50,7 +51,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
             stmt.setString(2, ordinazione.getNumeroClienti() == null ? null : ordinazione.getNumeroClienti());
             stmt.setString(3, ordinazione.getTipoOrdine().name());
             stmt.setString(4, ordinazione.getInfoTavolo() == null ? null : ordinazione.getInfoTavolo());
-            stmt.setString(5, ordinazione.getStatoOrdine().name()); // Usa .name() per la stringa
+            stmt.setString(5, ordinazione.getStatoOrdine().name());
             stmt.setString(6, ordinazione.getOrarioCreazione() == null ? null : ordinazione.getOrarioCreazione());
 
             int affectedRows = stmt.executeUpdate();
@@ -72,45 +73,48 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
 
     @Override
     public void delete(Integer id) {
-        // Prima, elimina le righe correlate nella tabella 'ordine'
         String deleteFromOrdine = "DELETE FROM ordine WHERE id = ?";
         String deleteFromOrdinazione = "DELETE FROM ordinazione WHERE id = ?";
 
         try {
-            connection.setAutoCommit(false); // Disabilita il commit automatico per controllare la transazione
+            connection.setAutoCommit(false);
 
-            // Step 1: Elimina riferimenti correlati nella tabella figlia
             try (PreparedStatement stmtOrdine = connection.prepareStatement(deleteFromOrdine)) {
                 stmtOrdine.setInt(1, id);
                 stmtOrdine.executeUpdate();
             }
 
-            // Step 2: Elimina l'ordinazione dalla tabella principale
             try (PreparedStatement stmtOrdinazione = connection.prepareStatement(deleteFromOrdinazione)) {
                 stmtOrdinazione.setInt(1, id);
                 int affectedRows = stmtOrdinazione.executeUpdate();
 
                 if (affectedRows == 0) {
-                    LOGGER.log(Level.WARNING, () -> "Nessun ordinazione trovato con ID: " + id);
+                    LOGGER.log(Level.WARNING, () ->
+                            String.format("Nessuna ordinazione trovata con ID: %d", id));
                 } else {
-                    LOGGER.log(Level.INFO, () -> "Ordinazione con ID: " + id + " eliminato con successo");
+                    LOGGER.log(Level.INFO, () ->
+                            String.format("Ordinazione con ID: %d eliminata con successo", id));
                 }
             }
 
-            connection.commit(); // Conferma la transazione
+            connection.commit();
         } catch (SQLException e) {
             try {
-                connection.rollback(); // Esegui un rollback in caso di errore
-                LOGGER.log(Level.SEVERE, "Transazione rollback a causa di un errore: " + e.getMessage());
+                connection.rollback();
+                LOGGER.log(Level.SEVERE, () ->
+                        String.format("Transazione rollback a causa di un errore: %s", e.getMessage()));
             } catch (SQLException rollbackEx) {
-                LOGGER.log(Level.SEVERE, "Errore durante il rollback: " + rollbackEx.getMessage());
+                LOGGER.log(Level.SEVERE, () ->
+                        String.format("Errore durante il rollback: %s", rollbackEx.getMessage()));
             }
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'eliminazione dell'ordinazione con ID: " + id);
+            LOGGER.log(Level.SEVERE, e, () ->
+                    String.format("Errore durante l'eliminazione dell'ordinazione con ID: %d", id));
         } finally {
             try {
-                connection.setAutoCommit(true); // Ripristina il commit automatico
+                connection.setAutoCommit(true);
             } catch (SQLException autoCommitEx) {
-                LOGGER.log(Level.SEVERE, "Errore durante il ripristino del commit automatico: " + autoCommitEx.getMessage());
+                LOGGER.log(Level.SEVERE, () ->
+                        String.format("Errore durante il ripristino del commit automatico: %s", autoCommitEx.getMessage()));
             }
         }
     }
@@ -124,7 +128,8 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
                 return rs.next() && rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante la verifica dell'esistenza dell'ordinazione con ID: " + id);
+            LOGGER.log(Level.SEVERE, e, () ->
+                    String.format("Errore durante la verifica dell'esistenza dell'ordinazione con ID: %d", id));
             return false;
         }
     }
@@ -150,12 +155,14 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
         String query = "UPDATE Ordinazione SET statoOrdine = ? WHERE id = ?";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, nuovoStato.name()); // Converte lo stato in stringa
-            preparedStatement.setInt(2, id); // Imposta l'ID dell'ordinazione
+            preparedStatement.setString(1, nuovoStato.name());
+            preparedStatement.setInt(2, id);
 
             int rowsUpdated = preparedStatement.executeUpdate();
             if (rowsUpdated == 0) {
-                LOGGER.log(Level.WARNING, "Nessuna ordinazione trovata con ID: {0}", id);            }
+                LOGGER.log(Level.WARNING, () ->
+                        String.format("Nessuna ordinazione trovata con ID: %d", id));
+            }
         } catch (SQLException e) {
             throw new DatabaseConfigurationException("Errore durante l'aggiornamento dello stato dell'ordinazione.", e);
         }
@@ -168,7 +175,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
                 rs.getString("numeroClienti"),
                 TipoOrdine.valueOf(rs.getString("tipoOrdine").toUpperCase()),
                 rs.getString("infoTavolo"),
-                StatoOrdine.valueOf(rs.getString("statoOrdine").toUpperCase()), // Conversione a enum
+                StatoOrdine.valueOf(rs.getString("statoOrdine").toUpperCase()),
                 rs.getString("orarioCreazione")
         );
     }

@@ -35,7 +35,7 @@ public class DatabaseArchivioDao implements ArchivioDao {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Errore caricamento archivio ID: " + id, e);
+            LOGGER.log(Level.SEVERE, e, () -> String.format("Errore caricamento archivio ID: %d", id));
         }
         return Optional.empty();
     }
@@ -61,7 +61,7 @@ public class DatabaseArchivioDao implements ArchivioDao {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Errore salvataggio archivio", e);
+            LOGGER.log(Level.SEVERE, e, () -> "Errore salvataggio archivio");
         }
     }
 
@@ -72,7 +72,7 @@ public class DatabaseArchivioDao implements ArchivioDao {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Errore eliminazione archivio ID: " + id, e);
+            LOGGER.log(Level.SEVERE, e, () -> String.format("Errore eliminazione archivio ID: %d", id));
         }
     }
 
@@ -85,7 +85,7 @@ public class DatabaseArchivioDao implements ArchivioDao {
                 return rs.next() && rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Errore verifica esistenza archivio", e);
+            LOGGER.log(Level.SEVERE, e, () -> "Errore verifica esistenza archivio");
             return false;
         }
     }
@@ -102,7 +102,7 @@ public class DatabaseArchivioDao implements ArchivioDao {
                 archivi.add(mapResultSetToArchivio(rs));
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Errore recupero archivi", e);
+            LOGGER.log(Level.SEVERE, e, () -> "Errore recupero archivi");
         }
         return archivi;
     }
@@ -123,7 +123,7 @@ public class DatabaseArchivioDao implements ArchivioDao {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Errore recupero archivi per intervallo di tempo", e);
+            LOGGER.log(Level.SEVERE, e, () -> "Errore recupero archivi per intervallo di tempo");
         }
         return archivi;
     }

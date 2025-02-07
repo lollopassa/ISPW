@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class Storage {
 
-    private static Storage instance;
+    protected static Storage instance;
 
     // Lista sincronizzata per le prenotazioni
     private final List<Prenotazione> prenotazioni = Collections.synchronizedList(new ArrayList<>());
@@ -29,7 +29,7 @@ public class Storage {
 
     private final List<Archivio> archivi = new ArrayList<>();
 
-    private Storage() {
+    protected Storage() {
         // Costruttore privato per implementare il Singleton
     }
 
