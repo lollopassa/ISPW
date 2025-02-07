@@ -22,6 +22,7 @@ public class HashingUtil {
         }
     }
 
+    
     private static String bytesToHex(byte[] bytes) {
         StringBuilder hexString = new StringBuilder();
         for (byte b : bytes) {
