@@ -21,10 +21,10 @@ public class Configuration {
                     persistenceMode = configuredPersistenceMode.toLowerCase();
                 }
             } else {
-                logger.warning("[AVVISO] File config.properties non trovato. Persistenza predefinita: " + persistenceMode + ".");
+                logger.warning(() -> "[AVVISO] File config.properties non trovato. Persistenza predefinita: " + persistenceMode + ".");
             }
         } catch (IOException e) {
-            logger.log(Level.WARNING, "[AVVISO] Errore nel caricamento del file di configurazione. Persistenza predefinita: " + persistenceMode + ".", e);
+            logger.log(Level.WARNING, e, () -> "[AVVISO] Errore nel caricamento del file di configurazione. Persistenza predefinita: " + persistenceMode + ".");
         }
     }
 
