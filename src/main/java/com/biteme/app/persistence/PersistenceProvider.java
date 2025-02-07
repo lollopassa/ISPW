@@ -2,6 +2,7 @@ package com.biteme.app.persistence;
 
 import com.biteme.app.persistence.inmemory.InMemoryDaoFactory;
 import com.biteme.app.persistence.database.DatabaseDaoFactory;
+import com.biteme.app.persistence.txt.TxtDaoFactory;
 
 public enum PersistenceProvider {
 
@@ -9,7 +10,11 @@ public enum PersistenceProvider {
     IN_MEMORY("in memory", new InMemoryDaoFactory()),
 
     // Persistenza tramite connessione al database
-    DATABASE("database", new DatabaseDaoFactory());
+    DATABASE("database", new DatabaseDaoFactory()),
+
+    // Persistenza tramite file di testo
+    TXT("txt", new TxtDaoFactory());
+
 
     private final String name;
     private final DaoFactory daoFactory;

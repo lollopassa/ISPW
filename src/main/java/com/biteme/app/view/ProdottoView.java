@@ -87,7 +87,7 @@ public class ProdottoView {
     private void configureComboBox() {
         categoriaComboBox.setItems(FXCollections.observableArrayList());
         categoriaComboBox.getItems().add(null);
-        categoriaComboBox.getItems().addAll("PIZZE", "PRIMI", "ANTIPASTI", "BEVANDE", "CONTORNI", "DOLCI");
+        categoriaComboBox.getItems().addAll("ANTIPASTI","PIZZE", "PRIMI", "SECONDI", "CONTORNI", "BEVANDE", "DOLCI");
         categoriaComboBox.setPromptText("Seleziona una categoria");
         categoriaComboBox.setValue(null);
         categoriaComboBox.setCellFactory(lv -> createCategoryCell());
@@ -131,6 +131,86 @@ public class ProdottoView {
             showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Errore nell'aggiunta del prodotto: " + e.getMessage());
         }
     }
+    @FXML
+    private void modificaProdotto() {
+        ProdottoBean selectedProdotto = prodottiTableView.getSelectionModel().getSelectedItem();
+        if (selectedProdotto == null) {
+            showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Seleziona un prodotto da modificare.");
+            return;
+        }
+
+        // Creazione del dialogo per la modifica
+        Dialog<ProdottoBean> dialog = new Dialog<>();
+        dialog.setTitle("Modifica Prodotto");
+        dialog.setHeaderText("Modifica i dati del prodotto:");
+        dialog.setResizable(true);
+
+        // Campi di input per la modifica
+        TextField nomeField = new TextField(selectedProdotto.getNome());
+        ComboBox<String> categoriaComboBoxModifica = new ComboBox<>(FXCollections.observableArrayList(
+                "ANTIPASTI","PIZZE", "PRIMI", "SECONDI", "CONTORNI", "BEVANDE", "DOLCI"
+        ));
+        categoriaComboBoxModifica.setValue(selectedProdotto.getCategoria());
+        TextField prezzoFieldModifica = new TextField(selectedProdotto.getPrezzo().toString());
+
+        // Layout per i campi
+        VBox vbox = new VBox(10);
+        vbox.getChildren().addAll(
+                new Label("Nome Prodotto:"), nomeField,
+                new Label("Categoria:"), categoriaComboBoxModifica,
+                new Label("Prezzo:"), prezzoFieldModifica
+        );
+        dialog.getDialogPane().setContent(vbox);
+
+        // Pulsanti OK e Annulla
+        ButtonType okButtonType = new ButtonType("Modifica", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+
+        // Gestione della conferma
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == okButtonType) {
+                // Aggiorna il prodotto con i nuovi valori
+                ProdottoBean prodottoModificato = new ProdottoBean();
+                prodottoModificato.setId(selectedProdotto.getId()); // Manteniamo l'ID invariato
+                prodottoModificato.setNome(nomeField.getText());
+                prodottoModificato.setCategoria(categoriaComboBoxModifica.getValue());
+                prodottoModificato.setPrezzo(parsePrezzo(prezzoFieldModifica.getText()));
+                prodottoModificato.setDisponibile(selectedProdotto.getDisponibile()); // Manteniamo lo stato di disponibilità
+
+                return prodottoModificato; // Restituiamo il nuovo prodotto
+            }
+            return null;
+        });
+
+        // Mostra il dialogo e gestisce il risultato
+        dialog.showAndWait().ifPresent(prodottoModificato -> {
+            try {
+                prodottoController.modificaProdotto(prodottoModificato);
+
+                showAlert(Alert.AlertType.INFORMATION, ALERT_INFORMATION, "Prodotto aggiornato correttamente!");
+                refreshTable();
+            } catch (ProdottoException e) {
+                showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Errore nella modifica del prodotto: " + e.getMessage());
+            }
+        });
+    }
+
+    @FXML
+    private void eliminaProdotto() {
+        ProdottoBean selectedProdotto = prodottiTableView.getSelectionModel().getSelectedItem();
+        if (selectedProdotto == null) {
+            showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Seleziona un prodotto da eliminare.");
+            return;
+        }
+
+        try {
+            prodottoController.eliminaProdotto(selectedProdotto.getId());
+            showAlert(Alert.AlertType.INFORMATION, ALERT_INFORMATION, "Prodotto eliminato correttamente!");
+            refreshTable();
+        } catch (ProdottoException e) {
+            showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Errore nell'eliminazione del prodotto: " + e.getMessage());
+        }
+    }
 
     private BigDecimal parsePrezzo(String prezzo) {
         try {
@@ -157,6 +237,4 @@ public class ProdottoView {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-    // Resto del codice rimane invariato...
 }

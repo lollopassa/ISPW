@@ -1,39 +1,35 @@
-package com.biteme.app.persistence.database;
+package com.biteme.app.persistence.txt;
 
 import com.biteme.app.persistence.*;
 
-
-public class DatabaseDaoFactory extends DaoFactory {
-
-
+public class TxtDaoFactory extends DaoFactory {
     @Override
     public UserDao getUserDao() {
-        return new DatabaseUserDao();
+        return new TxtUserDao();
     }
 
     @Override
     public PrenotazioneDao getPrenotazioneDao() {
-        return new DatabasePrenotazioneDao();
+        return new TxtPrenotazioneDao();
     }
 
     @Override
     public OrdinazioneDao getOrdinazioneDao() {
-        return new DatabaseOrdinazioneDao();
+        return new TxtOrdinazioneDao();
     }
 
     @Override
     public ProdottoDao getProdottoDao() {
-        return new DatabaseProdottoDao();
+        return new TxtProdottoDao();
     }
 
     @Override
     public OrdineDao getOrdineDao() {
-        return new DatabaseOrdineDao();
+        return new TxtOrdineDao();
     }
 
     @Override
     public ArchivioDao getArchivioDao() {
-        return new DatabaseArchivioDao();
+        return new TxtArchivioDao();
     }
-
 }

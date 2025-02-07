@@ -14,7 +14,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.StringConverter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 public class OrdinazioneView {
@@ -135,14 +134,11 @@ public class OrdinazioneView {
                 showAlert(VALIDATION_ERROR, "Il campo 'Orario' deve essere nel formato HH:mm (es. '12:20').", Alert.AlertType.ERROR);
                 return;
             }
-            // Per Asporto, i campi "coperti" e "tavolo" non sono necessari
             coperti = "";
             tavolo = "";
-        } else { // "Al Tavolo"
-            // Se il campo orario è vuoto, imposta automaticamente l'orario corrente
-            if (orario.isEmpty()) {
-                orario = LocalTime.now().toString().substring(0, 5);
-            }
+        } else {
+            orario = java.time.LocalTime.now().toString().substring(0, 5);
+
         }
 
         // Crea il bean con i dati validati
