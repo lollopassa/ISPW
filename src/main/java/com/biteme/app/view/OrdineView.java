@@ -9,13 +9,15 @@ import com.biteme.app.bean.OrdineBean;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.control.Button;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
-import java.util.List;
 import javafx.scene.layout.Region;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,6 +44,7 @@ public class OrdineView {
     private void handleSalva() {
         int ordineId = ordinazioneController.getIdOrdineSelezionato();
         controller.salvaOrdineEStato(ordineId, "IN_CORSO");
+        showAlert("Ordine salvato", "L'ordine è stato salvato con successo.", AlertType.INFORMATION);
         ordinazioneController.cambiaASchermataOrdinazione();
     }
 
@@ -49,6 +52,7 @@ public class OrdineView {
     public void handleCheckout(ActionEvent actionEvent) {
         int ordineId = ordinazioneController.getIdOrdineSelezionato();
         controller.salvaOrdineEStato(ordineId, "COMPLETATO");
+        showAlert("Checkout completato", "Il checkout dell'ordine è stato completato con successo.", AlertType.INFORMATION);
         ordinazioneController.cambiaASchermataOrdinazione();
     }
 
@@ -77,10 +81,12 @@ public class OrdineView {
             } else {
                 Logger.getLogger(OrdineView.class.getName())
                         .log(Level.SEVERE, () -> "OrdineBean non trovato per l'ID: " + ordineId);
+                showAlert("Errore", "Ordine non trovato per l'ID: " + ordineId, AlertType.ERROR);
             }
         } else {
             Logger.getLogger(OrdineView.class.getName())
                     .warning("Nessuna ordinazione selezionata.");
+            showAlert("Errore", "Nessuna ordinazione selezionata.", AlertType.ERROR);
         }
     }
 
@@ -363,5 +369,13 @@ public class OrdineView {
             }
         }
         totaleOrdine.setText(String.format("Totale: €%.2f", totale));
+    }
+
+    private void showAlert(String title, String content, AlertType alertType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

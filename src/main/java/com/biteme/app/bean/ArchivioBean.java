@@ -11,8 +11,6 @@ public class ArchivioBean {
     private BigDecimal totale;
     private LocalDateTime dataArchiviazione;
 
-    // Getter e Setter
-
     public int getIdOrdine() {
         return idOrdine;
     }

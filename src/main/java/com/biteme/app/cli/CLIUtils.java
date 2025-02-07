@@ -5,7 +5,6 @@ import java.util.Scanner;
 public class CLIUtils {
 
     private CLIUtils() {
-        //costruttore privato
     }
 
     private static final Scanner scanner = new Scanner(System.in);

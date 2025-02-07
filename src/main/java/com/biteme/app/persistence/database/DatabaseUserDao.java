@@ -134,16 +134,4 @@ public class DatabaseUserDao implements UserDao {
         return false; // Return false if there's an exception during the check
     }
 
-
-    public boolean existsRole(UserRole role) {
-        try (PreparedStatement stmt = connection.prepareStatement("SELECT COUNT(*) FROM user WHERE ruolo = ?")) {
-            stmt.setString(1, role.name());
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() && rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Errore durante la verifica del ruolo", e);
-        }
-        return false; // Return false if there's an exception during the check
-    }
 }

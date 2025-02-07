@@ -101,23 +101,6 @@ public class DatabasePrenotazioneDao implements PrenotazioneDao {
     }
 
     @Override
-    public List<Prenotazione> getByOrario(LocalTime orario) {
-        String query = "SELECT id, nomeCliente, orario, data, note, telefono, coperti FROM prenotazione WHERE orario = ?";
-        List<Prenotazione> prenotazioni = new ArrayList<>();
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setTime(1, Time.valueOf(orario));
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    prenotazioni.add(mapResultSetToPrenotazione(rs));
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> String.format("Errore durante il recupero delle prenotazioni per l'orario: %s", orario));
-        }
-        return prenotazioni;
-    }
-
-    @Override
     public List<Prenotazione> getByData(LocalDate data) {
         String query = "SELECT id, nomeCliente, orario, data, note, telefono, coperti FROM prenotazione WHERE data = ?";
         List<Prenotazione> prenotazioni = new ArrayList<>();

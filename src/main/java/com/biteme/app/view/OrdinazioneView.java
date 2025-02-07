@@ -14,9 +14,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.StringConverter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public class OrdinazioneView {
+
+    // Definizione delle costanti per evitare duplicazioni delle stringhe
+    private static final String VALIDATION_ERROR = "Errore di Validazione";
+    private static final String SUCCESS = "Successo";
+    private static final String ERROR = "Errore";
 
     @FXML
     private TextField nomeClienteField;
@@ -53,7 +59,6 @@ public class OrdinazioneView {
 
     private final OrdineController ordineController = new OrdineController();
     private final OrdinazioneController ordinazioneController = new OrdinazioneController();
-    // Istanza del nuovo ArchivioController per gestire l'archiviazione
     private final ArchivioController archivioController = new ArchivioController();
 
     private static OrdinazioneBean ordineSelezionato;
@@ -104,21 +109,59 @@ public class OrdinazioneView {
         statoOrdineColumn.setCellValueFactory(new PropertyValueFactory<>("statoOrdine"));
     }
 
-    // La view raccoglie i dati e chiama il controller per la creazione dell'ordine.
     @FXML
     public void createOrdine() {
+        String nome = nomeClienteField.getText().trim();
+        String tipoOrdine = tipoOrdineComboBox.getValue();
+        String orario = orarioField.getText().trim();
+        String coperti = copertiField.getText().trim();
+        String tavolo = tavoloField.getText().trim();
+
+        // Validazione dei campi
+        if (nome.isEmpty()) {
+            showAlert(VALIDATION_ERROR, "Il campo Nome Cliente deve essere compilato.", Alert.AlertType.WARNING);
+            return;
+        }
+        if (tipoOrdine == null || tipoOrdine.isEmpty()) {
+            showAlert(VALIDATION_ERROR, "Seleziona un tipo di ordine: 'Al Tavolo' o 'Asporto'.", Alert.AlertType.WARNING);
+            return;
+        }
+        if ("Asporto".equals(tipoOrdine)) {
+            if (orario.isEmpty()) {
+                showAlert(VALIDATION_ERROR, "Il campo Orario deve essere compilato per Asporto.", Alert.AlertType.WARNING);
+                return;
+            }
+            if (!ordinazioneController.isValidTime(orario)) {
+                showAlert(VALIDATION_ERROR, "Il campo 'Orario' deve essere nel formato HH:mm (es. '12:20').", Alert.AlertType.ERROR);
+                return;
+            }
+            // Per Asporto, i campi "coperti" e "tavolo" non sono necessari
+            coperti = "";
+            tavolo = "";
+        } else { // "Al Tavolo"
+            // Se il campo orario è vuoto, imposta automaticamente l'orario corrente
+            if (orario.isEmpty()) {
+                orario = LocalTime.now().toString().substring(0, 5);
+            }
+        }
+
+        // Crea il bean con i dati validati
         OrdinazioneBean ordinazioneBean = new OrdinazioneBean();
-        ordinazioneBean.setNome(nomeClienteField.getText());
-        ordinazioneBean.setTipoOrdine(tipoOrdineComboBox.getValue());
-        ordinazioneBean.setOrarioCreazione(orarioField.getText());
-        ordinazioneBean.setNumeroClienti(copertiField.getText());
-        ordinazioneBean.setInfoTavolo(tavoloField.getText());
+        ordinazioneBean.setNome(nome);
+        ordinazioneBean.setTipoOrdine(tipoOrdine);
+        ordinazioneBean.setOrarioCreazione(orario);
+        ordinazioneBean.setNumeroClienti(coperti);
+        ordinazioneBean.setInfoTavolo(tavolo);
 
-        // Il controller gestisce internamente eventuali errori o messaggi.
-        ordinazioneController.creaOrdine(ordinazioneBean);
-
-        clearFields();
-        refreshTable();
+        try {
+            // Chiama il controller per creare l'ordine
+            ordinazioneController.creaOrdine(ordinazioneBean);
+            showAlert(SUCCESS, "Ordine creato con successo per il cliente: " + nome, Alert.AlertType.INFORMATION);
+            clearFields();
+            refreshTable();
+        } catch (Exception e) {
+            showAlert(ERROR, "Si è verificato un errore durante la creazione dell'ordine: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
 
     public static OrdinazioneBean getOrdineSelezionato() {
@@ -132,40 +175,51 @@ public class OrdinazioneView {
     @FXML
     private void modificaOrdine() {
         OrdinazioneBean ordinazione = ordinazioniTableView.getSelectionModel().getSelectedItem();
-        if (ordinazione != null) {
-            OrdinazioneBean ordine = new OrdinazioneBean();
-            ordine.setId(ordinazione.getId());
-            ordine.setNome(ordinazione.getNome());
-            ordine.setNumeroClienti(ordinazione.getNumeroClienti());
-            ordine.setTipoOrdine(ordinazione.getTipoOrdine());
-            ordine.setInfoTavolo(ordinazione.getInfoTavolo());
-            ordine.setStatoOrdine(ordinazione.getStatoOrdine());
-            ordine.setOrarioCreazione(ordinazione.getOrarioCreazione());
-
-            setOrdineSelezionato(ordine);
-            SceneLoader.loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
+        if (ordinazione == null) {
+            showAlert(ERROR, "Seleziona un ordine da modificare.", Alert.AlertType.WARNING);
+            return;
         }
+        OrdinazioneBean ordine = new OrdinazioneBean();
+        ordine.setId(ordinazione.getId());
+        ordine.setNome(ordinazione.getNome());
+        ordine.setNumeroClienti(ordinazione.getNumeroClienti());
+        ordine.setTipoOrdine(ordinazione.getTipoOrdine());
+        ordine.setInfoTavolo(ordinazione.getInfoTavolo());
+        ordine.setStatoOrdine(ordinazione.getStatoOrdine());
+        ordine.setOrarioCreazione(ordinazione.getOrarioCreazione());
+
+        setOrdineSelezionato(ordine);
+        SceneLoader.loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
     }
 
     @FXML
     private void eliminaOrdine() {
         OrdinazioneBean ordinazioneSelezionata = ordinazioniTableView.getSelectionModel().getSelectedItem();
-        if (ordinazioneSelezionata != null) {
-            // Il controller gestisce la cancellazione e gli eventuali alert d'errore.
+        if (ordinazioneSelezionata == null) {
+            showAlert(ERROR, "Seleziona un ordine da eliminare.", Alert.AlertType.WARNING);
+            return;
+        }
+        try {
             ordinazioneController.eliminaOrdinazione(ordinazioneSelezionata.getId());
+            showAlert(SUCCESS, "Ordine eliminato con successo.", Alert.AlertType.INFORMATION);
             refreshTable();
+        } catch (Exception e) {
+            showAlert(ERROR, "Si è verificato un errore durante l'eliminazione dell'ordine: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
     @FXML
     public void archiviaOrdine() {
         OrdinazioneBean ordinazioneSelezionata = ordinazioniTableView.getSelectionModel().getSelectedItem();
-        if (ordinazioneSelezionata != null) {
-            // Recupera i dettagli completi dell'ordine.
+        if (ordinazioneSelezionata == null) {
+            showAlert(ERROR, "Seleziona un ordine da archiviare.", Alert.AlertType.WARNING);
+            return;
+        }
+        try {
+            // Recupera i dettagli completi dell'ordine tramite OrdineController
             OrdineBean ordineBean = ordineController.getOrdineById(ordinazioneSelezionata.getId());
             BigDecimal totale = calcolaTotaleOrdine(ordineBean);
 
-            // Crea l'ArchivioBean per l'archiviazione
             ArchivioBean archivioBean = new ArchivioBean();
             archivioBean.setIdOrdine(ordineBean.getId());
             archivioBean.setProdotti(ordineBean.getProdotti());
@@ -173,12 +227,13 @@ public class OrdinazioneView {
             archivioBean.setTotale(totale);
             archivioBean.setDataArchiviazione(LocalDateTime.now());
 
-            // Archivia l'ordine tramite ArchivioController
             archivioController.archiviaOrdine(archivioBean);
-
-            // Rimuove l'ordine archiviato dall'elenco degli ordini attivi
+            // Rimuove l'ordine archiviato
             ordinazioneController.eliminaOrdinazione(ordinazioneSelezionata.getId());
+            showAlert(SUCCESS, "Ordine archiviato con successo.", Alert.AlertType.INFORMATION);
             refreshTable();
+        } catch (Exception e) {
+            showAlert(ERROR, "Si è verificato un errore durante l'archiviazione: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -188,7 +243,7 @@ public class OrdinazioneView {
             List<String> prodotti = ordineBean.getProdotti();
             List<Integer> quantita = ordineBean.getQuantita();
             if (prodotti != null && quantita != null && prodotti.size() == quantita.size()) {
-                // Calcolo di esempio: sostituisci con la logica di calcolo reale se necessario.
+                // Esempio di calcolo: sostituisci con la logica di calcolo reale
                 for (int i = 0; i < prodotti.size(); i++) {
                     totale = totale.add(BigDecimal.valueOf(10).multiply(BigDecimal.valueOf(quantita.get(i))));
                 }
@@ -209,5 +264,12 @@ public class OrdinazioneView {
         tavoloField.clear();
         tipoOrdineComboBox.getSelectionModel().clearSelection();
         tipoOrdineComboBox.setValue(null);
+    }
+
+    private void showAlert(String title, String message, Alert.AlertType alertType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

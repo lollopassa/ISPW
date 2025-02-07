@@ -5,14 +5,11 @@ public class OrdinazioneBean {
     private int id;
     private String nome;
     private String numeroClienti;
-    // Ora usiamo String anziché il model enum TipoOrdine
     private String tipoOrdine;
     private String infoTavolo;
-    // Ora usiamo String anziché il model enum StatoOrdine
     private String statoOrdine;
     private String orarioCreazione;
 
-    // Getter e Setter
     public int getId() {
         return id;
     }

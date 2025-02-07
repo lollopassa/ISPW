@@ -9,7 +9,6 @@ public class ProdottoBean {
     private BigDecimal prezzo;
     private Boolean disponibile;
 
-    // Getter e Setter
     public Integer getId() {
         return id;
     }

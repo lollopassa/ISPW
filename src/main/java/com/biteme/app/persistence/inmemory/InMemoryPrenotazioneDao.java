@@ -42,15 +42,6 @@ public class InMemoryPrenotazioneDao implements PrenotazioneDao {
         return prenotazioni.stream().anyMatch(p -> p.getId() == key);
     }
 
-
-    @Override
-    public List<Prenotazione> getByOrario(LocalTime orario) {
-        // Filtra le prenotazioni dall'orario
-        return prenotazioni.stream()
-                .filter(p -> p.getOrario().equals(orario))
-                .toList(); // Sostituito "collect(Collectors.toList())" con "toList()"
-    }
-
     @Override
     public List<Prenotazione> getByData(LocalDate data) {
         // Filtra le prenotazioni dalla data

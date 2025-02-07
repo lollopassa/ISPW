@@ -5,8 +5,8 @@ import com.biteme.app.controller.SignupController;
 
 public class SignupCLI {
 
+    // Costruttore privato per evitare istanziazioni
     private SignupCLI() {
-        // Costruttore privato
     }
 
     private static final String RETRY_MESSAGE = "Riprova la registrazione.\n";

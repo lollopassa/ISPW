@@ -27,7 +27,6 @@ public enum PersistenceProvider {
         return daoFactory;
     }
 
-    // Metodo per restituire un'istanza del provider in base a un nome
     public static PersistenceProvider getProviderByName(String name) {
         for (PersistenceProvider provider : values()) {
             if (provider.getName().equalsIgnoreCase(name)) {

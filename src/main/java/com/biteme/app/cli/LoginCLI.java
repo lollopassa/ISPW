@@ -6,8 +6,8 @@ import com.biteme.app.controller.LoginController;
 
 public class LoginCLI {
 
+    // Costruttore privato per evitare istanziazioni
     private LoginCLI() {
-        //costruttore privato
     }
 
     private static final Scanner scanner = new Scanner(System.in);
@@ -16,11 +16,12 @@ public class LoginCLI {
         System.out.println("========== Benvenuto ==========");
         System.out.println("1. Login");
         System.out.println("2. Registrazione");
+        System.out.println("3. Login con Google");
         System.out.print("Scegli un'opzione: ");
         String scelta = scanner.nextLine();
 
         if (scelta.equals("1")) {
-            // Procedura di Login
+            // Procedura di Login tradizionale
             System.out.println("========== Login CLI ==========");
             System.out.print("Inserisci Email o Username: ");
             String emailOrUsername = scanner.nextLine();
@@ -42,7 +43,7 @@ public class LoginCLI {
                 // Se l'autenticazione ha successo
                 System.out.println("Login effettuato con successo! Benvenuto " + emailOrUsername);
 
-                // Verifica se l'utente Ã¨ admin
+                // Verifica se l'utente è admin
                 if (loginController.isUserAdmin()) {
                     System.out.println("Benvenuto, amministratore!");
                 }
@@ -58,6 +59,28 @@ public class LoginCLI {
         } else if (scelta.equals("2")) {
             // Procedura di Registrazione
             SignupCLI.start();
+        } else if (scelta.equals("3")) {
+            // Procedura di Login con Google
+            System.out.println("========== Login con Google ==========");
+            LoginController loginController = new LoginController();
+            try {
+                // Autenticazione tramite Google (il metodo aprirà la schermata di login di Google)
+                loginController.authenticateWithGoogle();
+                String username = loginController.getCurrentUsername();
+                System.out.println("Login con Google effettuato con successo! Benvenuto " + username);
+
+                // Verifica se l'utente è admin
+                if (loginController.isUserAdmin()) {
+                    System.out.println("Benvenuto, amministratore!");
+                }
+
+                // Avvia il menu principale
+                MenuCLI.start();
+            } catch (Exception ex) {
+                System.out.println("Errore durante il login con Google: " + ex.getMessage());
+                System.out.println("Riprova.");
+                login();
+            }
         } else {
             System.out.println("Opzione non valida!");
             login();

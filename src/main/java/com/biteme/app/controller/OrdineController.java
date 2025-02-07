@@ -9,7 +9,6 @@ import com.biteme.app.model.StatoOrdine;
 import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.util.Configuration;
-import com.biteme.app.controller.OrdinazioneController;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -43,10 +42,6 @@ public class OrdineController {
         return ordineBean;
     }
 
-    /**
-     * Salva l'ordine e aggiorna lo stato dell'ordinazione associata.
-     * In caso di errori, viene lanciata una OrdineException.
-     */
     public void salvaOrdineEStato(int ordineId, String statoStr) {
         try {
             StatoOrdine stato = convertStringToStatoOrdine(statoStr);
@@ -65,10 +60,6 @@ public class OrdineController {
         }
     }
 
-    /**
-     * Salva l'ordine.
-     * Se qualcosa va storto, viene lanciata una OrdineException.
-     */
     public void salvaOrdine(OrdineBean ordineBean, int id) {
         try {
             Ordine nuovoOrdine = new Ordine(

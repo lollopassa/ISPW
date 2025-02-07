@@ -15,17 +15,25 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import java.util.Map;
 import com.biteme.app.controller.ArchivioController;
 import javafx.scene.layout.Pane;
+import java.util.logging.Logger;
 
 public class AdminHomeView {
 
-    // Definizione della costante per "Guadagni"
     private static final String GUADAGNI_LABEL = "Guadagni";
+    private static final String GUADAGNI_GIORNALIERO = "Guadagni Giornalieri";
+    private static final String GUADAGNI_AGGREGATI = "Guadagni Aggregati";
+    private static final String GIORNO_DELLA_SETTIMANA = "Giorno della settimana";
 
     @FXML
     private ComboBox<String> periodoComboBox;
 
+    // Campo rinominato per corrispondere all'fx:id="switchButton" definito nell'FXML
     @FXML
     private Button switchButton;
+
+    // Campo per lo switch del tipo di aggregazione (potrebbe non essere presente nell'FXML)
+    @FXML
+    private Button switchAggregationButton;
 
     @FXML
     private TableView<PiattoStatistiche> statisticheTable;
@@ -43,11 +51,17 @@ public class AdminHomeView {
 
     private ArchivioController archivioController;
 
-    private boolean mostraGuadagni; // Flag per gestione dello switch
+    // Flag per la visualizzazione: mostraGuadagni = true -> visualizza guadagni, false -> visualizza prodotti ordinati
+    private boolean mostraGuadagni;
+    // Flag per decidere se, in modalità guadagni, visualizzare i dati aggregati per periodo oppure per giorno
+    private boolean usaGuadagniAggregati;
+
+    private static final Logger logger = Logger.getLogger(AdminHomeView.class.getName());
 
     public AdminHomeView() {
         this.archivioController = new ArchivioController();
-        this.mostraGuadagni = false; // Default: mostra prodotti più ordinati
+        this.mostraGuadagni = false;     // Default: mostra prodotti ordinati
+        this.usaGuadagniAggregati = false; // Default: in modalità guadagni, mostra dati giornalieri
     }
 
     @FXML
@@ -55,63 +69,94 @@ public class AdminHomeView {
         colonnaPiatto.setCellValueFactory(new PropertyValueFactory<>("piatto"));
         colonnaOrdini.setCellValueFactory(new PropertyValueFactory<>("totale"));
 
-        xAxis.setLabel("Piatto");
-        yAxis.setLabel("Totale");
+        // Imposta le etichette degli assi in base al tipo di visualizzazione
+        if (mostraGuadagni) {
+            xAxis.setLabel(GIORNO_DELLA_SETTIMANA);
+            yAxis.setLabel(GUADAGNI_LABEL);
+        } else {
+            xAxis.setLabel("Piatto");
+            yAxis.setLabel("Totale");
+        }
 
         if (periodoComboBox != null) {
             periodoComboBox.setValue("Settimana");
         }
 
-        // Impostiamo il category gap per rendere le colonne più strette
-        barChart.setCategoryGap(10); // Puoi ridurre ulteriormente il valore se necessario
+        barChart.setCategoryGap(10);
+
+        // Se il pulsante di switch aggregazione è presente, imposta il testo iniziale
+        if (switchAggregationButton != null) {
+            switchAggregationButton.setText(usaGuadagniAggregati ? GUADAGNI_AGGREGATI : GUADAGNI_GIORNALIERO);
+        }
     }
 
     @FXML
     public void aggiornaDati() {
-        // Otteniamo il valore selezionato senza controllarlo qui; la validazione avverrà in ArchivioController
         String periodoSelezionato = periodoComboBox.getValue();
         Map<String, Number> statistiche;
         if (mostraGuadagni) {
-            statistiche = archivioController.guadagniPerGiorno(periodoSelezionato.toLowerCase());
+            if (usaGuadagniAggregati) {
+                statistiche = archivioController.guadagniPerPeriodo(periodoSelezionato.toLowerCase());
+            } else {
+                statistiche = archivioController.guadagniPerGiorno(periodoSelezionato.toLowerCase());
+            }
         } else {
             statistiche = archivioController.piattiPiuOrdinatiPerPeriodo(periodoSelezionato.toLowerCase());
         }
 
-        // Se la mappa è vuota (inserimento non valido o nessun dato disponibile) possiamo mostrare un messaggio di errore
-        if(statistiche.isEmpty()){
-            System.err.println("Nessun dato disponibile per il periodo selezionato o periodo non valido.");
+        if (statistiche.isEmpty()) {
+            logger.severe("Nessun dato disponibile per il periodo selezionato o periodo non valido.");
         }
 
-        // Aggiorna la tabella
+        // Aggiorna la tabella con i dati ottenuti
         ObservableList<PiattoStatistiche> data = FXCollections.observableArrayList();
         statistiche.forEach((key, value) -> data.add(new PiattoStatistiche(key, value)));
         statisticheTable.setItems(data);
 
-        // Crea un nuovo BarChart in base allo stato corrente
+        // Crea un nuovo grafico in base allo stato corrente
         BarChart<String, Number> newChart = createNewBarChart(mostraGuadagni);
 
-        // Aggiunge i dati al nuovo grafico
         XYChart.Series<String, Number> serie = new XYChart.Series<>();
-        serie.setName(mostraGuadagni ? GUADAGNI_LABEL : "Totale Ordini");
+        String serieName;
+        if (mostraGuadagni) {
+            serieName = usaGuadagniAggregati ? GUADAGNI_LABEL + " Aggregati" : GUADAGNI_LABEL;
+        } else {
+            serieName = "Totale Ordini";
+        }
+        serie.setName(serieName);
         statistiche.forEach((key, value) -> serie.getData().add(new XYChart.Data<>(key, value)));
         newChart.getData().add(serie);
 
-        // Sostituisci il vecchio grafico con il nuovo
+        // Sostituisce il vecchio grafico con il nuovo
         Pane parent = (Pane) barChart.getParent();
         int index = parent.getChildren().indexOf(barChart);
         parent.getChildren().remove(barChart);
         parent.getChildren().add(index, newChart);
-        barChart = newChart;  // aggiorna il riferimento
+        barChart = newChart;
     }
 
     @FXML
     public void switchView() {
-        mostraGuadagni = !mostraGuadagni; // Cambia lo stato
+        mostraGuadagni = !mostraGuadagni;
+        // Aggiorna il testo del pulsante switchView (qui il campo si chiama switchButton, in base all'FXML)
+        if (switchButton != null) {
+            switchButton.setText(mostraGuadagni ? "Prodotti" : GUADAGNI_LABEL);
+        } else {
+            logger.warning("switchButton è null. Verifica l'fx:id nel file FXML.");
+        }
+        aggiornaDati();
+    }
 
-        // Cambia il testo del pulsante
-        switchButton.setText(mostraGuadagni ? "Prodotti Ordinati" : GUADAGNI_LABEL);
-
-        // Aggiorna i dati per riflettere lo stato corrente
+    @FXML
+    public void switchAggregation() {
+        // Inverte il flag per il tipo di aggregazione dei guadagni
+        usaGuadagniAggregati = !usaGuadagniAggregati;
+        if (switchAggregationButton != null) {
+            switchAggregationButton.setText(usaGuadagniAggregati ? GUADAGNI_AGGREGATI : GUADAGNI_GIORNALIERO);
+        } else {
+            // Se il pulsante non è presente nell'FXML, logghiamo l'informazione (ma non blocchiamo l'esecuzione)
+            logger.info("switchAggregationButton non presente nell'FXML.");
+        }
         aggiornaDati();
     }
 
@@ -137,9 +182,14 @@ public class AdminHomeView {
         CategoryAxis newXAxis = new CategoryAxis();
         NumberAxis newYAxis = new NumberAxis();
         if (isGuadagni) {
-            newXAxis.setCategories(FXCollections.observableArrayList("Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"));
-            newXAxis.setLabel("Giorno della settimana");
-            newYAxis.setLabel(GUADAGNI_LABEL);
+            if (usaGuadagniAggregati) {
+                newXAxis.setCategories(FXCollections.observableArrayList("Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"));
+                newXAxis.setLabel(GIORNO_DELLA_SETTIMANA);
+                newYAxis.setLabel(GUADAGNI_LABEL);
+            } else {
+                newXAxis.setLabel(GIORNO_DELLA_SETTIMANA);
+                newYAxis.setLabel(GUADAGNI_LABEL);
+            }
         } else {
             newXAxis.setLabel("Piatto");
             newYAxis.setLabel("Totale Ordini");

@@ -10,8 +10,8 @@ import java.util.Scanner;
 
 public class OrdineCLI {
 
+    // Costruttore privato per evitare istanziazioni
     private OrdineCLI() {
-        //costruttore privato
     }
 
     private static OrdineController ordineController = new OrdineController();

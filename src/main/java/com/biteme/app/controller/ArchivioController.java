@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 public class ArchivioController {
     private ArchivioDao archivioDao;
 
-    // Definizione delle costanti
     private static final String PERIODO_SETTIMANA = "settimana";
     private static final String PERIODO_MESE = "mese";
     private static final String PERIODO_TRIMESTRE = "trimestre";

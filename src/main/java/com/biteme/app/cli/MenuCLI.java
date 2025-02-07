@@ -4,8 +4,8 @@ import com.biteme.app.controller.LoginController;
 
 public class MenuCLI {
 
+    // Costruttore privato per evitare istanziazioni
     private MenuCLI() {
-        //costruttore privato
     }
 
     public static void start() {

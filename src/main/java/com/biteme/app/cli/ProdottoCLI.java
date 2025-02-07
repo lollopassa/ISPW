@@ -8,8 +8,8 @@ import com.biteme.app.exception.ProdottoException;
 
 public class ProdottoCLI {
 
+    // Costruttore privato per evitare istanziazioni
     private ProdottoCLI() {
-        // Costruttore privato
     }
 
     private static final ProdottoController prodottoController = new ProdottoController();

@@ -8,7 +8,6 @@ public class SignupBean {
     private String confirmPassword;
 
 
-    // Getter e Setter
     public String getEmail() {
         return email;
     }

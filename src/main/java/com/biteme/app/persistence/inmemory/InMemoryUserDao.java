@@ -56,8 +56,4 @@ public class InMemoryUserDao implements UserDao {
         return users.values().stream().anyMatch(u -> u.getEmail().equals(email));
     }
 
-    @Override
-    public boolean existsRole(UserRole role) {
-        return users.values().stream().anyMatch(u -> u.getRuolo() == role);
-    }
 }
