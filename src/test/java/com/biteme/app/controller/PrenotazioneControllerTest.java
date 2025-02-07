@@ -7,13 +7,14 @@ import com.biteme.app.persistence.inmemory.InMemoryPrenotazioneDao;
 import com.biteme.app.persistence.inmemory.Storage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+//@author Kevin Hoxha
 class PrenotazioneControllerTest {
 
     private PrenotazioneController controller;
@@ -143,72 +144,40 @@ class PrenotazioneControllerTest {
 
     @Test
     void testCreaPrenotazioneConNomeVuoto() {
-        Exception ex = assertThrows(ValidationException.class, () -> controller.creaPrenotazione(
-                "   ",
-                "20:00",
-                LocalDate.of(2025, 3, 15),
-                "1234567890",
-                "Test",
-                "3"
-        ));
-        assertEquals("Il nome del cliente non può essere vuoto.", ex.getMessage());
+        assertThrowsValidationException("Il nome del cliente non può essere vuoto.", "   ", "20:00", LocalDate.of(2025, 3, 15), "1234567890", "Test", "3");
     }
 
     @Test
     void testCreaPrenotazioneConOrarioNonValido() {
-        Exception ex = assertThrows(ValidationException.class, () -> controller.creaPrenotazione(
-                "Mario Rossi",
-                "invalid",
-                LocalDate.of(2025, 3, 15),
-                "1234567890",
-                "Test",
-                "3"
-        ));
-        assertEquals("Formato orario non valido. Usa 'HH:mm'.", ex.getMessage());
+        assertThrowsValidationException("Formato orario non valido. Usa 'HH:mm'.", "Mario Rossi", "invalid", LocalDate.of(2025, 3, 15), "1234567890", "Test", "3");
     }
 
     @Test
     void testCreaPrenotazioneConDataNulla() {
-        Exception ex = assertThrows(ValidationException.class, () -> controller.creaPrenotazione(
-                "Mario Rossi",
-                "20:00",
-                null,
-                "1234567890",
-                "Test",
-                "3"
-        ));
-        assertEquals("Seleziona una data valida.", ex.getMessage());
+        assertThrowsValidationException("Seleziona una data valida.", "Mario Rossi", "20:00", null, "1234567890", "Test", "3");
     }
 
     @Test
     void testCreaPrenotazioneConTelefonoNonValido() {
-        Exception ex = assertThrows(ValidationException.class, () -> controller.creaPrenotazione(
-                "Mario Rossi",
-                "20:00",
-                LocalDate.of(2025, 3, 15),
-                "invalid_123",
-                "Test",
-                "3"
-        ));
-        assertEquals("Il telefono deve contenere solo numeri.", ex.getMessage());
+        assertThrowsValidationException("Il telefono deve contenere solo numeri.", "Mario Rossi", "20:00", LocalDate.of(2025, 3, 15), "invalid_123", "Test", "3");
     }
 
     @Test
     void testCreaPrenotazioneConCopertiNegativi() {
-        Exception ex = assertThrows(ValidationException.class, () -> controller.creaPrenotazione(
-                "Mario Rossi",
-                "20:00",
-                LocalDate.of(2025, 3, 15),
-                "1234567890",
-                "Test",
-                "-1"
-        ));
-        assertEquals("I coperti devono essere maggiori di 0.", ex.getMessage());
+        assertThrowsValidationException("I coperti devono essere maggiori di 0.", "Mario Rossi", "20:00", LocalDate.of(2025, 3, 15), "1234567890", "Test", "-1");
     }
 
     @Test
     void testEliminaPrenotazioneNonEsistente() {
         Exception ex = assertThrows(IllegalArgumentException.class, () -> controller.eliminaPrenotazione(999));
         assertEquals("La prenotazione con ID 999 non esiste.", ex.getMessage());
+    }
+
+    // Metodo helper per centralizzare la gestione delle eccezioni
+    private void assertThrowsValidationException(String expectedMessage, String nome, String orario, LocalDate data, String telefono, String note, String coperti) {
+        Exception ex = assertThrows(ValidationException.class, () -> {
+            controller.creaPrenotazione(nome, orario, data, telefono, note, coperti);
+        });
+        assertEquals(expectedMessage, ex.getMessage());
     }
 }

@@ -1,41 +1,37 @@
 package com.biteme.app.util;
 
 import com.biteme.app.persistence.PersistenceProvider;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Configuration {
-
+    private static final Logger logger = Logger.getLogger(Configuration.class.getName());
     private static final Properties properties = new Properties();
-    private static String persistenceMode = "in memory"; // Imposta il valore predefinito come "in memory"
+    private static String persistenceMode = "database";
 
-    // Caricamento delle proprietà dal file config.properties
     static {
         try (InputStream input = Configuration.class.getClassLoader().getResourceAsStream("config.properties")) {
             if (input != null) {
                 properties.load(input);
-
-                // Leggere la modalità di persistenza dal file config.properties
                 String configuredPersistenceMode = properties.getProperty("persistence.mode");
                 if (configuredPersistenceMode != null && !configuredPersistenceMode.isBlank()) {
-                    persistenceMode = configuredPersistenceMode.toLowerCase(); // Usa la configurazione dal file se presente
+                    persistenceMode = configuredPersistenceMode.toLowerCase();
                 }
             } else {
-                System.err.println("[AVVISO] File config.properties non trovato. Persistenza predefinita: in-memory.");
+                logger.warning("[AVVISO] File config.properties non trovato. Persistenza predefinita: in-memory.");
             }
         } catch (IOException e) {
-            System.err.println("[AVVISO] Errore nel caricamento del file di configurazione. Persistenza predefinita: in-memory.");
+            logger.log(Level.WARNING, "[AVVISO] Errore nel caricamento del file di configurazione. Persistenza predefinita: in-memory.", e);
         }
     }
 
-    // Costruttore privato per impedire l'instanziazione della classe
     private Configuration() {
         // Costruttore privato per disabilitare l'istanziazione
     }
 
-    // Metodo per ottenere il provider di persistenza configurato
     public static PersistenceProvider getPersistenceProvider() {
         return PersistenceProvider.getProviderByName(persistenceMode);
     }
