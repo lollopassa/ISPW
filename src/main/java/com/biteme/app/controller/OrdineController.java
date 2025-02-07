@@ -2,12 +2,14 @@ package com.biteme.app.controller;
 
 import com.biteme.app.bean.OrdineBean;
 import com.biteme.app.bean.ProdottoBean;
+import com.biteme.app.exception.OrdineException;
 import com.biteme.app.model.Ordine;
 import com.biteme.app.model.Prodotto;
 import com.biteme.app.model.StatoOrdine;
 import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.util.Configuration;
+import com.biteme.app.controller.OrdinazioneController;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -19,7 +21,7 @@ public class OrdineController {
 
     private final ProdottoDao prodottoDao;
     private final OrdineDao ordineDao;
-    private VBox riepilogoContenuto; // Impostato dalla view
+    private VBox riepilogoContenuto; // Set by the view
 
     public OrdineController() {
         this.prodottoDao = Configuration.getPersistenceProvider()
@@ -30,7 +32,6 @@ public class OrdineController {
                 .getOrdineDao();
     }
 
-    // Imposta il VBox passato dalla view
     public void setRiepilogoContenuto(VBox riepilogoContenuto) {
         this.riepilogoContenuto = riepilogoContenuto;
     }
@@ -43,53 +44,50 @@ public class OrdineController {
     }
 
     /**
-     * Metodo modificato: la view passa una stringa che viene convertita internamente in un valore
-     * di StatoOrdine (model). In questo modo la view non fa riferimento diretto al model.
+     * Salva l'ordine e aggiorna lo stato dell'ordinazione associata.
+     * In caso di errori, viene lanciata una OrdineException.
      */
     public void salvaOrdineEStato(int ordineId, String statoStr) {
-        StatoOrdine stato = convertStringToStatoOrdine(statoStr);
-        List<String> prodotti = recuperaProdottiDalRiepilogo();
-        List<Integer> quantita = new ArrayList<>();
-        for (String prodotto : prodotti) {
-            quantita.add(recuperaQuantitaDalRiepilogo(prodotto));
-        }
-        OrdineBean ordineBean = preparaOrdineBean(prodotti, quantita);
-        salvaOrdine(ordineBean, ordineId);
-        // Aggiorna lo stato dell'ordinazione tramite il controller di ordinazione
-        OrdinazioneController ordinazioneController = new OrdinazioneController();
-        ordinazioneController.aggiornaStatoOrdinazione(ordineId, stato);
-    }
-
-    // Metodo helper per convertire la stringa in StatoOrdine
-    private StatoOrdine convertStringToStatoOrdine(String statoStr) {
-        if (statoStr == null) {
-            throw new IllegalArgumentException("Stato ordine non può essere null");
-        }
-        switch (statoStr.toUpperCase()) {
-            case "IN_CORSO":
-                return StatoOrdine.IN_CORSO;
-            case "COMPLETATO":
-                return StatoOrdine.COMPLETATO;
-            default:
-                throw new IllegalArgumentException("Stato ordine non valido: " + statoStr);
+        try {
+            StatoOrdine stato = convertStringToStatoOrdine(statoStr);
+            List<String> prodotti = recuperaProdottiDalRiepilogo();
+            List<Integer> quantita = new ArrayList<>();
+            for (String prodotto : prodotti) {
+                quantita.add(recuperaQuantitaDalRiepilogo(prodotto));
+            }
+            OrdineBean ordineBean = preparaOrdineBean(prodotti, quantita);
+            salvaOrdine(ordineBean, ordineId);
+            // Aggiorna lo stato dell'ordinazione tramite il controller delle ordinazioni
+            OrdinazioneController ordinazioneController = new OrdinazioneController();
+            ordinazioneController.aggiornaStatoOrdinazione(ordineId, stato);
+        } catch (Exception e) {
+            throw new OrdineException("Errore nel salvataggio dell'ordine e nell'aggiornamento dello stato: " + e.getMessage(), e);
         }
     }
 
+    /**
+     * Salva l'ordine.
+     * Se qualcosa va storto, viene lanciata una OrdineException.
+     */
     public void salvaOrdine(OrdineBean ordineBean, int id) {
-        Ordine nuovoOrdine = new Ordine(
-                id,
-                ordineBean.getProdotti(),
-                ordineBean.getQuantita()
-        );
-        ordineDao.store(nuovoOrdine);
+        try {
+            Ordine nuovoOrdine = new Ordine(
+                    id,
+                    ordineBean.getProdotti(),
+                    ordineBean.getQuantita()
+            );
+            ordineDao.store(nuovoOrdine);
+        } catch (Exception e) {
+            throw new OrdineException("Errore nel salvataggio dell'ordine: " + e.getMessage(), e);
+        }
     }
 
-    // Recupero dei prodotti dal riepilogo (il VBox viene gestito internamente)
+    // Recupera la lista dei nomi dei prodotti dal riepilogo (VBox)
     private List<String> recuperaProdottiDalRiepilogo() {
         List<String> prodotti = new ArrayList<>();
         for (Node nodo : riepilogoContenuto.getChildren()) {
             if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
-                String testo = nomeEQuantitaLabel.getText(); // Es. "Pizza Margherita x 2"
+                String testo = nomeEQuantitaLabel.getText(); // ad esempio: "Pizza Margherita x 2"
                 String[] parti = testo.split(" x ");
                 if (parti.length > 1) {
                     String nomeProdotto = parti[0].trim();
@@ -100,7 +98,7 @@ public class OrdineController {
         return prodotti;
     }
 
-    // Recupera la quantità di un prodotto specifico dal riepilogo
+    // Recupera la quantità per un prodotto specifico dal riepilogo
     public int recuperaQuantitaDalRiepilogo(String nomeProdotto) {
         for (Node nodo : riepilogoContenuto.getChildren()) {
             if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
@@ -126,14 +124,12 @@ public class OrdineController {
                     prodottoBean.setId(prodotto.getId());
                     prodottoBean.setNome(prodotto.getNome());
                     prodottoBean.setPrezzo(prodotto.getPrezzo());
-                    // Converte il valore enum in String
                     prodottoBean.setCategoria(prodotto.getCategoria().name());
                     prodottoBean.setDisponibile(prodotto.isDisponibile());
                     return prodottoBean;
                 })
                 .toList();
     }
-
 
     public OrdineBean getOrdineById(int id) {
         return load(id);
@@ -142,7 +138,7 @@ public class OrdineController {
     public OrdineBean load(int idOrdine) {
         Ordine ordine = ordineDao.getById(idOrdine);
         if (ordine == null) {
-            throw new IllegalArgumentException("L'ordine con ID " + idOrdine + " non esiste.");
+            throw new OrdineException("L'ordine con ID " + idOrdine + " non esiste.");
         }
         OrdineBean ordineBean = new OrdineBean();
         ordineBean.setId(ordine.getId());
@@ -159,7 +155,6 @@ public class OrdineController {
                     prodottoBean.setId(prodotto.getId());
                     prodottoBean.setNome(prodotto.getNome());
                     prodottoBean.setPrezzo(prodotto.getPrezzo());
-                    // Converte il valore enum in String
                     prodottoBean.setCategoria(prodotto.getCategoria().name());
                     prodottoBean.setDisponibile(prodotto.isDisponibile());
                     return prodottoBean;
@@ -167,4 +162,17 @@ public class OrdineController {
                 .toList();
     }
 
+    private StatoOrdine convertStringToStatoOrdine(String statoStr) {
+        if (statoStr == null) {
+            throw new IllegalArgumentException("Stato ordine non può essere null");
+        }
+        switch (statoStr.toUpperCase()) {
+            case "IN_CORSO":
+                return StatoOrdine.IN_CORSO;
+            case "COMPLETATO":
+                return StatoOrdine.COMPLETATO;
+            default:
+                throw new IllegalArgumentException("Stato ordine non valido: " + statoStr);
+        }
+    }
 }

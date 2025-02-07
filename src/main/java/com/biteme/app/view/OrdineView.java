@@ -38,7 +38,6 @@ public class OrdineView {
 
     private static final String ASPORTO = "Asporto";
 
-    // La view non usa più l'enum del model: passiamo direttamente una stringa
     @FXML
     private void handleSalva() {
         int ordineId = ordinazioneController.getIdOrdineSelezionato();
@@ -46,7 +45,6 @@ public class OrdineView {
         ordinazioneController.cambiaASchermataOrdinazione();
     }
 
-    // La view passa una stringa, non un enum
     @FXML
     public void handleCheckout(ActionEvent actionEvent) {
         int ordineId = ordinazioneController.getIdOrdineSelezionato();
@@ -86,7 +84,6 @@ public class OrdineView {
         }
     }
 
-    // --- Metodi già presenti per il caricamento dei prodotti e per la gestione del riepilogo ---
     private void caricaProdottiNelRiepilogo(OrdineBean ordineBean) {
         riepilogoContenuto.getChildren().clear();
         List<String> prodotti = ordineBean.getProdotti();
@@ -366,12 +363,5 @@ public class OrdineView {
             }
         }
         totaleOrdine.setText(String.format("Totale: €%.2f", totale));
-    }
-
-    // Il metodo per ottenere l'ordinazione selezionata viene definito (o richiamato) altrove,
-    // per esempio in OrdinazioneView, in modo da centralizzare lo scambio dei bean.
-    public static OrdinazioneBean getOrdineSelezionato() {
-        // Implementazione esistente o delegata ad una classe comune
-        return null;
     }
 }

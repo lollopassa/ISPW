@@ -5,9 +5,14 @@ import com.biteme.app.model.User;
 import com.biteme.app.model.UserRole;
 import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.service.GoogleAuthService;
-import com.biteme.app.util.*;
+import com.biteme.app.util.Configuration;
+import com.biteme.app.util.GoogleAuthUtility;
+import com.biteme.app.util.HashingUtil;
+import com.biteme.app.util.SceneLoader;
+import com.biteme.app.util.UserSession;
 import com.biteme.app.persistence.UserDao;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class LoginController {
@@ -20,36 +25,45 @@ public class LoginController {
         this.googleAuthService = new GoogleAuthService();
     }
 
-    public boolean authenticateUser(LoginBean loginBean) {
-        String emailOrUsername = loginBean.getEmailOrUsername();
-        String password = loginBean.getPassword();
-
-        if (emailOrUsername.isEmpty() || password.isEmpty()) {
-            return false;
+    public void authenticateUser(LoginBean loginBean) {
+        // Controllo che i campi non siano vuoti
+        if (loginBean.getEmailOrUsername() == null || loginBean.getEmailOrUsername().trim().isEmpty() ||
+                loginBean.getPassword() == null || loginBean.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("Email/Username e password sono obbligatori.");
         }
 
-        if (emailOrUsername.contains("@") && !isValidEmail(emailOrUsername)) {
-            return false;
+        // Se si tratta di un'email, controlla il formato
+        if (loginBean.getEmailOrUsername().contains("@") && !isValidEmail(loginBean.getEmailOrUsername())) {
+            throw new IllegalArgumentException("Il formato dell'email non è valido.");
         }
 
-        User user = userDao.load(emailOrUsername)
-                .filter(u -> validatePassword(u, password))
-                .orElse(null);
-
-        if (user != null) {
-            UserSession.setCurrentUser(user);
-            return true;
+        // Prova a caricare l'utente dal DAO
+        Optional<User> optionalUser = userDao.load(loginBean.getEmailOrUsername());
+        if (!optionalUser.isPresent()) {
+            throw new IllegalArgumentException("Utente non trovato.");
         }
-        return false;
-    }
+        User user = optionalUser.get();
 
-    private boolean validatePassword(User user, String password) {
+        // Se l'utente è stato creato tramite Google, non può autenticarsi con password tradizionale
         if (user.isGoogleUser()) {
-            return false;
+            throw new IllegalArgumentException("Utente Google non può autenticarsi tramite metodo tradizionale.");
         }
-        return user.getPassword().equals(HashingUtil.hashPassword(password));
+
+        // Verifica la password (hashata) corrisponda a quella salvata
+        if (!user.getPassword().equals(HashingUtil.hashPassword(loginBean.getPassword()))) {
+            throw new IllegalArgumentException("Password errata.");
+        }
+
+        // Se tutto è valido, imposta l'utente corrente
+        UserSession.setCurrentUser(user);
     }
 
+    /**
+     * Autentica un utente tramite Google.
+     * Se l'autenticazione fallisce, viene lanciata un'eccezione.
+     *
+     * @throws GoogleAuthException se l'autenticazione Google fallisce
+     */
     public void authenticateWithGoogle() throws GoogleAuthException {
         try {
             String accessToken = googleAuthService.authenticateWithGoogle();
@@ -69,6 +83,9 @@ public class LoginController {
         }
     }
 
+    /**
+     * Se l'utente esiste ma non è un utente Google, questo metodo lancia un'eccezione.
+     */
     private User validateGoogleUser(User user) {
         if (!user.isGoogleUser()) {
             throw new IllegalStateException("Email già registrata con metodo tradizionale");
@@ -76,6 +93,9 @@ public class LoginController {
         return user;
     }
 
+    /**
+     * Carica la schermata appropriata in base al ruolo dell'utente.
+     */
     public void navigateToHome() {
         User user = UserSession.getCurrentUser();
 
@@ -99,10 +119,12 @@ public class LoginController {
         User currentUser = UserSession.getCurrentUser();
         return currentUser != null ? currentUser.getUsername() : "";
     }
-    public boolean isUserAdmin(){
+
+    public boolean isUserAdmin() {
         User currentUser = UserSession.getCurrentUser();
         return currentUser != null && currentUser.getRuolo() == UserRole.ADMIN;
     }
+
     public void logout() {
         UserSession.clear();
     }

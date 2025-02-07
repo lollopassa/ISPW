@@ -8,7 +8,6 @@ import com.biteme.app.util.Configuration;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
-
 import java.util.stream.Collectors;
 
 public class ArchivioController {
@@ -18,6 +17,8 @@ public class ArchivioController {
     private static final String PERIODO_SETTIMANA = "settimana";
     private static final String PERIODO_MESE = "mese";
     private static final String PERIODO_TRIMESTRE = "trimestre";
+    private static final String ERRORE_PERIODO_NON_VALIDO =
+            "Periodo non valido. Deve essere 'settimana', 'mese' o 'trimestre'.";
 
     public ArchivioController() {
         this.archivioDao = Configuration.getPersistenceProvider()
@@ -52,18 +53,21 @@ public class ArchivioController {
             }
         }
 
-        // Convertiamo a Map<String, Number> e utilizziamo LinkedHashMap per mantenere l'ordine
         return conteggioPiatti.entrySet().stream()
                 .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordine decrescente
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        e -> (Number) e.getValue(), // Conversione a Number
-                        (e1, e2) -> e1, // Gestione conflitti, anche se non necessaria
-                        LinkedHashMap::new // Ordina preservando l'ordine
+                        e -> (Number) e.getValue(),
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
                 ));
     }
 
     public Map<String, Number> piattiPiuOrdinatiPerPeriodo(String periodo) {
+        if (periodo == null || periodo.trim().isEmpty()) {
+            throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
+        }
+
         LocalDateTime startDate;
         LocalDateTime endDate = LocalDateTime.now();
 
@@ -78,13 +82,16 @@ public class ArchivioController {
                 startDate = endDate.minusMonths(3);
                 break;
             default:
-                throw new IllegalArgumentException("Periodo non valido. Usa 'settimana', 'mese', o 'trimestre'.");
+                throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
         }
 
         return piattiPiuOrdinati(startDate, endDate);
     }
 
     public Map<String, Number> guadagniPerPeriodo(String periodo) {
+        if (periodo == null || periodo.trim().isEmpty()) {
+            throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
+        }
         LocalDateTime startDate;
         LocalDateTime endDate = LocalDateTime.now();
 
@@ -99,7 +106,7 @@ public class ArchivioController {
                 startDate = endDate.minusMonths(3);
                 break;
             default:
-                throw new IllegalArgumentException("Periodo non valido. Usa 'settimana', 'mese', o 'trimestre'.");
+                throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
         }
 
         List<Archivio> archivi = archivioDao.findByDateRange(startDate, endDate);
@@ -114,17 +121,19 @@ public class ArchivioController {
             }
         }
 
-        // Convertiamo a Map<String, Number> per conformità con il contratto del metodo
         return guadagni.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        e -> e.getValue().doubleValue(), // Conversione a Double (Number)
+                        e -> e.getValue().doubleValue(),
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));
     }
 
     public Map<String, Number> guadagniPerGiorno(String periodo) {
+        if (periodo == null || periodo.trim().isEmpty()) {
+            throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
+        }
         LocalDateTime startDate;
         LocalDateTime endDate = LocalDateTime.now();
 
@@ -139,39 +148,31 @@ public class ArchivioController {
                 startDate = endDate.minusMonths(3);
                 break;
             default:
-                throw new IllegalArgumentException("Periodo non valido. Usa 'settimana', 'mese' o 'trimestre'.");
+                throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
         }
 
         List<Archivio> archivi = archivioDao.findByDateRange(startDate, endDate);
 
-        // Creiamo una mappa ordinata con i giorni della settimana abbreviati
         Map<String, BigDecimal> guadagniGiorno = new LinkedHashMap<>();
-        // Inizializziamo con zero per ogni giorno abbreviato
         String[] giorni = { "Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom" };
         for (String giorno : giorni) {
             guadagniGiorno.put(giorno, BigDecimal.ZERO);
         }
 
-        // Raggruppiamo i totali in base al giorno della settimana, usando le abbreviazioni
         for (Archivio archivio : archivi) {
-            String giornoAbbreviato = "";
-            switch (archivio.getDataArchiviazione().getDayOfWeek()) {
-                case MONDAY:    giornoAbbreviato = "Lun"; break;
-                case TUESDAY:   giornoAbbreviato = "Mar"; break;
-                case WEDNESDAY: giornoAbbreviato = "Mer"; break;
-                case THURSDAY:  giornoAbbreviato = "Gio"; break;
-                case FRIDAY:    giornoAbbreviato = "Ven"; break;
-                case SATURDAY:  giornoAbbreviato = "Sab"; break;
-                case SUNDAY:    giornoAbbreviato = "Dom"; break;
-            }
+            String giornoAbbreviato = switch (archivio.getDataArchiviazione().getDayOfWeek()) {
+                case MONDAY -> "Lun";
+                case TUESDAY -> "Mar";
+                case WEDNESDAY -> "Mer";
+                case THURSDAY -> "Gio";
+                case FRIDAY -> "Ven";
+                case SATURDAY -> "Sab";
+                case SUNDAY -> "Dom";
+            };
             BigDecimal totaleGiorno = guadagniGiorno.get(giornoAbbreviato);
-            if (totaleGiorno == null) {
-                totaleGiorno = BigDecimal.ZERO;
-            }
             guadagniGiorno.put(giornoAbbreviato, totaleGiorno.add(archivio.getTotale()));
         }
 
-        // Convertiamo in Map<String, Number>
         Map<String, Number> result = new LinkedHashMap<>();
         guadagniGiorno.forEach((g, tot) -> result.put(g, tot.doubleValue()));
         return result;

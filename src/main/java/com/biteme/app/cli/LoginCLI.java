@@ -27,26 +27,33 @@ public class LoginCLI {
             System.out.print("Inserisci Password: ");
             String password = scanner.nextLine();
 
+            // Crea il bean con le credenziali dell'utente
             LoginBean loginBean = new LoginBean();
             loginBean.setEmailOrUsername(emailOrUsername);
             loginBean.setPassword(password);
 
+            // Istanzia il controller
             LoginController loginController = new LoginController();
-            boolean authenticatedUser = loginController.authenticateUser(loginBean);
 
-            if (authenticatedUser) {
+            try {
+                // Esegui l'autenticazione utente
+                loginController.authenticateUser(loginBean);
+
+                // Se l'autenticazione ha successo
                 System.out.println("Login effettuato con successo! Benvenuto " + emailOrUsername);
 
-                // Verifica se l'utente è admin
+                // Verifica se l'utente Ã¨ admin
                 if (loginController.isUserAdmin()) {
                     System.out.println("Benvenuto, amministratore!");
                 }
 
-                MenuCLI.start(); // Avvia il menu principale
-            } else {
+                // Avvia il menu principale
+                MenuCLI.start();
+            } catch (IllegalArgumentException ex) {
+                // L'autenticazione fallisce se viene sollevata un'eccezione
+                System.out.println("Errore: " + ex.getMessage());
                 System.out.println("Credenziali non valide! Riprova.");
-                // Riprova il login (oppure potresti aggiungere un'opzione per uscire)
-                login();
+                login(); // Riprova il login
             }
         } else if (scelta.equals("2")) {
             // Procedura di Registrazione

@@ -2,13 +2,15 @@ package com.biteme.app.controller;
 
 import com.biteme.app.bean.OrdineBean;
 import com.biteme.app.bean.OrdinazioneBean;
-import com.biteme.app.view.OrdinazioneView;
+import com.biteme.app.exception.OrdinazioneException;
 import com.biteme.app.model.Ordinazione;
 import com.biteme.app.model.StatoOrdine;
 import com.biteme.app.model.TipoOrdine;
 import com.biteme.app.persistence.OrdinazioneDao;
 import com.biteme.app.util.Configuration;
 import com.biteme.app.util.SceneLoader;
+import com.biteme.app.controller.OrdineController;
+import com.biteme.app.view.OrdinazioneView;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,27 +27,21 @@ public class OrdinazioneController {
     }
 
     public void creaOrdine(OrdinazioneBean ordinazioneBean) {
-        // Converte il bean in model
-        Ordinazione ordinazione = convertToModel(ordinazioneBean);
-        // Imposta lo stato iniziale (ad es. NUOVO)
-        ordinazione.setStatoOrdine(StatoOrdine.NUOVO);
-        // Salva l'ordinazione nel database
-        ordinazioneDao.store(ordinazione);
-
-        // Aggiorna l'ID generato nel bean
-        ordinazioneBean.setId(ordinazione.getId());
-
-        // Crea l'OrdineBean collegato e lo salva
-        OrdineBean ordineBean = new OrdineBean();
-        ordineBean.setId(ordinazione.getId());
-        ordineBean.setProdotti(new ArrayList<>());
-        ordineBean.setQuantita(new ArrayList<>());
-        ordineController.salvaOrdine(ordineBean, ordinazione.getId());
+        try {
+            Ordinazione ordinazione = convertToModel(ordinazioneBean);
+            ordinazione.setStatoOrdine(StatoOrdine.NUOVO);
+            ordinazioneDao.store(ordinazione);
+            ordinazioneBean.setId(ordinazione.getId());
+            OrdineBean ordineBean = new OrdineBean();
+            ordineBean.setId(ordinazione.getId());
+            ordineBean.setProdotti(new ArrayList<>());
+            ordineBean.setQuantita(new ArrayList<>());
+            ordineController.salvaOrdine(ordineBean, ordinazione.getId());
+        } catch (Exception e) {
+            throw new OrdinazioneException("Errore nella creazione dell'ordinazione: " + e.getMessage(), e);
+        }
     }
 
-    /**
-     * Restituisce tutti gli ordini come bean.
-     */
     public List<OrdinazioneBean> getOrdini() {
         List<Ordinazione> listaModel = ordinazioneDao.getAll();
         return listaModel.stream()
@@ -53,23 +49,33 @@ public class OrdinazioneController {
                 .toList();
     }
 
-    public void eliminaOrdine(int id) {
-        if (ordinazioneDao.exists(id)) {
+    public void eliminaOrdinazione(int id) {
+        if (!ordinazioneDao.exists(id)) {
+            throw new OrdinazioneException("L'ordinazione con ID " + id + " non esiste.");
+        }
+        try {
             ordinazioneDao.delete(id);
-        } else {
-            throw new IllegalArgumentException("L'ordine con ID " + id + " non esiste.");
+        } catch (Exception e) {
+            throw new OrdinazioneException("Errore nell'eliminazione dell'ordinazione: " + e.getMessage(), e);
         }
     }
 
-    // Metodo per ottenere l'ID dell'ordine selezionato dalla view
+    // Metodo per ottenere l'ID dell'ordinazione selezionata dalla view
     public int getIdOrdineSelezionato() {
         OrdinazioneBean ordinazioneBean = OrdinazioneView.getOrdineSelezionato();
+        if (ordinazioneBean == null) {
+            throw new OrdinazioneException("Nessuna ordinazione selezionata.");
+        }
         return ordinazioneBean.getId();
     }
 
-    // Metodo per aggiornare lo stato dell'ordinazione (se necessario)
+    // Metodo per aggiornare lo stato dell'ordinazione
     public void aggiornaStatoOrdinazione(int ordineId, StatoOrdine nuovoStato) {
-        ordinazioneDao.aggiornaStato(ordineId, nuovoStato);
+        try {
+            ordinazioneDao.aggiornaStato(ordineId, nuovoStato);
+        } catch (Exception e) {
+            throw new OrdinazioneException("Errore nell'aggiornamento dello stato dell'ordinazione: " + e.getMessage(), e);
+        }
     }
 
     public void cambiaASchermataOrdinazione() {
@@ -89,12 +95,8 @@ public class OrdinazioneController {
         }
     }
 
-    public void eliminaOrdinazione(Integer id) {
-        ordinazioneDao.delete(id);
-    }
-
+    // --- Private helper methods ---
     private Ordinazione convertToModel(OrdinazioneBean bean) {
-        // Converte la stringa presente nel bean in un valore enum del model
         TipoOrdine tipoOrdine;
         if ("Al Tavolo".equals(bean.getTipoOrdine())) {
             tipoOrdine = TipoOrdine.AL_TAVOLO;
@@ -103,9 +105,7 @@ public class OrdinazioneController {
         } else {
             throw new IllegalArgumentException("Tipo Ordine non valido: " + bean.getTipoOrdine());
         }
-        // Per lo stato, se non è stato impostato dalla view si usa NUOVO
         StatoOrdine statoOrdine = StatoOrdine.NUOVO;
-
         return new Ordinazione(
                 bean.getId(),
                 bean.getNome(),
@@ -122,7 +122,6 @@ public class OrdinazioneController {
         bean.setId(model.getId());
         bean.setNome(model.getNomeCliente());
         bean.setNumeroClienti(model.getNumeroClienti());
-        // Converte l'enum in una stringa per la view
         bean.setTipoOrdine(model.getTipoOrdine().toString());
         bean.setInfoTavolo(model.getInfoTavolo());
         bean.setStatoOrdine(model.getStatoOrdine().toString());

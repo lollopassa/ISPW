@@ -64,7 +64,7 @@
             <TextField fx:id="telefonoField" prefHeight="35.0" prefWidth="300.0" promptText="Telefono" style="-fx-font-size: 14px;" />
 
             <!-- Pulsante per aggiungere una prenotazione -->
-            <Button onAction="#createBooking" prefHeight="40.0" prefWidth="300.0" style="-fx-background-color: #303d68; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;" text="Aggiungi Prenotazione" />
+            <Button onAction="#creaPrenotazione" prefHeight="40.0" prefWidth="300.0" style="-fx-background-color: #303d68; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;" text="Aggiungi Prenotazione" />
         </VBox>
 
         <!-- Tabella delle Prenotazioni con Icona Elimina -->

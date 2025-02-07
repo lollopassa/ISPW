@@ -18,33 +18,33 @@ public class LoginView {
     private final LoginController loginController = new LoginController();
 
     @FXML
-    private void onLoginButtonClick(){
-    LoginBean loginBean = new LoginBean();
+    private void onLoginButtonClick() {
+        // Crea il bean con i dati inseriti dall'utente
+        LoginBean loginBean = new LoginBean(); // Usa il costruttore senza parametri
         loginBean.setEmailOrUsername(emailOrUsernameTextField.getText());
         loginBean.setPassword(passwordTextField.getText());
 
-    boolean isAuthenticated = loginController.authenticateUser(loginBean);
-
-        if (isAuthenticated) {
-        showAlert("Successo", "Login effettuato con successo!", Alert.AlertType.INFORMATION);
-        loginController.navigateToHome();
-    } else {
-        showAlert("Errore", "Credenziali non valide!", Alert.AlertType.ERROR);
+        try {
+            // Il controller esegue la validazione e imposta l'utente corrente; in caso di errore lancia un'eccezione
+            loginController.authenticateUser(loginBean);
+            showAlert("Successo", "Login effettuato con successo!", Alert.AlertType.INFORMATION);
+            loginController.navigateToHome();
+        } catch (IllegalArgumentException ex) {
+            showAlert("Errore", ex.getMessage(), Alert.AlertType.ERROR);
+        }
     }
-}
 
-
-@FXML
+    @FXML
     private void onGoogleLoginButtonClick() {
-    try {
-        loginController.authenticateWithGoogle();
-        String username = loginController.getCurrentUsername();
-        showAlert("Benvenuto", "Accesso effettuato come " + username, Alert.AlertType.INFORMATION);
-        loginController.navigateToHome();
-    } catch (Exception e) {
-        showAlert("Errore Google", e.getMessage(), Alert.AlertType.ERROR);
+        try {
+            loginController.authenticateWithGoogle();
+            String username = loginController.getCurrentUsername();
+            showAlert("Benvenuto", "Accesso effettuato come " + username, Alert.AlertType.INFORMATION);
+            loginController.navigateToHome();
+        } catch (Exception e) {
+            showAlert("Errore Google", e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
-}
 
     @FXML
     private void onSignupButtonClick() {

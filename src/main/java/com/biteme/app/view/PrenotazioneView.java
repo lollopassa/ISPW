@@ -4,6 +4,7 @@ import com.biteme.app.bean.EmailBean;
 import com.biteme.app.bean.PrenotazioneBean;
 import com.biteme.app.controller.EmailController;
 import com.biteme.app.controller.PrenotazioneController;
+import com.biteme.app.exception.ValidationException;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -70,6 +71,13 @@ public class PrenotazioneView {
         eliminaButton.setDisable(true);
         emailButton.setDisable(true);
 
+        modificaButton.setCursor(javafx.scene.Cursor.HAND);
+        eliminaButton.setCursor(javafx.scene.Cursor.HAND);
+        emailButton.setCursor(javafx.scene.Cursor.HAND);
+
+        frecciaIndietro.setCursor(javafx.scene.Cursor.HAND);
+        frecciaAvanti.setCursor(javafx.scene.Cursor.HAND);
+
         prenotazioniTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             boolean rigaSelezionata = newValue != null;
             modificaButton.setDisable(!rigaSelezionata);
@@ -92,46 +100,25 @@ public class PrenotazioneView {
     }
 
     @FXML
-    private void createBooking() {
-        if (giornoSelezionato == null) {
-            showAlert(ERROR_TITLE, "Seleziona un giorno dal calendario.", Alert.AlertType.ERROR);
-            return;
+    private void creaPrenotazione() {
+        try {
+            prenotazioneController.creaPrenotazione(
+                    nomeClienteField.getText().trim(),
+                    orarioField.getText().trim(),
+                    giornoSelezionato,
+                    telefonoField.getText().trim(),
+                    noteField.getText().trim(),
+                    copertiField.getText().trim()
+            );
+
+            showAlert(SUCCESS_TITLE, "Prenotazione creata con successo!", Alert.AlertType.INFORMATION);
+            resetForm();
+            refreshTable(giornoSelezionato);
+        } catch (ValidationException e) {
+            showAlert(ERROR_TITLE, e.getMessage(), Alert.AlertType.ERROR);
         }
-
-        PrenotazioneBean bean = new PrenotazioneBean();
-        bean.setNomeCliente(nomeClienteField.getText().trim());
-
-        // Parsing dell'orario (estratto in un metodo separato)
-        LocalTime orario = parseOrario(orarioField.getText());
-        if (orario == null) {
-            return;
-        }
-        bean.setOrario(orario);
-
-        bean.setData(giornoSelezionato);
-
-        String telefono = telefonoField.getText().trim();
-        if (!telefono.isBlank() && !telefono.matches("\\d+")) {
-            showAlert(ERROR_TITLE, "Inserisci un numero di telefono valido.", Alert.AlertType.ERROR);
-            return;
-        }
-        bean.setTelefono(telefono);
-
-        bean.setNote(noteField.getText().trim());
-
-        // Parsing dei coperti (estratto in un metodo separato)
-        Integer coperti = parseCoperti(copertiField.getText());
-        if (coperti == null) {
-            return;
-        }
-        bean.setCoperti(coperti);
-
-        prenotazioneController.creaPrenotazione(bean);
-
-        showAlert(SUCCESS_TITLE, "Prenotazione creata con successo!", Alert.AlertType.INFORMATION);
-        resetForm();
-        refreshTable(giornoSelezionato);
     }
+
 
     @FXML
     private void eliminaPrenotazione() {
@@ -148,13 +135,12 @@ public class PrenotazioneView {
 
     @FXML
     private void modificaPrenotazione() {
-        PrenotazioneBean prenotazioneSelezionata = prenotazioniTableView.getSelectionModel().getSelectedItem();
-        if (prenotazioneSelezionata == null) {
-            showAlert(ERROR_TITLE, "Seleziona una prenotazione da modificare.", Alert.AlertType.ERROR);
-            return;
-        }
-        mostraDialogModifica(prenotazioneSelezionata);
+        PrenotazioneBean selected = prenotazioniTableView.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+
+        mostraDialogModifica(selected);
     }
+
 
     private void mostraDialogModifica(PrenotazioneBean prenotazione) {
         Dialog<PrenotazioneBean> dialog = new Dialog<>();
@@ -191,94 +177,29 @@ public class PrenotazioneView {
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == salvaButtonType) {
-                return validateAndCreatePrenotazione(prenotazione, nomeField, dataPicker, orarioInput, copertiInput, telefonoInput, noteInput);
+                try {
+                    return prenotazioneController.modificaPrenotazione(
+                            prenotazione.getId(),
+                            nomeField.getText().trim(),
+                            orarioInput.getText().trim(),
+                            dataPicker.getValue(),
+                            telefonoInput.getText().trim(),
+                            noteInput.getText().trim(),
+                            copertiInput.getText().trim()
+                    );
+                } catch (ValidationException e) {
+                    showAlert(ERROR_TITLE, e.getMessage(), Alert.AlertType.ERROR);
+                    return null;
+                }
             }
             return null;
         });
-
-        dialog.showAndWait().ifPresent(updatedPrenotazione -> {
-            if (updatedPrenotazione != null) {
-                prenotazioneController.modificaPrenotazione(updatedPrenotazione);
+        dialog.showAndWait().ifPresent(result -> {
+            if (result != null) {
+                showAlert(SUCCESS_TITLE, "Prenotazione modificata con successo!", Alert.AlertType.INFORMATION);
                 refreshTable(giornoSelezionato);
-                showAlert(SUCCESS_TITLE, "Prenotazione aggiornata correttamente!", Alert.AlertType.INFORMATION);
             }
         });
-    }
-
-    private PrenotazioneBean validateAndCreatePrenotazione(PrenotazioneBean prenotazione, TextField nomeField, DatePicker dataPicker, TextField orarioInput, TextField copertiInput,
-                                                           TextField telefonoInput, TextField noteInput) {
-        try {
-            String nomeCliente = nomeField.getText().trim();
-            if (nomeCliente.isEmpty()) {
-                showAlert(ERROR_TITLE, "Il nome del cliente non può essere vuoto.", Alert.AlertType.ERROR);
-                return null;
-            }
-
-            LocalDate data = dataPicker.getValue();
-            if (data == null) {
-                showAlert(ERROR_TITLE, "Devi selezionare una data.", Alert.AlertType.ERROR);
-                return null;
-            }
-
-            LocalTime orario = parseOrario(orarioInput.getText());
-            if (orario == null) {
-                return null;
-            }
-
-            Integer coperti = parseCoperti(copertiInput.getText());
-            if (coperti == null) {
-                return null;
-            }
-
-            String telefono = telefonoInput.getText().trim();
-            if (!telefono.isEmpty() && !telefono.matches("\\d{10}")) {
-                showAlert(ERROR_TITLE, "Il numero di telefono deve essere composto da 10 cifre.", Alert.AlertType.ERROR);
-                return null;
-            }
-
-            String note = noteInput.getText().trim();
-
-            PrenotazioneBean bean = new PrenotazioneBean();
-            bean.setId(prenotazione.getId());
-            bean.setNomeCliente(nomeCliente);
-            bean.setData(data);
-            bean.setOrario(orario);
-            bean.setCoperti(coperti);
-            bean.setTelefono(telefono);
-            bean.setNote(note);
-            return bean;
-        } catch (Exception e) {
-            showAlert(ERROR_TITLE, "Errore durante la modifica della prenotazione.", Alert.AlertType.ERROR);
-            return null;
-        }
-    }
-
-    /**
-     * Estrae il parsing dell'orario in un metodo separato.
-     */
-    private LocalTime parseOrario(String orarioText) {
-        try {
-            return LocalTime.parse(orarioText.trim());
-        } catch (Exception e) {
-            showAlert(ERROR_TITLE, "Inserisci un orario valido (hh:mm).", Alert.AlertType.ERROR);
-            return null;
-        }
-    }
-
-    /**
-     * Estrae il parsing dei coperti in un metodo separato.
-     */
-    private Integer parseCoperti(String copertiText) {
-        try {
-            int coperti = Integer.parseInt(copertiText.trim());
-            if (coperti <= 0) {
-                throw new NumberFormatException();
-            }
-            return coperti;
-        } catch (NumberFormatException e) {
-            showAlert(ERROR_TITLE, "Inserisci un numero valido per i coperti.", Alert.AlertType.ERROR);
-            return null;
-        }
     }
 
     @FXML

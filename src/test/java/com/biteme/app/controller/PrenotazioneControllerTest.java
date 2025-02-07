@@ -69,6 +69,21 @@ public class PrenotazioneControllerTest {
     }
 
     @Test
+    public void testCreaPrenotazioneConDatiErrati() {
+        PrenotazioneBean bean = new PrenotazioneBean();
+        bean.setNomeCliente(""); // Nome vuoto
+        bean.setData(null); // Data nulla
+        bean.setOrario(null); // Orario nullo
+        bean.setTelefono("123"); // Numero di telefono non valido
+        bean.setCoperti(-1); // Numero di coperti negativo
+
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
+            controller.creaPrenotazione(bean);
+        });
+        assertTrue(ex.getMessage().contains("Dati non validi"));
+    }
+
+    @Test
     public void testGetPrenotazioniByData() {
         // Inserisci una prenotazione direttamente tramite il DAO in-memory
         Prenotazione p = new Prenotazione(0, "Luigi Bianchi", LocalTime.of(19, 0),

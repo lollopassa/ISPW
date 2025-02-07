@@ -102,7 +102,7 @@ public class OrdinazioneCLI {
 
         int id = promptForOrderId();
         if (id != -1) {
-            ORDINAZIONE_CONTROLLER.eliminaOrdine(id);
+            ORDINAZIONE_CONTROLLER.eliminaOrdinazione(id);
             System.out.println("Ordine eliminato.");
         }
     }
@@ -116,7 +116,7 @@ public class OrdinazioneCLI {
             try {
                 // Se necessario, recupera e compila i dati dell'ArchivioBean (qui viene passato un bean vuoto)
                 ARCHIVIO_CONTROLLER.archiviaOrdine(new com.biteme.app.bean.ArchivioBean());
-                ORDINAZIONE_CONTROLLER.eliminaOrdine(id);
+                ORDINAZIONE_CONTROLLER.eliminaOrdinazione(id);
                 System.out.println("Ordine archiviato con successo.");
             } catch (Exception e) {
                 System.out.println("Errore durante l'archiviazione: " + e.getMessage());

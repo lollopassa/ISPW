@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.controller.LoginController;
 import com.biteme.app.controller.ProdottoController;
+import com.biteme.app.exception.ProdottoException;
 
 public class ProdottoCLI {
 
@@ -13,6 +14,7 @@ public class ProdottoCLI {
 
     private static final ProdottoController prodottoController = new ProdottoController();
     private static final LoginController loginController = new LoginController();
+    private static final String ERROR_MESSAGE = "errore";
 
     public static void start() {
         var scanner = CLIUtils.getScanner();
@@ -69,52 +71,72 @@ public class ProdottoCLI {
     }
 
     private static void aggiungiProdotto(java.util.Scanner scanner) {
-        System.out.print("Nome Prodotto: ");
-        String nome = scanner.nextLine();
-        System.out.print("Categoria (es. PIZZE, PRIMI, ANTIPASTI, BEVANDE, CONTORNI, DOLCI): ");
-        String categoria = scanner.nextLine(); // Leggiamo la categoria come stringa
-        System.out.print("Prezzo: ");
-        BigDecimal prezzo = new BigDecimal(scanner.nextLine());
+        try {
+            System.out.print("Nome Prodotto: ");
+            String nome = scanner.nextLine();
+            System.out.print("Categoria (PIZZE, PRIMI, ANTIPASTI, BEVANDE, CONTORNI, DOLCI): ");
+            String categoria = scanner.nextLine(); // Inserito dall'utente come stringa
+            System.out.print("Prezzo: ");
+            BigDecimal prezzo = new BigDecimal(scanner.nextLine()); // Gestione numerica
 
-        ProdottoBean bean = new ProdottoBean();
-        bean.setNome(nome);
-        bean.setCategoria(categoria.toUpperCase());
-        bean.setPrezzo(prezzo);
-        bean.setDisponibile(true);
+            ProdottoBean bean = new ProdottoBean();
+            bean.setNome(nome);
+            bean.setCategoria(categoria.toUpperCase());
+            bean.setPrezzo(prezzo);
+            bean.setDisponibile(true);
 
-        prodottoController.aggiungiProdotto(bean);
-        System.out.println("Prodotto aggiunto correttamente.");
+            prodottoController.aggiungiProdotto(bean);
+            System.out.println("Prodotto aggiunto correttamente.");
+        } catch (ProdottoException e) {
+            // Stampe di errore sul terminale
+            System.out.println(ERROR_MESSAGE + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Errore: Il prezzo deve essere un valore numerico.");
+        }
     }
 
     private static void modificaProdotto(java.util.Scanner scanner) {
-        System.out.print("Inserisci l'ID del prodotto da modificare: ");
-        int id = Integer.parseInt(scanner.nextLine());
-        System.out.print("Nuovo Nome: ");
-        String nome = scanner.nextLine();
-        System.out.print("Nuova Categoria (es. PIZZE, PRIMI, ANTIPASTI, BEVANDE, CONTORNI, DOLCI): ");
-        String categoria = scanner.nextLine();
-        System.out.print("Nuovo Prezzo: ");
-        BigDecimal prezzo = new BigDecimal(scanner.nextLine());
+        try {
+            System.out.print("Inserisci l'ID del prodotto da modificare: ");
+            int id = Integer.parseInt(scanner.nextLine());
+            System.out.print("Nuovo Nome: ");
+            String nome = scanner.nextLine();
+            System.out.print("Nuova Categoria (PIZZE, PRIMI, ANTIPASTI, BEVANDE, CONTORNI, DOLCI): ");
+            String categoria = scanner.nextLine();
+            System.out.print("Nuovo Prezzo: ");
+            BigDecimal prezzo = new BigDecimal(scanner.nextLine());
 
-        ProdottoBean beanAggiornato = new ProdottoBean();
-        beanAggiornato.setId(id);
-        beanAggiornato.setNome(nome);
-        beanAggiornato.setCategoria(categoria.toUpperCase());
-        beanAggiornato.setPrezzo(prezzo);
-        beanAggiornato.setDisponibile(true);
+            ProdottoBean beanAggiornato = new ProdottoBean();
+            beanAggiornato.setId(id);
+            beanAggiornato.setNome(nome);
+            beanAggiornato.setCategoria(categoria.toUpperCase());
+            beanAggiornato.setPrezzo(prezzo);
+            beanAggiornato.setDisponibile(true);
 
-        prodottoController.modificaProdotto(beanAggiornato);
-        System.out.println("Prodotto aggiornato.");
+            prodottoController.modificaProdotto(beanAggiornato);
+            System.out.println("Prodotto aggiornato con successo.");
+        } catch (ProdottoException e) {
+            System.out.println("Errore: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Errore: Il prezzo deve essere un valore numerico.");
+        }
     }
 
     private static void eliminaProdotto(java.util.Scanner scanner) {
-        System.out.print("Inserisci l'ID del prodotto da eliminare: ");
-        int id = Integer.parseInt(scanner.nextLine());
-        System.out.print("Confermi l'eliminazione? (s/n): ");
-        String conferma = scanner.nextLine();
-        if (conferma.equalsIgnoreCase("s")) {
-            prodottoController.eliminaProdotto(id);
-            System.out.println("Prodotto eliminato.");
+        try {
+            System.out.print("Inserisci l'ID del prodotto da eliminare: ");
+            int id = Integer.parseInt(scanner.nextLine());
+            System.out.print("Confermi l'eliminazione? (s/n): ");
+            String conferma = scanner.nextLine();
+
+            if (conferma.equalsIgnoreCase("s")) {
+                prodottoController.eliminaProdotto(id);
+                System.out.println("Prodotto eliminato con successo.");
+            }
+        } catch (ProdottoException e) {
+            System.out.println("Errore: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Errore: L'ID del prodotto deve essere un valore numerico.");
         }
     }
 

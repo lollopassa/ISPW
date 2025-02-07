@@ -12,7 +12,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-
 import java.util.Map;
 import com.biteme.app.controller.ArchivioController;
 import javafx.scene.layout.Pane;
@@ -69,17 +68,18 @@ public class AdminHomeView {
 
     @FXML
     public void aggiornaDati() {
+        // Otteniamo il valore selezionato senza controllarlo qui; la validazione avverrà in ArchivioController
         String periodoSelezionato = periodoComboBox.getValue();
-        if (periodoSelezionato == null || periodoSelezionato.isEmpty()) {
-            System.out.println("Nessun periodo selezionato.");
-            return;
-        }
-
         Map<String, Number> statistiche;
         if (mostraGuadagni) {
             statistiche = archivioController.guadagniPerGiorno(periodoSelezionato.toLowerCase());
         } else {
             statistiche = archivioController.piattiPiuOrdinatiPerPeriodo(periodoSelezionato.toLowerCase());
+        }
+
+        // Se la mappa è vuota (inserimento non valido o nessun dato disponibile) possiamo mostrare un messaggio di errore
+        if(statistiche.isEmpty()){
+            System.err.println("Nessun dato disponibile per il periodo selezionato o periodo non valido.");
         }
 
         // Aggiorna la tabella
@@ -132,6 +132,7 @@ public class AdminHomeView {
             return totale;
         }
     }
+
     private BarChart<String, Number> createNewBarChart(boolean isGuadagni) {
         CategoryAxis newXAxis = new CategoryAxis();
         NumberAxis newYAxis = new NumberAxis();
@@ -146,12 +147,10 @@ public class AdminHomeView {
         BarChart<String, Number> newChart = new BarChart<>(newXAxis, newYAxis);
         newChart.setCategoryGap(10);
         newChart.setAnimated(false);
-        // Imposta dimensioni e posizione uguali al vecchio grafico
         newChart.setPrefHeight(barChart.getPrefHeight());
         newChart.setPrefWidth(barChart.getPrefWidth());
         newChart.setLayoutX(barChart.getLayoutX());
         newChart.setLayoutY(barChart.getLayoutY());
         return newChart;
     }
-
 }

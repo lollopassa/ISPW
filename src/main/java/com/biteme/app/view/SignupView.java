@@ -32,22 +32,13 @@ public class SignupView {
         signupBean.setPassword(passwordTextField.getText());
         signupBean.setConfirmPassword(confirmPasswordTextField.getText());
 
-        // Validazione iniziale tramite il bean
-        if (!signupController.isValid(signupBean)) { // Passaggio corretto del bean come argomento
-            showAlert("Errore di Validazione", signupController.getErrorMessage(), Alert.AlertType.ERROR);
-            return;
-        }
-
-        // Chiamata al controller per registrare l'utente
+        // Il controller si occupa di validare e registrare l'utente.
         try {
-            if (signupController.registerUser(signupBean)) {
-                showAlert("Successo", "Registrazione completata!", Alert.AlertType.INFORMATION);
-                signupController.navigateToLogin();
-            } else {
-                showAlert("Errore", signupController.getErrorMessage(), Alert.AlertType.ERROR);
-            }
+            signupController.registerUser(signupBean);
+            showAlert("Successo", "Registrazione completata!", Alert.AlertType.INFORMATION);
+            signupController.navigateToLogin();
         } catch (IllegalArgumentException ex) {
-            // Eccezione specifica per utente già registrato o altri errori da DB
+            // Se c'è un errore di validazione o l'utente esiste già, viene mostrato l'errore
             showAlert("Errore di Registrazione", ex.getMessage(), Alert.AlertType.ERROR);
         }
     }
