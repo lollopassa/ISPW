@@ -36,10 +36,6 @@ class PrenotazioneControllerTest {
         daoField.set(controller, inMemoryDao);
     }
 
-    // ===============================
-    // Test di successo
-    // ===============================
-
     @Test
     void testCreaPrenotazione() {
         controller.creaPrenotazione(
@@ -51,13 +47,11 @@ class PrenotazioneControllerTest {
                 "3"
         );
 
-        // Recupera le prenotazioni per verificarne la persistenza
         List<Prenotazione> prenotazioni = Storage.getInstance().getPrenotazioni();
         assertEquals(1, prenotazioni.size());
 
         Prenotazione p = prenotazioni.get(0);
 
-        // Verifica che i valori inseriti siano corretti
         assertTrue(p.getId() > 0);
         assertEquals("Mario Rossi", p.getNomeCliente());
         assertEquals(LocalDate.of(2025, 4, 15), p.getData());
@@ -69,7 +63,6 @@ class PrenotazioneControllerTest {
 
     @Test
     void testModificaPrenotazione() {
-        // Inserisce una prenotazione iniziale
         Prenotazione initPrenotazione = new Prenotazione(
                 0,
                 "Anna Verdi",
@@ -82,7 +75,6 @@ class PrenotazioneControllerTest {
         inMemoryDao.store(initPrenotazione);
         int storedId = initPrenotazione.getId();
 
-        // Modifica i dettagli della prenotazione
         PrenotazioneBean updatedBean = controller.modificaPrenotazione(
                 storedId,
                 "Anna Verdi Modificata",
@@ -105,7 +97,6 @@ class PrenotazioneControllerTest {
 
     @Test
     void testEliminaPrenotazione() {
-        // Inserisce una prenotazione
         Prenotazione prenotazione = new Prenotazione(
                 0,
                 "Mario Rossi",
@@ -118,16 +109,13 @@ class PrenotazioneControllerTest {
         inMemoryDao.store(prenotazione);
         int storedId = prenotazione.getId();
 
-        // Elimina la prenotazione tramite il controller
         controller.eliminaPrenotazione(storedId);
 
-        // Assicurati che sia stata effettivamente eliminata
         assertFalse(inMemoryDao.exists(storedId));
     }
 
     @Test
     void testGetPrenotazioniByData() {
-        // Aggiunge una prenotazione direttamente nel DAO in-memory
         Prenotazione p = new Prenotazione(
                 0,
                 "Giovanna Bianchi",
@@ -139,14 +127,12 @@ class PrenotazioneControllerTest {
         );
         inMemoryDao.store(p);
 
-        // Recupera le prenotazioni per una data specifica
         List<PrenotazioneBean> prenotazioni = controller.getPrenotazioniByData(LocalDate.of(2025, 7, 20));
         assertNotNull(prenotazioni);
         assertEquals(1, prenotazioni.size());
 
         PrenotazioneBean bean = prenotazioni.get(0);
 
-        // Verifica i dettagli della prenotazione
         assertEquals("Giovanna Bianchi", bean.getNomeCliente());
         assertEquals(LocalDate.of(2025, 7, 20), bean.getData());
         assertEquals(LocalTime.of(19, 30), bean.getOrario());
@@ -154,10 +140,6 @@ class PrenotazioneControllerTest {
         assertEquals("3345678912", bean.getTelefono());
         assertEquals(6, bean.getCoperti());
     }
-
-    // ===============================
-    // Test per validazioni e errori
-    // ===============================
 
     @Test
     void testCreaPrenotazioneConNomeVuoto() {

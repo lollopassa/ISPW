@@ -19,11 +19,9 @@ public class Configuration {
 
                 // Leggere la modalità di persistenza dal file config.properties
                 persistenceMode = properties.getProperty("persistence.mode", "inmemory").toLowerCase(); // Predefinito "inmemory"
-            } else {
-                throw new IllegalStateException("Impossibile trovare il file config.properties");
             }
         } catch (IOException e) {
-            throw new IllegalStateException("Errore durante il caricamento del file di configurazione", e);
+            System.err.println("[AVVISO] Errore nel caricamento del file di configurazione, avvio con persistenza in-memory.");
         }
     }
 
