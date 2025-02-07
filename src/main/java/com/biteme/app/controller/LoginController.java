@@ -8,7 +8,6 @@ import com.biteme.app.service.GoogleAuthService;
 import com.biteme.app.util.*;
 import com.biteme.app.persistence.UserDao;
 
-
 import java.util.regex.Pattern;
 
 public class LoginController {
