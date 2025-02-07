@@ -5,10 +5,10 @@ import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.view.OrdinazioneView;
 import com.biteme.app.model.Ordinazione;
 import com.biteme.app.model.StatoOrdine;
+import com.biteme.app.model.TipoOrdine;
 import com.biteme.app.persistence.OrdinazioneDao;
 import com.biteme.app.util.Configuration;
 import com.biteme.app.util.SceneLoader;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,14 +25,14 @@ public class OrdinazioneController {
     }
 
     public void creaOrdine(OrdinazioneBean ordinazioneBean) {
-        // Creazione dell'oggetto model a partire dal bean
+        // Converte il bean in model
         Ordinazione ordinazione = convertToModel(ordinazioneBean);
-        // Imposta lo stato iniziale se necessario (ad esempio, NUOVO)
+        // Imposta lo stato iniziale (ad es. NUOVO)
         ordinazione.setStatoOrdine(StatoOrdine.NUOVO);
         // Salva l'ordinazione nel database
         ordinazioneDao.store(ordinazione);
 
-        // Imposta l'ID generato nel bean
+        // Aggiorna l'ID generato nel bean
         ordinazioneBean.setId(ordinazione.getId());
 
         // Crea l'OrdineBean collegato e lo salva
@@ -94,13 +94,25 @@ public class OrdinazioneController {
     }
 
     private Ordinazione convertToModel(OrdinazioneBean bean) {
+        // Converte la stringa presente nel bean in un valore enum del model
+        TipoOrdine tipoOrdine;
+        if ("Al Tavolo".equals(bean.getTipoOrdine())) {
+            tipoOrdine = TipoOrdine.AL_TAVOLO;
+        } else if ("Asporto".equals(bean.getTipoOrdine())) {
+            tipoOrdine = TipoOrdine.ASPORTO;
+        } else {
+            throw new IllegalArgumentException("Tipo Ordine non valido: " + bean.getTipoOrdine());
+        }
+        // Per lo stato, se non è stato impostato dalla view si usa NUOVO
+        StatoOrdine statoOrdine = StatoOrdine.NUOVO;
+
         return new Ordinazione(
                 bean.getId(),
                 bean.getNome(),
                 bean.getNumeroClienti(),
-                bean.getTipoOrdine(),
+                tipoOrdine,
                 bean.getInfoTavolo(),
-                bean.getStatoOrdine(),
+                statoOrdine,
                 bean.getOrarioCreazione()
         );
     }
@@ -110,9 +122,10 @@ public class OrdinazioneController {
         bean.setId(model.getId());
         bean.setNome(model.getNomeCliente());
         bean.setNumeroClienti(model.getNumeroClienti());
-        bean.setTipoOrdine(model.getTipoOrdine());
+        // Converte l'enum in una stringa per la view
+        bean.setTipoOrdine(model.getTipoOrdine().toString());
         bean.setInfoTavolo(model.getInfoTavolo());
-        bean.setStatoOrdine(model.getStatoOrdine());
+        bean.setStatoOrdine(model.getStatoOrdine().toString());
         bean.setOrarioCreazione(model.getOrarioCreazione());
         return bean;
     }

@@ -12,30 +12,25 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class OrdineController {
 
     private final ProdottoDao prodottoDao;
-
     private final OrdineDao ordineDao;
-
-    private VBox riepilogoContenuto; // Riferimento per accedere al VBox passato dal boundary
+    private VBox riepilogoContenuto; // Impostato dalla view
 
     public OrdineController() {
-        // Ottenere ProdottoDao usando la configurazione del sistema
         this.prodottoDao = Configuration.getPersistenceProvider()
                 .getDaoFactory()
                 .getProdottoDao();
-
         this.ordineDao = Configuration.getPersistenceProvider()
                 .getDaoFactory()
                 .getOrdineDao();
     }
 
-    // Metodo per impostare il contenitore VBox (viene passato da OrdineBoundary)
+    // Imposta il VBox passato dalla view
     public void setRiepilogoContenuto(VBox riepilogoContenuto) {
         this.riepilogoContenuto = riepilogoContenuto;
     }
@@ -47,138 +42,129 @@ public class OrdineController {
         return ordineBean;
     }
 
-    public void salvaOrdineEStato(int ordineId, StatoOrdine stato) {
-        // Recupera prodotti e quantità
+    /**
+     * Metodo modificato: la view passa una stringa che viene convertita internamente in un valore
+     * di StatoOrdine (model). In questo modo la view non fa riferimento diretto al model.
+     */
+    public void salvaOrdineEStato(int ordineId, String statoStr) {
+        StatoOrdine stato = convertStringToStatoOrdine(statoStr);
         List<String> prodotti = recuperaProdottiDalRiepilogo();
         List<Integer> quantita = new ArrayList<>();
         for (String prodotto : prodotti) {
             quantita.add(recuperaQuantitaDalRiepilogo(prodotto));
         }
-
-        // Prepara OrdineBean e salva l'ordine
         OrdineBean ordineBean = preparaOrdineBean(prodotti, quantita);
         salvaOrdine(ordineBean, ordineId);
-
-        // Aggiorna lo stato dell'ordinazione nel controller dell'ordinazione
+        // Aggiorna lo stato dell'ordinazione tramite il controller di ordinazione
         OrdinazioneController ordinazioneController = new OrdinazioneController();
         ordinazioneController.aggiornaStatoOrdinazione(ordineId, stato);
     }
 
-    public void salvaOrdine(OrdineBean ordineBean, int id) {
-        // Converti OrdineBean in un oggetto Ordine
-        Ordine nuovoOrdine = new Ordine(
-                id,                // ID dell'ordine
-                ordineBean.getProdotti(), // Lista dei prodotti
-                ordineBean.getQuantita()  // Lista delle quantità
-        );
+    // Metodo helper per convertire la stringa in StatoOrdine
+    private StatoOrdine convertStringToStatoOrdine(String statoStr) {
+        if (statoStr == null) {
+            throw new IllegalArgumentException("Stato ordine non può essere null");
+        }
+        switch (statoStr.toUpperCase()) {
+            case "IN_CORSO":
+                return StatoOrdine.IN_CORSO;
+            case "COMPLETATO":
+                return StatoOrdine.COMPLETATO;
+            default:
+                throw new IllegalArgumentException("Stato ordine non valido: " + statoStr);
+        }
+    }
 
-        // Salva l'oggetto Ordine nel database
+    public void salvaOrdine(OrdineBean ordineBean, int id) {
+        Ordine nuovoOrdine = new Ordine(
+                id,
+                ordineBean.getProdotti(),
+                ordineBean.getQuantita()
+        );
         ordineDao.store(nuovoOrdine);
     }
 
-    // Recupero dei prodotti dal riepilogo
+    // Recupero dei prodotti dal riepilogo (il VBox viene gestito internamente)
     private List<String> recuperaProdottiDalRiepilogo() {
         List<String> prodotti = new ArrayList<>();
-
         for (Node nodo : riepilogoContenuto.getChildren()) {
-            // Verifica che il nodo sia un HBox e che il primo elemento sia una Label
             if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
                 String testo = nomeEQuantitaLabel.getText(); // Es. "Pizza Margherita x 2"
-
-                // Verifica che il testo sia nel formato atteso ("NomeProdotto x Quantità")
                 String[] parti = testo.split(" x ");
-                if (parti.length > 1) { // Assumiamo che ci sia sempre il formato corretto
-                    String nomeProdotto = parti[0].trim(); // Estrae il nome del prodotto
+                if (parti.length > 1) {
+                    String nomeProdotto = parti[0].trim();
                     prodotti.add(nomeProdotto);
                 }
             }
         }
-
         return prodotti;
     }
 
-    // Recupero della quantità di un prodotto specifico dal riepilogo
+    // Recupera la quantità di un prodotto specifico dal riepilogo
     public int recuperaQuantitaDalRiepilogo(String nomeProdotto) {
         for (Node nodo : riepilogoContenuto.getChildren()) {
-            // Verifica che il nodo sia un HBox e che contenga una Label con nome e quantità
             if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
-                String testo = nomeEQuantitaLabel.getText(); // Es. "Pizza Margherita x 2"
-
-                // Verifica che il testo inizi con il nome del prodotto e il separatore " x"
+                String testo = nomeEQuantitaLabel.getText();
                 if (testo.startsWith(nomeProdotto + " x")) {
                     try {
-                        // Estrae la quantità dal testo
                         String[] parti = testo.split(" x ");
-                        return Integer.parseInt(parti[1].trim()); // Converti la quantità in intero
+                        return Integer.parseInt(parti[1].trim());
                     } catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
-                        // Se ci sono problemi nel parsing, restituisce 0
                         return 0;
                     }
                 }
             }
         }
-        return 0; // Restituisce 0 se il prodotto non viene trovato
+        return 0;
     }
 
     public List<ProdottoBean> getProdottiByCategoria(String categoria) {
-        // Recupera i prodotti dalla DAO in base alla categoria
         List<Prodotto> prodotti = prodottoDao.getByCategoria(categoria);
-
-        // Converti la lista di Prodotto a ProdottoBean per il livello di visualizzazione
         return prodotti.stream()
                 .map(prodotto -> {
                     ProdottoBean prodottoBean = new ProdottoBean();
                     prodottoBean.setId(prodotto.getId());
                     prodottoBean.setNome(prodotto.getNome());
                     prodottoBean.setPrezzo(prodotto.getPrezzo());
-                    prodottoBean.setCategoria(prodotto.getCategoria());
+                    // Converte il valore enum in String
+                    prodottoBean.setCategoria(prodotto.getCategoria().name());
                     prodottoBean.setDisponibile(prodotto.isDisponibile());
                     return prodottoBean;
                 })
                 .toList();
     }
 
-    // OrdineController.java
+
     public OrdineBean getOrdineById(int id) {
-        return load(id); // Riutilizza il metodo esistente load()
+        return load(id);
     }
 
     public OrdineBean load(int idOrdine) {
-        // Recupera l'ordine dalla DAO utilizzando l'ID fornito
         Ordine ordine = ordineDao.getById(idOrdine);
-
         if (ordine == null) {
             throw new IllegalArgumentException("L'ordine con ID " + idOrdine + " non esiste.");
         }
-
-        // Crea un oggetto OrdineBean per il livello di visualizzazione
         OrdineBean ordineBean = new OrdineBean();
         ordineBean.setId(ordine.getId());
-
-        // Supponendo che ordine.getProdotti() restituisca una lista di nomi dei prodotti
         ordineBean.setProdotti(ordine.getProdotti());
-
-        // Supponendo che ordine.getQuantita() restituisca una lista di quantità per i prodotti
         ordineBean.setQuantita(ordine.getQuantita());
-
         return ordineBean;
     }
 
     public List<ProdottoBean> getTuttiProdotti() {
-        // Recupera tutti i prodotti da ProdottoDao
         List<Prodotto> prodotti = prodottoDao.getAll();
-
-        // Converti la lista di Prodotto a ProdottoBean per il livello di visualizzazione
         return prodotti.stream()
                 .map(prodotto -> {
                     ProdottoBean prodottoBean = new ProdottoBean();
                     prodottoBean.setId(prodotto.getId());
                     prodottoBean.setNome(prodotto.getNome());
                     prodottoBean.setPrezzo(prodotto.getPrezzo());
-                    prodottoBean.setCategoria(prodotto.getCategoria());
+                    // Converte il valore enum in String
+                    prodottoBean.setCategoria(prodotto.getCategoria().name());
                     prodottoBean.setDisponibile(prodotto.isDisponibile());
                     return prodottoBean;
                 })
                 .toList();
     }
+
 }

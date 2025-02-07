@@ -2,9 +2,9 @@ package com.biteme.app.controller;
 
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.model.Prodotto;
+import com.biteme.app.model.Categoria;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.util.Configuration;
-
 import java.util.List;
 
 public class ProdottoController {
@@ -23,7 +23,8 @@ public class ProdottoController {
                 prodottoBean.getId() != null ? prodottoBean.getId() : 0,
                 prodottoBean.getNome(),
                 prodottoBean.getPrezzo(),
-                prodottoBean.getCategoria(),
+                // Converte la stringa in Categoria tramite il model
+                Categoria.valueOf(prodottoBean.getCategoria()),
                 prodottoBean.getDisponibile() != null && prodottoBean.getDisponibile()
         );
         prodottoDao.store(prodotto);
@@ -65,7 +66,7 @@ public class ProdottoController {
                 prodottoBean.getId(),
                 prodottoBean.getNome(),
                 prodottoBean.getPrezzo(),
-                prodottoBean.getCategoria(),
+                Categoria.valueOf(prodottoBean.getCategoria()),
                 prodottoBean.getDisponibile() != null && prodottoBean.getDisponibile()
         );
         prodottoDao.update(prodottoAggiornato);
@@ -79,7 +80,8 @@ public class ProdottoController {
         bean.setId(prodotto.getId());
         bean.setNome(prodotto.getNome());
         bean.setPrezzo(prodotto.getPrezzo());
-        bean.setCategoria(prodotto.getCategoria());
+        // Memorizza la categoria come stringa (nome dell'enum)
+        bean.setCategoria(prodotto.getCategoria().name());
         bean.setDisponibile(prodotto.isDisponibile());
         return bean;
     }

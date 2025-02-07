@@ -3,7 +3,6 @@ package com.biteme.app.view;
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.controller.LoginController;
 import com.biteme.app.controller.ProdottoController;
-import com.biteme.app.model.Categoria;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -29,13 +28,14 @@ public class ProdottoView {
     @FXML
     private TextField nomeProdottoField;
 
+    // Ora il ComboBox lavora con String (i valori testuali delle categorie)
     @FXML
-    private ComboBox<Categoria> categoriaComboBox;
+    private ComboBox<String> categoriaComboBox;
 
     @FXML
     private TextField prezzoField;
 
-    // La TableView ora utilizza ProdottoBean
+    // La TableView utilizza ProdottoBean
     @FXML
     private TableView<ProdottoBean> prodottiTableView;
 
@@ -45,8 +45,9 @@ public class ProdottoView {
     @FXML
     private TableColumn<ProdottoBean, String> nomeColumn;
 
+    // La colonna della categoria ora mostra una stringa
     @FXML
-    private TableColumn<ProdottoBean, Categoria> categoriaColumn;
+    private TableColumn<ProdottoBean, String> categoriaColumn;
 
     @FXML
     private TableColumn<ProdottoBean, BigDecimal> prezzoColumn;
@@ -74,7 +75,6 @@ public class ProdottoView {
         configureTableColumns();
         refreshTable();
 
-        // Verifica il ruolo dell'utente tramite LoginController
         boolean isAdmin = loginController.isUserAdmin();
 
         if (!isAdmin) {
@@ -82,7 +82,6 @@ public class ProdottoView {
             aggiungiProdottoVBox.setManaged(false);
             adminButtonsHBox.setVisible(false);
             adminButtonsHBox.setManaged(false);
-            // Disabilita l'editing della tabella per utenti non admin
             prodottiTableView.setEditable(false);
         } else {
             aggiungiProdottoVBox.setVisible(true);
@@ -90,7 +89,6 @@ public class ProdottoView {
             adminButtonsHBox.setVisible(true);
             adminButtonsHBox.setManaged(true);
 
-            // Gestione della selezione per abilitare/disabilitare i pulsanti
             modificaButton.setDisable(true);
             eliminaButton.setDisable(true);
             prodottiTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -104,32 +102,32 @@ public class ProdottoView {
     private void configureComboBox() {
         categoriaComboBox.setItems(FXCollections.observableArrayList());
         categoriaComboBox.getItems().add(null); // Placeholder
-        categoriaComboBox.getItems().addAll(Categoria.values());
+        // Aggiungiamo i valori testuali delle categorie
+        categoriaComboBox.getItems().addAll("PIZZE", "PRIMI", "ANTIPASTI", "BEVANDE", "CONTORNI", "DOLCI");
         categoriaComboBox.setPromptText("Seleziona una categoria");
         categoriaComboBox.setValue(null); // Imposta il placeholder
         categoriaComboBox.setCellFactory(lv -> createCategoryCell());
         categoriaComboBox.setButtonCell(createCategoryCell());
     }
 
-    private ListCell<Categoria> createCategoryCell() {
+    private ListCell<String> createCategoryCell() {
         return new ListCell<>() {
             @Override
-            protected void updateItem(Categoria item, boolean empty) {
+            protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                setText((empty || item == null) ? "Seleziona una categoria" : item.name());
+                setText((empty || item == null) ? "Seleziona una categoria" : item);
             }
         };
     }
 
     private void configureTableColumns() {
-        // Configurazione delle colonne della tabella tramite PropertyValueFactory sui bean
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         nomeColumn.setCellValueFactory(new PropertyValueFactory<>("nome"));
         categoriaColumn.setCellValueFactory(new PropertyValueFactory<>("categoria"));
         prezzoColumn.setCellValueFactory(new PropertyValueFactory<>("prezzo"));
         disponibileColumn.setCellValueFactory(new PropertyValueFactory<>("disponibile"));
 
-        // Se vuoi permettere l'editing inline, puoi configurare la colonna del nome in questo modo:
+        // Permette l'editing inline della colonna del nome, se desiderato
         nomeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
     }
 
@@ -145,30 +143,25 @@ public class ProdottoView {
     @FXML
     private void aggiungiProdotto() {
         try {
-            // Verifica che il nome non sia vuoto
             if (nomeProdottoField.getText().isBlank()) {
                 showAlert(ALERT_ERROR_TITLE, "Il nome del prodotto non può essere vuoto!", Alert.AlertType.ERROR);
                 return;
             }
-            // Verifica che sia selezionata una categoria valida
             if (categoriaComboBox.getValue() == null) {
                 showAlert(ALERT_ERROR_TITLE, "Seleziona una categoria!", Alert.AlertType.ERROR);
                 return;
             }
-            // Verifica che il prezzo sia numerico e valido
             if (prezzoField.getText().isBlank() || !isNumeric(prezzoField.getText())) {
                 showAlert(ALERT_ERROR_TITLE, "Inserisci un valore numerico valido per il prezzo!", Alert.AlertType.ERROR);
                 return;
             }
 
-            // Creazione del bean Prodotto
             ProdottoBean prodottoBean = new ProdottoBean();
             prodottoBean.setNome(nomeProdottoField.getText());
             prodottoBean.setCategoria(categoriaComboBox.getValue());
             prodottoBean.setPrezzo(new BigDecimal(prezzoField.getText()));
-            prodottoBean.setDisponibile(true); // Di default, il prodotto è disponibile
+            prodottoBean.setDisponibile(true);
 
-            // Salva il prodotto tramite il controller
             prodottoController.aggiungiProdotto(prodottoBean);
             showAlert(ALERT_SUCCESS_TITLE, "Prodotto aggiunto correttamente!", Alert.AlertType.INFORMATION);
 
@@ -187,7 +180,7 @@ public class ProdottoView {
         nomeProdottoField.clear();
         prezzoField.clear();
         categoriaComboBox.getSelectionModel().clearSelection();
-        categoriaComboBox.setValue(null); // Ripristina il placeholder
+        categoriaComboBox.setValue(null);
     }
 
     private void showAlert(String title, String message, Alert.AlertType type) {
@@ -206,15 +199,15 @@ public class ProdottoView {
     }
 
     /**
-     * Mostra la dialog per modificare un prodotto. La dialog lavora con il bean.
+     * Mostra la dialog per modificare un prodotto. La dialog lavora esclusivamente con il bean.
      */
     private void mostraDialogModifica(ProdottoBean bean) {
         Dialog<ProdottoBean> dialog = new Dialog<>();
         dialog.setTitle("Modifica Prodotto");
 
-        // Configura i campi di input per la modifica
         TextField nomeField = new TextField(bean.getNome());
-        ComboBox<Categoria> categoriaField = new ComboBox<>(FXCollections.observableArrayList(Categoria.values()));
+        // Utilizza un ComboBox<String> per la modifica della categoria
+        ComboBox<String> categoriaField = new ComboBox<>(FXCollections.observableArrayList("PIZZE", "PRIMI", "ANTIPASTI", "BEVANDE", "CONTORNI", "DOLCI"));
         categoriaField.setValue(bean.getCategoria());
         TextField priceField = new TextField(bean.getPrezzo().toString());
 
@@ -251,7 +244,6 @@ public class ProdottoView {
         });
 
         dialog.showAndWait().ifPresent(beanAggiornato -> {
-            // Chiedi al controller di aggiornare il prodotto (il controller si occuperà della conversione)
             prodottoController.modificaProdotto(beanAggiornato);
             refreshTable();
             showAlert(ALERT_SUCCESS_TITLE, "Prodotto aggiornato con successo!", Alert.AlertType.INFORMATION);

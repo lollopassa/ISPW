@@ -9,7 +9,6 @@ import com.biteme.app.controller.OrdinazioneController;
 import com.biteme.app.controller.OrdineController;
 import com.biteme.app.controller.ProdottoController;
 import com.biteme.app.exception.ProdottoNotFoundException;
-import com.biteme.app.model.TipoOrdine;
 import com.biteme.app.util.SceneLoader;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -30,50 +29,38 @@ public class OrdinazioneView {
     @FXML
     private TextField nomeClienteField;
 
+    // Ora il ComboBox lavora con String (non con il model enum TipoOrdine)
     @FXML
-    private ComboBox<TipoOrdine> tipoOrdineComboBox;
+    private ComboBox<String> tipoOrdineComboBox;
 
     @FXML
     private TextField orarioField;
-
     @FXML
     private TextField copertiField;
-
     @FXML
     private TextField tavoloField;
-
     @FXML
     private TableView<OrdinazioneBean> ordinazioniTableView;
-
     @FXML
     private TableColumn<OrdinazioneBean, Integer> idColumn;
-
     @FXML
     private TableColumn<OrdinazioneBean, String> nomeColumn;
-
     @FXML
-    private TableColumn<OrdinazioneBean, TipoOrdine> tipoOrdineColumn;
-
+    private TableColumn<OrdinazioneBean, String> tipoOrdineColumn;
     @FXML
     private TableColumn<OrdinazioneBean, String> orarioColumn;
-
     @FXML
     private TableColumn<OrdinazioneBean, String> copertiColumn;
-
     @FXML
     private TableColumn<OrdinazioneBean, String> infoTavoloColumn;
-
     @FXML
     private TableColumn<OrdinazioneBean, String> statoOrdineColumn;
-
     @FXML
-    private Button modificaButton; // Per modificare l'ordine
-
+    private Button modificaButton;
     @FXML
-    private Button eliminaButton; // Per eliminare l'ordine
-
+    private Button eliminaButton;
     @FXML
-    private Button archiviaButton; // Per archiviare l'ordine
+    private Button archiviaButton;
 
     private final OrdineController ordineController = new OrdineController();
     private final ArchivioController archivioController = new ArchivioController();
@@ -103,22 +90,26 @@ public class OrdinazioneView {
 
     private void configureComboBox() {
         tipoOrdineComboBox.setItems(FXCollections.observableArrayList());
+        // Aggiungiamo un valore null per gestire il prompt
         tipoOrdineComboBox.getItems().add(null);
-        tipoOrdineComboBox.getItems().addAll(TipoOrdine.values());
+        // Aggiungiamo i valori testuali che verranno usati nella Bean
+        tipoOrdineComboBox.getItems().addAll("Al Tavolo", "Asporto");
         tipoOrdineComboBox.setPromptText("Al Tavolo o Asporto?");
         tipoOrdineComboBox.setValue(null);
-        // Imposta una StringConverter per mostrare il testo formattato
-        tipoOrdineComboBox.setConverter(new StringConverter<>() {
+
+        // Imposta una StringConverter per formattare correttamente il testo mostrato
+        tipoOrdineComboBox.setConverter(new StringConverter<String>() {
             @Override
-            public String toString(TipoOrdine object) {
-                return (object == null) ? "Al Tavolo o Asporto?" : object.name().replace("_", " ");
+            public String toString(String object) {
+                return (object == null) ? "Al Tavolo o Asporto?" : object;
             }
             @Override
-            public TipoOrdine fromString(String string) {
-                return TipoOrdine.valueOf(string.replace(" ", "_"));
+            public String fromString(String string) {
+                return string;
             }
         });
     }
+
 
     private void initTableColumns() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -133,21 +124,22 @@ public class OrdinazioneView {
     @FXML
     public void createOrdine() {
         String nomeCliente = nomeClienteField.getText();
-        TipoOrdine tipoOrdine = tipoOrdineComboBox.getValue();
+        String tipoOrdine = tipoOrdineComboBox.getValue();
         String orario = orarioField.getText();
         String coperti = copertiField.getText();
         String tavolo = tavoloField.getText();
 
-        if (tipoOrdine == null) {
+        if (tipoOrdine == null || tipoOrdine.isEmpty()) {
             showAlert("Tipo Ordine Mancante",
                     "Seleziona un tipo di ordine: 'Al Tavolo' o 'Asporto'.",
                     Alert.AlertType.WARNING);
             return;
         }
 
-        if (tipoOrdine == TipoOrdine.AL_TAVOLO) {
+        if ("Al Tavolo".equals(tipoOrdine)) {
+            // Per l'ordine al tavolo, imposta l'orario corrente
             orario = LocalTime.now().toString().substring(0, 5);
-        } else if (tipoOrdine == TipoOrdine.ASPORTO) {
+        } else if ("Asporto".equals(tipoOrdine)) {
             coperti = null;
             tavolo = null;
             if (orario.isEmpty()) {
@@ -169,6 +161,7 @@ public class OrdinazioneView {
             return;
         }
 
+        // Crea il bean e lo passa al controller
         OrdinazioneBean ordinazioneBean = new OrdinazioneBean();
         ordinazioneBean.setNome(nomeCliente);
         ordinazioneBean.setTipoOrdine(tipoOrdine);
@@ -291,6 +284,7 @@ public class OrdinazioneView {
         }
         return totale;
     }
+
     private void refreshTable() {
         List<OrdinazioneBean> ordini = ordinazioneController.getOrdini();
         ordinazioniTableView.getItems().setAll(ordini);

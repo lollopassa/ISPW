@@ -2,6 +2,7 @@ package com.biteme.app.cli;
 
 import java.util.List;
 import java.util.Scanner;
+
 import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.controller.ArchivioController;
 import com.biteme.app.controller.OrdinazioneController;
@@ -23,8 +24,8 @@ public class OrdinazioneCLI {
             "6. Torna al Menu"
     };
 
+    // Costruttore privato per evitare istanziazioni
     private OrdinazioneCLI() {
-    //costruttore privato
     }
 
     public static void start() {
@@ -55,11 +56,21 @@ public class OrdinazioneCLI {
 
     private static void handleCreateOrder() {
         OrdinazioneBean bean = new OrdinazioneBean();
+
         System.out.print("Nome Cliente: ");
         bean.setNome(SCANNER.nextLine());
 
-        System.out.print("Tipo Ordine (AL_TAVOLO/ASPORTO): ");
-        bean.setTipoOrdine(com.biteme.app.model.TipoOrdine.valueOf(SCANNER.nextLine()));
+        System.out.print("Tipo Ordine (Al Tavolo/Asporto): ");
+        String inputTipo = SCANNER.nextLine().trim();
+        // Convertiamo l'input (eventualmente in maiuscolo) nel formato atteso dal bean
+        if (inputTipo.equalsIgnoreCase("AL_TAVOLO") || inputTipo.equalsIgnoreCase("Al Tavolo")) {
+            bean.setTipoOrdine("Al Tavolo");
+        } else if (inputTipo.equalsIgnoreCase("ASPORTO") || inputTipo.equalsIgnoreCase("Asporto")) {
+            bean.setTipoOrdine("Asporto");
+        } else {
+            System.out.println("Tipo Ordine non valido. Operazione annullata.");
+            return;
+        }
 
         System.out.print("Orario (HH:mm): ");
         bean.setOrarioCreazione(SCANNER.nextLine());
@@ -79,7 +90,10 @@ public class OrdinazioneCLI {
         if (showOrderList(orders)) return;
 
         int id = promptForOrderId();
-        if (id != -1) OrdineCLI.start(id);
+        if (id != -1) {
+            // Avvia la CLI di modifica (presumibilmente OrdineCLI è l'interfaccia per la modifica)
+            OrdineCLI.start(id);
+        }
     }
 
     private static void handleDeleteOrder() {
@@ -100,6 +114,7 @@ public class OrdinazioneCLI {
         int id = promptForOrderId();
         if (id != -1) {
             try {
+                // Se necessario, recupera e compila i dati dell'ArchivioBean (qui viene passato un bean vuoto)
                 ARCHIVIO_CONTROLLER.archiviaOrdine(new com.biteme.app.bean.ArchivioBean());
                 ORDINAZIONE_CONTROLLER.eliminaOrdine(id);
                 System.out.println("Ordine archiviato con successo.");

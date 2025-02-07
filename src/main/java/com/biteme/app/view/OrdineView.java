@@ -4,7 +4,8 @@ import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.controller.OrdinazioneController;
 import com.biteme.app.controller.OrdineController;
-import com.biteme.app.model.StatoOrdine;
+import com.biteme.app.util.SceneLoader;
+import com.biteme.app.bean.OrdineBean;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -15,8 +16,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import java.util.List;
 import javafx.scene.layout.Region;
-import com.biteme.app.util.SceneLoader;
-import com.biteme.app.bean.OrdineBean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,17 +38,19 @@ public class OrdineView {
 
     private static final String ASPORTO = "Asporto";
 
+    // La view non usa più l'enum del model: passiamo direttamente una stringa
     @FXML
     private void handleSalva() {
         int ordineId = ordinazioneController.getIdOrdineSelezionato();
-        controller.salvaOrdineEStato(ordineId, StatoOrdine.IN_CORSO);
+        controller.salvaOrdineEStato(ordineId, "IN_CORSO");
         ordinazioneController.cambiaASchermataOrdinazione();
     }
 
+    // La view passa una stringa, non un enum
     @FXML
     public void handleCheckout(ActionEvent actionEvent) {
         int ordineId = ordinazioneController.getIdOrdineSelezionato();
-        controller.salvaOrdineEStato(ordineId, StatoOrdine.COMPLETATO);
+        controller.salvaOrdineEStato(ordineId, "COMPLETATO");
         ordinazioneController.cambiaASchermataOrdinazione();
     }
 
@@ -57,8 +58,6 @@ public class OrdineView {
     private void handleIndietro(){
         SceneLoader.loadScene("/com/biteme/app/ordinazione.fxml", "Torna a Ordinazione");
     }
-
-
 
     @FXML
     public void initialize() {
@@ -77,15 +76,17 @@ public class OrdineView {
                 }
                 caricaProdottiAssociati();
                 caricaProdottiNelRiepilogo(ordineBean);
-            } else {   Logger.getLogger(OrdineView.class.getName())
-                    .log(Level.SEVERE, () -> "OrdineBean non trovato per l'ID: " + ordineId);}
+            } else {
+                Logger.getLogger(OrdineView.class.getName())
+                        .log(Level.SEVERE, () -> "OrdineBean non trovato per l'ID: " + ordineId);
+            }
         } else {
             Logger.getLogger(OrdineView.class.getName())
                     .warning("Nessuna ordinazione selezionata.");
         }
     }
 
-
+    // --- Metodi già presenti per il caricamento dei prodotti e per la gestione del riepilogo ---
     private void caricaProdottiNelRiepilogo(OrdineBean ordineBean) {
         riepilogoContenuto.getChildren().clear();
         List<String> prodotti = ordineBean.getProdotti();
@@ -98,7 +99,6 @@ public class OrdineView {
             double prezzoProdotto = recuperaPrezzoProdotto(nomeProdotto, prodottiDisponibili);
 
             aggiungiAlRiepilogo(nomeProdotto, prezzoProdotto, quantitaProdotto);
-
         }
         aggiornaTotaleOrdine();
     }
@@ -111,7 +111,6 @@ public class OrdineView {
         }
         return 0.0;
     }
-
 
     private void caricaProdottiAssociati() {
         List<ProdottoBean> prodotti = controller.getProdottiByCategoria("Tutti");
@@ -134,7 +133,7 @@ public class OrdineView {
         }
     }
 
-
+    // I metodi per la gestione delle categorie e dei controlli sul riepilogo rimangono invariati
     @FXML
     private void handleCategoriaBevande() {
         caricaProdotti("Bevande");
@@ -197,7 +196,7 @@ public class OrdineView {
         Label labelQuantitaText = new Label("Quantità:");
         labelQuantitaText.setStyle("-fx-font-size: 14px; -fx-text-fill: black; -fx-font-weight: bold;");
         HBox controlliQuantita = creaControlliQuantita(prodotto);
-        Label quantitaLabel = (Label) controlliQuantita.getChildren().get(1); // La `Label` del contatore
+        Label quantitaLabel = (Label) controlliQuantita.getChildren().get(1); // La Label del contatore
         quantitaLabel.setText(String.valueOf(quantitaDalRiepilogo));
 
         boxProdotto.getChildren().addAll(labelNome, labelQuantitaText, controlliQuantita);
@@ -230,30 +229,22 @@ public class OrdineView {
         return labelQuantitaContatore;
     }
 
-
-
-
     private Button creaBottoneMeno(Label quantitaLabel, ProdottoBean prodotto) {
         Button meno = new Button("-");
         meno.setPrefSize(30, 30);
-
         meno.setStyle("-fx-text-fill: red; -fx-font-weight: bold; -fx-font-size: 16px;");
-
         meno.setOnAction(event -> {
             int quantitaAttuale = Integer.parseInt(quantitaLabel.getText());
-
             if (quantitaAttuale > 0) {
                 diminuisciQuantita(quantitaLabel, prodotto.getNome());
                 aggiornaRiepilogo(prodotto.getNome(), prodotto.getPrezzo().doubleValue(), -1);
             }
         });
-
         return meno;
     }
 
     private void diminuisciQuantita(Label quantita, String nomeProdotto) {
         int currentQuantity = Integer.parseInt(quantita.getText());
-
         if (currentQuantity > 0) {
             quantita.setText(String.valueOf(currentQuantity - 1));
             if (currentQuantity - 1 == 0) {
@@ -270,8 +261,6 @@ public class OrdineView {
         );
         aggiornaTotaleOrdine();
     }
-
-
 
     private Button creaBottonePiu(Label quantitaLabel, ProdottoBean prodotto) {
         Button piu = new Button("+");
@@ -292,32 +281,23 @@ public class OrdineView {
     private void aggiungiAlRiepilogo(String nomeProdotto, double prezzo, int quantita) {
         HBox nuovoElemento = new HBox(10);
         nuovoElemento.setAlignment(Pos.CENTER_LEFT);
-
         Label nomeEQuantitaLabel = new Label(nomeProdotto + " x " + quantita);
         nomeEQuantitaLabel.setPrefWidth(200);
         nomeEQuantitaLabel.setStyle("-fx-font-size: 14px;");
-
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
-
         Label prezzoLabel = new Label(String.format("%.2f €", prezzo * quantita));
         prezzoLabel.setStyle("-fx-font-size: 14px;");
-
         nuovoElemento.getChildren().addAll(nomeEQuantitaLabel, spacer, prezzoLabel);
-
         riepilogoContenuto.getChildren().add(nuovoElemento);
         aggiornaTotaleOrdine();
     }
-
-
 
     private void mostraMessaggioNessunProdotto(String categoria) {
         Label noProdotti = new Label("Nessun prodotto disponibile per la categoria: " + categoria);
         noProdotti.setStyle("-fx-font-size: 14px; -fx-text-fill: gray; -fx-padding: 10px;");
         flowPaneProdotti.getChildren().add(noProdotti);
     }
-
-
 
     private void aggiornaRiepilogo(String nomeProdotto, double prezzo, int quantita) {
         if (aggiornaElementoEsistente(nomeProdotto, prezzo, quantita)) {
@@ -360,14 +340,11 @@ public class OrdineView {
 
     private void aggiornaQuantitaEPrezzo(HBox hbox, String nomeProdotto, double prezzo, int nuovaQuantita) {
         Label nomeEQuantitaLabel = (Label) hbox.getChildren().get(0);
-        Label prezzoLabel = (Label) hbox.getChildren().get(2); // Terzo elemento è il prezzo
-
+        Label prezzoLabel = (Label) hbox.getChildren().get(2);
         nomeEQuantitaLabel.setText(nomeProdotto + " x " + nuovaQuantita);
         prezzoLabel.setText(String.format("%.2f €", prezzo * nuovaQuantita));
-
         aggiornaTotaleOrdine();
     }
-
 
     @FXML
     private void aggiornaTotaleOrdine() {
@@ -377,7 +354,6 @@ public class OrdineView {
             totaleOrdine.setText("Totale: €0.00");
             return;
         }
-
         for (javafx.scene.Node nodo : riepilogoContenuto.getChildren()) {
             if (nodo instanceof HBox hbox) {
                 Label prezzoLabel = (Label) hbox.getChildren().get(hbox.getChildren().size() - 1);
@@ -390,5 +366,12 @@ public class OrdineView {
             }
         }
         totaleOrdine.setText(String.format("Totale: €%.2f", totale));
+    }
+
+    // Il metodo per ottenere l'ordinazione selezionata viene definito (o richiamato) altrove,
+    // per esempio in OrdinazioneView, in modo da centralizzare lo scambio dei bean.
+    public static OrdinazioneBean getOrdineSelezionato() {
+        // Implementazione esistente o delegata ad una classe comune
+        return null;
     }
 }

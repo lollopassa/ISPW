@@ -4,12 +4,11 @@ import java.math.BigDecimal;
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.controller.LoginController;
 import com.biteme.app.controller.ProdottoController;
-import com.biteme.app.model.Categoria;
 
 public class ProdottoCLI {
 
     private ProdottoCLI() {
-        //costruttore privato
+        // Costruttore privato
     }
 
     private static final ProdottoController prodottoController = new ProdottoController();
@@ -50,7 +49,6 @@ public class ProdottoCLI {
             }
             default -> System.out.println("Opzione non valida.");
         }
-
         return true;
     }
 
@@ -67,22 +65,20 @@ public class ProdottoCLI {
             }
             default -> System.out.println("Opzione non valida.");
         }
-
         return true;
     }
 
     private static void aggiungiProdotto(java.util.Scanner scanner) {
         System.out.print("Nome Prodotto: ");
         String nome = scanner.nextLine();
-        System.out.print("Categoria (es. PIZZE, PRIMI, etc.): ");
-        String categoriaStr = scanner.nextLine();
-        Categoria categoria = Categoria.valueOf(categoriaStr.toUpperCase());
+        System.out.print("Categoria (es. PIZZE, PRIMI, ANTIPASTI, BEVANDE, CONTORNI, DOLCI): ");
+        String categoria = scanner.nextLine(); // Leggiamo la categoria come stringa
         System.out.print("Prezzo: ");
         BigDecimal prezzo = new BigDecimal(scanner.nextLine());
 
         ProdottoBean bean = new ProdottoBean();
         bean.setNome(nome);
-        bean.setCategoria(categoria);
+        bean.setCategoria(categoria.toUpperCase());
         bean.setPrezzo(prezzo);
         bean.setDisponibile(true);
 
@@ -95,15 +91,15 @@ public class ProdottoCLI {
         int id = Integer.parseInt(scanner.nextLine());
         System.out.print("Nuovo Nome: ");
         String nome = scanner.nextLine();
-        System.out.print("Nuova Categoria (es. PIZZE, PRIMI, etc.): ");
-        Categoria categoria = Categoria.valueOf(scanner.nextLine().toUpperCase());
+        System.out.print("Nuova Categoria (es. PIZZE, PRIMI, ANTIPASTI, BEVANDE, CONTORNI, DOLCI): ");
+        String categoria = scanner.nextLine();
         System.out.print("Nuovo Prezzo: ");
         BigDecimal prezzo = new BigDecimal(scanner.nextLine());
 
         ProdottoBean beanAggiornato = new ProdottoBean();
         beanAggiornato.setId(id);
         beanAggiornato.setNome(nome);
-        beanAggiornato.setCategoria(categoria);
+        beanAggiornato.setCategoria(categoria.toUpperCase());
         beanAggiornato.setPrezzo(prezzo);
         beanAggiornato.setDisponibile(true);
 
