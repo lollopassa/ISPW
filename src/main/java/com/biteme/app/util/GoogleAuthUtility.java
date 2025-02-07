@@ -23,14 +23,9 @@ public class GoogleAuthUtility {
     // Autenticazione che restituisce direttamente l'access token
     public static String authenticate() throws GoogleAuthException, InterruptedException {
         try {
-            String accessToken = performAuthentication();
-            if (accessToken == null) {
-                throw new GoogleAuthException("Autenticazione Google fallita. Verifica i dettagli e riprova.");
-            }
-            return accessToken;
+            return performAuthentication(); // Restituisce l'access token
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new GoogleAuthException("Il thread è stato interrotto durante l'autenticazione con Google.", e);
+            throw e;
         } catch (Exception e) {
             throw new GoogleAuthException("Errore durante l'autenticazione con Google", e);
         }

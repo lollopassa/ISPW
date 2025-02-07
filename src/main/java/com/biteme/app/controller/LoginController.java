@@ -58,6 +58,12 @@ public class LoginController {
         UserSession.setCurrentUser(user);
     }
 
+    /**
+     * Autentica un utente tramite Google.
+     * Se l'autenticazione fallisce, viene lanciata un'eccezione.
+     *
+     * @throws GoogleAuthException se l'autenticazione Google fallisce
+     */
     public void authenticateWithGoogle() throws GoogleAuthException {
         try {
             String accessToken = googleAuthService.authenticateWithGoogle();
@@ -77,6 +83,9 @@ public class LoginController {
         }
     }
 
+    /**
+     * Se l'utente esiste ma non è un utente Google, questo metodo lancia un'eccezione.
+     */
     private User validateGoogleUser(User user) {
         if (!user.isGoogleUser()) {
             throw new IllegalStateException("Email già registrata con metodo tradizionale");
@@ -84,24 +93,17 @@ public class LoginController {
         return user;
     }
 
+    /**
+     * Carica la schermata appropriata in base al ruolo dell'utente.
+     */
     public void navigateToHome() {
         User user = UserSession.getCurrentUser();
-        String scenePath = user.getRuolo() == UserRole.ADMIN
-                ? "/com/biteme/app/adminHome.fxml"
-                : "/com/biteme/app/home.fxml";
-        String title = user.getRuolo() == UserRole.ADMIN
-                ? "Admin Home - BiteMe"
-                : "Home - BiteMe";
 
-        SceneLoader.loadScene(scenePath, title);
-    }
-
-    // Nuovo metodo helper per il testing
-    String getHomeScenePath() {
-        User user = UserSession.getCurrentUser();
-        return user.getRuolo() == UserRole.ADMIN
-                ? "/com/biteme/app/adminHome.fxml"
-                : "/com/biteme/app/home.fxml";
+        if (user.getRuolo() == UserRole.ADMIN) {
+            SceneLoader.loadScene("/com/biteme/app/adminHome.fxml", "Admin Home - BiteMe");
+        } else {
+            SceneLoader.loadScene("/com/biteme/app/home.fxml", "Home - BiteMe");
+        }
     }
 
     public void navigateToSignup() {

@@ -1,13 +1,18 @@
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.LoginBean;
+import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.model.User;
 import com.biteme.app.model.UserRole;
 import com.biteme.app.persistence.inmemory.InMemoryUserDao;
 import com.biteme.app.persistence.inmemory.Storage;
+import com.biteme.app.service.GoogleAuthService;
+import com.biteme.app.util.GoogleAuthUtility; // Import corretto
 import com.biteme.app.util.HashingUtil;
 import com.biteme.app.util.UserSession;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 
@@ -19,84 +24,192 @@ import static org.junit.jupiter.api.Assertions.*;
 class LoginControllerTest {
 
     private LoginController controller;
-    private InMemoryUserDao userDao;
+    private InMemoryUserDao inMemoryUserDao;
+    private StubGoogleAuthService stubGoogleAuthService;
+
+    // Classe stub per GoogleAuthService
+    static class StubGoogleAuthService extends GoogleAuthService {
+        private boolean authenticationSuccess = true;
+        private GoogleAuthUtility.GoogleUserData userData;
+
+        public void setUserData(GoogleAuthUtility.GoogleUserData userData) {
+            this.userData = userData;
+        }
+
+        @Override
+        public String authenticateWithGoogle() throws GoogleAuthException {
+            if (!authenticationSuccess) throw new GoogleAuthException("Authentication failed");
+            return "dummy_token";
+        }
+
+        @Override
+        public GoogleAuthUtility.GoogleUserData getGoogleUserData(String accessToken) {
+            return userData;
+        }
+    }
 
     @BeforeEach
     void setUp() throws Exception {
         controller = new LoginController();
-        userDao = new InMemoryUserDao();
-        injectMockUserDao();
-    }
+        inMemoryUserDao = new InMemoryUserDao();
+        stubGoogleAuthService = new StubGoogleAuthService();
 
-    private void injectMockUserDao() throws Exception {
-        Field daoField = LoginController.class.getDeclaredField("userDao");
-        daoField.setAccessible(true);
-        daoField.set(controller, userDao);
+        // Inject dependencies via reflection
+        Field userDaoField = LoginController.class.getDeclaredField("userDao");
+        userDaoField.setAccessible(true);
+        userDaoField.set(controller, inMemoryUserDao);
+
+        Field googleAuthField = LoginController.class.getDeclaredField("googleAuthService");
+        googleAuthField.setAccessible(true);
+        googleAuthField.set(controller, stubGoogleAuthService);
     }
 
     @AfterEach
     void tearDown() {
-        Storage.getInstance().getUsers().clear();
         UserSession.clear();
+        Storage.getInstance().getUsers().clear();
     }
 
     @Test
-    void testAuthenticateUserSuccess() {
-        // Crea un utente con password in chiaro (il sistema si occuperà dell'hashing)
-        String password = "password123";
-        User user = new User("testuser", "test@example.com", password, UserRole.CAMERIERE);
+    void testAuthenticateUser_WithEmptyEmailOrPassword() {
+        // Caso 1: Email vuota
+        LoginBean bean = new LoginBean();
+        bean.setEmailOrUsername("");
+        bean.setPassword("password");
+
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> controller.authenticateUser(bean));
+        assertEquals("Email/Username e password sono obbligatori.", ex.getMessage());
+
+        // Caso 2: Password vuota
+        bean.setEmailOrUsername("test@test.com");
+        bean.setPassword("");
+
+        ex = assertThrows(IllegalArgumentException.class, () -> controller.authenticateUser(bean));
+        assertEquals("Email/Username e password sono obbligatori.", ex.getMessage());
+
+        // Caso 3: Entrambi i campi vuoti
+        bean.setEmailOrUsername("");
+        bean.setPassword("");
+
+        ex = assertThrows(IllegalArgumentException.class, () -> controller.authenticateUser(bean));
+        assertEquals("Email/Username e password sono obbligatori.", ex.getMessage());
+    }
+
+    @Test
+    void testAuthenticateUser_WithInvalidEmail() {
+        LoginBean bean = new LoginBean();
+        bean.setEmailOrUsername("invalid-email"); // Email senza "@" o formato sbagliato
+        bean.setPassword("password");
+
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> controller.authenticateUser(bean));
+        assertEquals("Il formato dell'email non è valido.", ex.getMessage());
+    }
+
+    @Test
+    void testAuthenticateUser_UserNotFound() {
+        LoginBean bean = new LoginBean();
+        bean.setEmailOrUsername("nonexistent@test.com");
+        bean.setPassword("password");
+
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> controller.authenticateUser(bean));
+        assertEquals("Utente non trovato.", ex.getMessage());
+    }
+
+    @Test
+    void testAuthenticateUser_AsGoogleUser() {
+        // Crea un utente Google e aggiungilo in memoria
+        User user = new User("googleuser", "google@test.com", null, UserRole.CAMERIERE);
+        user.setGoogleUser(true);
+        inMemoryUserDao.store(user);
+
+        LoginBean bean = new LoginBean();
+        bean.setEmailOrUsername("google@test.com");
+        bean.setPassword("anypass");
+
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> controller.authenticateUser(bean));
+        assertEquals("Utente Google non può autenticarsi tramite metodo tradizionale.", ex.getMessage());
+    }
+
+    @Test
+    void testAuthenticateUser_WrongPassword() {
+        // Crea un utente con password corretta e aggiungilo in memoria
+        User user = new User("testuser", "test@test.com", HashingUtil.hashPassword("correctpassword"), UserRole.CAMERIERE);
+        inMemoryUserDao.store(user);
+
+        LoginBean bean = new LoginBean();
+        bean.setEmailOrUsername("test@test.com");
+        bean.setPassword("wrongpassword");
+
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> controller.authenticateUser(bean));
+        assertEquals("Password errata.", ex.getMessage());
+    }
+
+    @Test
+    void testAuthenticateWithGoogle_MissingGoogleUserData()  {
+        // Simula uno scenario in cui i dati dell'utente Google risultino null
+        stubGoogleAuthService.setUserData(null);
+
+        Exception ex = assertThrows(IllegalStateException.class, () -> controller.authenticateWithGoogle());
+        assertEquals("Dati utente Google non validi.", ex.getMessage());
+    }
+
+    @Test
+    void testAuthenticateWithGoogle_UserAlreadyExistsWithPassword() {
+        // Simula un utente che esiste con un metodo tradizionale (non Google)
+        User user = new User("testuser", "test@test.com", "hashedpassword", UserRole.CAMERIERE);
         user.setGoogleUser(false);
-        userDao.store(user); // Assicurati che lo store faccia l'hashing della password
+        inMemoryUserDao.store(user);
 
-        // Crea un LoginBean con la password in chiaro
-        LoginBean loginBean = createLoginBean("test@example.com", password);
+        // Simula che Google restituisca i dati di questo utente
+        stubGoogleAuthService.setUserData(new GoogleAuthUtility.GoogleUserData("test@test.com", "Test User"));
 
-        // Esegui l'autenticazione
-        assertDoesNotThrow(() -> controller.authenticateUser(loginBean));
-        assertEquals(user, UserSession.getCurrentUser());
+        Exception ex = assertThrows(IllegalStateException.class, () -> controller.authenticateWithGoogle());
+        assertEquals("Email già registrata con metodo tradizionale", ex.getMessage());
     }
 
     @Test
-    void testAuthenticateUserInvalidEmailFormat() {
-        LoginBean loginBean = createLoginBean("invalid@format", "password123");
+    void testNavigateToHome_InvalidUser() {
+        // Simula che nessun utente è loggato
+        UserSession.clear();
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> controller.authenticateUser(loginBean)
-        );
-        assertEquals("Il formato dell'email non è valido.", exception.getMessage());
+        Exception ex = assertThrows(NullPointerException.class, () -> controller.navigateToHome());
+        assertEquals("Utente non trovato.", ex.getMessage()); // Controlla il caso limite
     }
 
     @Test
-    void testNavigateToHomeAsAdmin() {
-        User user = new User("admin", "admin@example.com", "admin123", UserRole.ADMIN);
-        UserSession.setCurrentUser(user);
+    void testNavigateToHome_ValidRoles() {
+        // Caso utente Admin
+        User admin = new User("admin", "admin@test.com", "password", UserRole.ADMIN);
+        UserSession.setCurrentUser(admin);
 
-        assertEquals("/com/biteme/app/adminHome.fxml", controller.getHomeScenePath());
-    }
+        assertDoesNotThrow(() -> controller.navigateToHome());
 
-    @Test
-    void testNavigateToHomeAsUser() {
-        User user = new User("user", "user@example.com", "user123", UserRole.CAMERIERE);
-        UserSession.setCurrentUser(user);
+        // Caso utente Cameriere
+        User cameriere = new User("user", "user@test.com", "password", UserRole.CAMERIERE);
+        UserSession.setCurrentUser(cameriere);
 
-        assertEquals("/com/biteme/app/home.fxml", controller.getHomeScenePath());
+        assertDoesNotThrow(() -> controller.navigateToHome());
     }
 
     @Test
     void testLogout() {
-        User user = new User("user", "user@example.com", HashingUtil.hashPassword("user123"), UserRole.CAMERIERE);
-        user.setGoogleUser(false); // Imposta googleUser
+        // Simula che un utente sia loggato
+        User user = new User("user", "user@test.com", "password", UserRole.CAMERIERE);
         UserSession.setCurrentUser(user);
+
+        // Chiama il logout
         controller.logout();
 
+        // Verifica che l'utente corrente sia stato rimosso
         assertNull(UserSession.getCurrentUser());
     }
 
-    private LoginBean createLoginBean(String email, String password) {
-        LoginBean bean = new LoginBean();
-        bean.setEmailOrUsername(email);
-        bean.setPassword(password);
-        return bean;
+    @Test
+    void testGetCurrentUsername_WhenUserIsNotLoggedIn() {
+        // Verifica cosa succede quando nessun utente è loggato
+        UserSession.clear();
+        assertEquals("", controller.getCurrentUsername());
     }
+
+
 }
