@@ -16,15 +16,17 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-//@author Kevin Hoxha
+    /*
+    @author Kevin Hoxha
+    */
 
-class ProdottoControllerTest {
+public class ProdottoControllerTest {
 
     private ProdottoController controller;
     private InMemoryProdottoDao inMemoryDao;
 
     @BeforeEach
-    void setUp() throws Exception {
+    public void setUp() throws Exception {
         // Pulisce lo storage condiviso dei prodotti per garantire test indipendenti
         Storage.getInstance().getProdotti().clear();
 
@@ -43,7 +45,7 @@ class ProdottoControllerTest {
     // Test di successo
 
     @Test
-    void testAggiungiProdotto() {
+    public void testAggiungiProdotto() {
         // Prepara il bean del prodotto
         ProdottoBean bean = new ProdottoBean();
         bean.setId(0); // Nuovo prodotto, id non ancora assegnato
@@ -70,7 +72,7 @@ class ProdottoControllerTest {
     }
 
     @Test
-    void testGetProdottoByNome() {
+    public void testGetProdottoByNome() {
         // Inserisce un prodotto direttamente tramite il DAO in‑memory
         Prodotto p = new Prodotto(0, "Pasta", new BigDecimal("12.50"), Categoria.PRIMI, true);
         inMemoryDao.store(p);
@@ -85,7 +87,7 @@ class ProdottoControllerTest {
     }
 
     @Test
-    void testGetProdotti() {
+    public void testGetProdotti() {
         // Inserisce alcuni prodotti: alcuni disponibili, altri no
         Prodotto p1 = new Prodotto(0, "Margherita", new BigDecimal("5.50"), Categoria.PIZZE, true);
         Prodotto p2 = new Prodotto(0, "Tiramisu", new BigDecimal("8"), Categoria.DOLCI, false);
@@ -104,7 +106,7 @@ class ProdottoControllerTest {
     }
 
     @Test
-    void testModificaProdotto() {
+    public void testModificaProdotto() {
         // Inserisce un prodotto iniziale
         Prodotto p = new Prodotto(0, "Fiorentina", new BigDecimal("75.00"), Categoria.SECONDI, true);
         inMemoryDao.store(p);
@@ -132,21 +134,28 @@ class ProdottoControllerTest {
     }
 
     @Test
-    void testEliminaProdotto() {
+    public void testEliminaProdotto() {
+        // Inserisce un prodotto
         Prodotto p = new Prodotto(0, "Brodo Vegetale", new BigDecimal("18.99"), Categoria.PRIMI, true);
         inMemoryDao.store(p);
         int storedId = p.getId();
+
+        // Elimina il prodotto tramite il controller
         controller.eliminaProdotto(storedId);
+
+        // Verifica che il prodotto sia stato eliminato
         assertFalse(inMemoryDao.exists(storedId));
     }
 
+    // Test di casi d'errore (utilizzando metodi helper per una singola invocazione)
+
     @Test
-    void testAggiungiProdottoConNomeVuoto() {
+    public void testAggiungiProdottoConNomeVuoto() {
         Exception ex = assertThrows(ProdottoException.class, this::aggiungiProdottoConNomeVuoto);
         assertTrue(ex.getMessage().contains("Il nome del prodotto non può essere vuoto."));
     }
 
-    void aggiungiProdottoConNomeVuoto() {
+    private void aggiungiProdottoConNomeVuoto() {
         ProdottoBean bean = new ProdottoBean();
         bean.setId(0);
         bean.setNome("   "); // Nome vuoto
@@ -157,12 +166,12 @@ class ProdottoControllerTest {
     }
 
     @Test
-    void testAggiungiProdottoConCategoriaVuota() {
+    public void testAggiungiProdottoConCategoriaVuota() {
         Exception ex = assertThrows(ProdottoException.class, this::aggiungiProdottoConCategoriaVuota);
         assertTrue(ex.getMessage().contains("Seleziona una categoria valida."));
     }
 
-    void aggiungiProdottoConCategoriaVuota() {
+    private void aggiungiProdottoConCategoriaVuota() {
         ProdottoBean bean = new ProdottoBean();
         bean.setId(0);
         bean.setNome("Margherita");
@@ -173,12 +182,12 @@ class ProdottoControllerTest {
     }
 
     @Test
-    void testAggiungiProdottoConPrezzoNonValido() {
+    public void testAggiungiProdottoConPrezzoNonValido() {
         Exception ex = assertThrows(ProdottoException.class, this::aggiungiProdottoConPrezzoNonValido);
         assertTrue(ex.getMessage().contains("Inserisci un valore numerico valido per il prezzo maggiore di zero."));
     }
 
-    void aggiungiProdottoConPrezzoNonValido() {
+    private void aggiungiProdottoConPrezzoNonValido() {
         ProdottoBean bean = new ProdottoBean();
         bean.setId(0);
         bean.setNome("Margherita");
@@ -189,22 +198,22 @@ class ProdottoControllerTest {
     }
 
     @Test
-    void testGetProdottoByNomeNonTrovato() {
+    public void testGetProdottoByNomeNonTrovato() {
         Exception ex = assertThrows(ProdottoException.class, this::getProdottoByNomeNonTrovato);
         assertTrue(ex.getMessage().contains("Prodotto con nome"));
     }
 
-    void getProdottoByNomeNonTrovato() {
+    private void getProdottoByNomeNonTrovato() {
         controller.getProdottoByNome("NonEsistente");
     }
 
     @Test
-    void testModificaProdottoConIdNonValido() {
+    public void testModificaProdottoConIdNonValido() {
         Exception ex = assertThrows(ProdottoException.class, this::modificaProdottoConIdNonValido);
         assertTrue(ex.getMessage().contains("L'ID del prodotto non è valido."));
     }
 
-    void modificaProdottoConIdNonValido() {
+    private void modificaProdottoConIdNonValido() {
         ProdottoBean bean = new ProdottoBean();
         bean.setId(0); // ID non valido per modifica
         bean.setNome("Nuovo Nome");
@@ -215,12 +224,12 @@ class ProdottoControllerTest {
     }
 
     @Test
-    void testEliminaProdottoConIdNonValido() {
+    public void testEliminaProdottoConIdNonValido() {
         Exception ex = assertThrows(ProdottoException.class, this::eliminaProdottoConIdNonValido);
         assertTrue(ex.getMessage().contains("L'ID del prodotto da eliminare non è valido."));
     }
 
-    void eliminaProdottoConIdNonValido() {
+    private void eliminaProdottoConIdNonValido() {
         controller.eliminaProdotto(null);
     }
 }
