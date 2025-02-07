@@ -1,4 +1,3 @@
-// PrenotazioneBean.java (modificato)
 package com.biteme.app.bean;
 
 import java.time.LocalDate;

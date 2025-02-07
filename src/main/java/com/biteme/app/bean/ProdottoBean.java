@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 public class ProdottoBean {
     private Integer id;
     private String nome;
-    // Ora la categoria è memorizzata come String, per evitare riferimenti al model
     private String categoria;
     private BigDecimal prezzo;
     private Boolean disponibile;
