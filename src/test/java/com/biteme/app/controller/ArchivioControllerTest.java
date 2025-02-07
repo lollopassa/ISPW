@@ -24,16 +24,12 @@ class ArchivioControllerTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        Storage.getInstance().getArchivi().clear();
         controller = new ArchivioController();
         inMemoryDao = new InMemoryArchivioDao();
         Field daoField = ArchivioController.class.getDeclaredField("archivioDao");
         daoField.setAccessible(true);
         daoField.set(controller, inMemoryDao);
-    }
-
-    @AfterEach
-    void tearDown() {
-        Storage.getInstance().getArchivi().clear();
     }
 
     @Test

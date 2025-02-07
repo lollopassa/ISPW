@@ -8,11 +8,10 @@ import com.biteme.app.model.Prodotto;
 import com.biteme.app.model.Categoria;
 import com.biteme.app.persistence.inmemory.InMemoryOrdineDao;
 import com.biteme.app.persistence.inmemory.InMemoryProdottoDao;
-import javafx.application.Platform;
+import com.biteme.app.persistence.inmemory.Storage;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
@@ -24,14 +23,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class OrdineControllerTest {
 
-    // Inizializza JavaFX (necessario per usare VBox, HBox, Label, ecc.)
-    static {
-        try {
-            Platform.startup(() -> {});
-        } catch (IllegalStateException e) {
-            // JavaFX è già stato inizializzato
-        }
-    }
 
     private OrdineController controller;
     private InMemoryOrdineDao inMemoryOrdineDao;
@@ -39,6 +30,7 @@ class OrdineControllerTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        Storage.getInstance().getOrdini().clear();
         // Inizializza il controller
         controller = new OrdineController();
 
@@ -54,11 +46,6 @@ class OrdineControllerTest {
         Field prodottoDaoField = OrdineController.class.getDeclaredField("prodottoDao");
         prodottoDaoField.setAccessible(true);
         prodottoDaoField.set(controller, inMemoryProdottoDao);
-    }
-
-    @AfterEach
-    void tearDown() {
-        // Pulizia dello storage se necessario
     }
 
     @Test

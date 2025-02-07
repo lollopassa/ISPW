@@ -14,6 +14,12 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class GoogleAuthUtility {
+
+    // Costruttore privato per impedire l'istanziazione
+    private GoogleAuthUtility() {
+        throw new UnsupportedOperationException("Questa è una classe utility e non può essere istanziata.");
+    }
+
     // Autenticazione che restituisce direttamente l'access token
     public static String authenticate() throws GoogleAuthException, InterruptedException {
         try {
