@@ -13,6 +13,9 @@ import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+//@author Lorenzo Passacantilli
+
+
 class LoginControllerTest {
 
     private LoginController controller;

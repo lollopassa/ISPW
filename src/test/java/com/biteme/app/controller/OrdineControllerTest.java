@@ -20,6 +20,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
+//@author Lorenzo Passacantilli
+
 class OrdineControllerTest {
 
     // Inizializza JavaFX (necessario per usare VBox, HBox, Label, ecc.)
