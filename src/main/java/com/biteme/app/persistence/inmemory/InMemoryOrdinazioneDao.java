@@ -7,11 +7,9 @@ import com.biteme.app.model.StatoOrdine;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 public class InMemoryOrdinazioneDao implements OrdinazioneDao {
 
-    private static final Logger logger = Logger.getLogger(InMemoryOrdinazioneDao.class.getName());
     private final List<Ordine> ordini = Storage.getInstance().getOrdini(); // Lista ordini
     private int currentId = 1; // ID univoco per le ordinazioni
     private final List<Ordinazione> ordinazioni = Storage.getInstance().getOrdinazioni(); // Usa lo storage condiviso
@@ -62,11 +60,8 @@ public class InMemoryOrdinazioneDao implements OrdinazioneDao {
     public void aggiornaStato(int id, StatoOrdine nuovoStato) {
         // Aggiorna lo stato solo se l'ordinazione esiste
         ordinazioni.stream()
-                .filter(o -> o.getId() == id) // Cerca un'ordinazione corrispondente all'ID
-                .findFirst() // Ritorna la prima corrispondenza (se esiste)
-                .ifPresentOrElse(
-                        ordinazione -> ordinazione.setStatoOrdine(nuovoStato), // Aggiorna lo stato
-                        () -> logger.warning(String.format("Ordinazione con ID %d non trovata. Stato non aggiornato.", id))
-                );
+                .filter(o -> o.getId() == id)
+                .findFirst()
+                .ifPresent(ordinazione -> ordinazione.setStatoOrdine(nuovoStato));
     }
 }

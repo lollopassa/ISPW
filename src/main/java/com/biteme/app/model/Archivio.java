@@ -12,7 +12,6 @@ public class Archivio {
     private BigDecimal totale;
     private LocalDateTime dataArchiviazione;
 
-    // Costruttore vuoto (opzionale, utile per alcune librerie/framework)
     public Archivio() {}
 
     // Costruttore completo per inizializzazione rapida
@@ -45,16 +44,14 @@ public class Archivio {
     }
 
 
+
     public void setIdOrdine(int idOrdine) {
         this.idOrdine = idOrdine;
     }
 
-
     public void setProdotti(List<String> prodotti) {
         this.prodotti = prodotti;
     }
-
-
 
     public void setQuantita(List<Integer> quantita) {
         this.quantita = quantita;
@@ -67,6 +64,8 @@ public class Archivio {
     public void setDataArchiviazione(LocalDateTime dataArchiviazione) {
         this.dataArchiviazione = dataArchiviazione;
     }
+
+
 
     @Override
     public String toString() {

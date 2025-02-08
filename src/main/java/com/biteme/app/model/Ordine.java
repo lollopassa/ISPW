@@ -15,28 +15,29 @@ public class Ordine {
         this.quantita = quantita;
     }
 
-    // Getter e setter
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public List<Integer> getQuantita() {
+        return quantita;
     }
 
     public List<String> getProdotti() {
         return prodotti;
     }
 
+    public int getId() {
+        return id;
+    }
+
+
+
+    public void setQuantita(List<Integer> quantita) {
+        this.quantita = quantita;
+    }
+
     public void setProdotti(List<String> prodotti) {
         this.prodotti = prodotti;
     }
 
-    public List<Integer> getQuantita() {
-        return quantita;
-    }
-
-    public void setQuantita(List<Integer> quantita) {
-        this.quantita = quantita;
+    public void setId(int id) {
+        this.id = id;
     }
 }

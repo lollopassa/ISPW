@@ -62,37 +62,23 @@ public class ArchivioController {
                 ));
     }
 
+
     public Map<String, Number> piattiPiuOrdinatiPerPeriodo(String periodo) {
-        if (periodo == null || periodo.trim().isEmpty()) {
-            throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
-        }
-
-        LocalDateTime startDate;
-        LocalDateTime endDate = LocalDateTime.now();
-
-        switch (periodo.toLowerCase()) {
-            case PERIODO_SETTIMANA:
-                startDate = endDate.minusWeeks(1);
-                break;
-            case PERIODO_MESE:
-                startDate = endDate.minusMonths(1);
-                break;
-            case PERIODO_TRIMESTRE:
-                startDate = endDate.minusMonths(3);
-                break;
-            default:
-                throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
-        }
+        LocalDateTime[] dateRange = getDateRange(periodo);
+        LocalDateTime startDate = dateRange[0];
+        LocalDateTime endDate = dateRange[1];
 
         return piattiPiuOrdinati(startDate, endDate);
     }
 
-    public Map<String, Number> guadagniPerPeriodo(String periodo) {
+
+
+    private LocalDateTime[] getDateRange(String periodo) {
         if (periodo == null || periodo.trim().isEmpty()) {
             throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
         }
-        LocalDateTime startDate;
         LocalDateTime endDate = LocalDateTime.now();
+        LocalDateTime startDate;
 
         switch (periodo.toLowerCase()) {
             case PERIODO_SETTIMANA:
@@ -107,11 +93,22 @@ public class ArchivioController {
             default:
                 throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
         }
+
+        return new LocalDateTime[]{ startDate, endDate };
+    }
+
+
+
+    public Map<String, Number> guadagniPerPeriodo(String periodo) {
+        LocalDateTime[] dateRange = getDateRange(periodo);
+        LocalDateTime startDate = dateRange[0];
+        LocalDateTime endDate = dateRange[1];
 
         List<Archivio> archivi = archivioDao.findByDateRange(startDate, endDate);
 
         Map<String, BigDecimal> guadagni = new HashMap<>();
         for (Archivio archivio : archivi) {
+            // Per ogni archivio, itera sui prodotti e somma il totale
             for (int i = 0; i < archivio.getProdotti().size(); i++) {
                 String prodotto = archivio.getProdotti().get(i);
                 BigDecimal totale = archivio.getTotale();
@@ -120,6 +117,7 @@ public class ArchivioController {
             }
         }
 
+        // Converte i valori da BigDecimal a double
         return guadagni.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
@@ -129,35 +127,24 @@ public class ArchivioController {
                 ));
     }
 
+
     public Map<String, Number> guadagniPerGiorno(String periodo) {
-        if (periodo == null || periodo.trim().isEmpty()) {
-            throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
-        }
-        LocalDateTime startDate;
-        LocalDateTime endDate = LocalDateTime.now();
+        // Ottieni il range di date tramite il metodo helper
+        LocalDateTime[] dateRange = getDateRange(periodo);
+        LocalDateTime startDate = dateRange[0];
+        LocalDateTime endDate = dateRange[1];
 
-        switch (periodo.toLowerCase()) {
-            case PERIODO_SETTIMANA:
-                startDate = endDate.minusWeeks(1);
-                break;
-            case PERIODO_MESE:
-                startDate = endDate.minusMonths(1);
-                break;
-            case PERIODO_TRIMESTRE:
-                startDate = endDate.minusMonths(3);
-                break;
-            default:
-                throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
-        }
-
+        // Recupera gli archivi per il range di date specificato
         List<Archivio> archivi = archivioDao.findByDateRange(startDate, endDate);
 
+        // Inizializza la mappa per contenere i guadagni per ogni giorno della settimana
         Map<String, BigDecimal> guadagniGiorno = new LinkedHashMap<>();
         String[] giorni = { "Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom" };
         for (String giorno : giorni) {
             guadagniGiorno.put(giorno, BigDecimal.ZERO);
         }
 
+        // Per ogni archivio, somma il totale al giorno corrispondente
         for (Archivio archivio : archivi) {
             String giornoAbbreviato = switch (archivio.getDataArchiviazione().getDayOfWeek()) {
                 case MONDAY -> "Lun";
@@ -172,8 +159,11 @@ public class ArchivioController {
             guadagniGiorno.put(giornoAbbreviato, totaleGiorno.add(archivio.getTotale()));
         }
 
+        // Converte i BigDecimal in double per il risultato finale
         Map<String, Number> result = new LinkedHashMap<>();
         guadagniGiorno.forEach((g, tot) -> result.put(g, tot.doubleValue()));
+
         return result;
     }
+
 }
