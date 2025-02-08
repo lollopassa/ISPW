@@ -71,7 +71,7 @@ public class OrdineView {
             OrdineBean ordineBean = controller.load(ordineId);
             if (ordineBean != null) {
                 String infoTavolo = ordinazioneBean.getInfoTavolo();
-                if (infoTavolo == null || ASPORTO.equalsIgnoreCase(infoTavolo)) {
+                if (infoTavolo == null || infoTavolo.trim().isEmpty() || ASPORTO.equalsIgnoreCase(infoTavolo)) {
                     this.nomeTavolo.setText(ASPORTO);
                 } else {
                     this.nomeTavolo.setText("Tavolo: " + infoTavolo);
