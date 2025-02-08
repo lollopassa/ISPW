@@ -26,6 +26,20 @@ public class DatabasePrenotazioneDao implements PrenotazioneDao {
     }
 
     @Override
+    public boolean exists(Integer id) {
+        String query = "SELECT COUNT(*) FROM prenotazione WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante la verifica dell'esistenza della prenotazione con ID: " + id);
+            return false;
+        }
+    }
+
+    @Override
     public Optional<Prenotazione> load(Integer id) {
         String query = "SELECT id, nomeCliente, orario, data, note, telefono, coperti FROM prenotazione WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -39,6 +53,64 @@ public class DatabasePrenotazioneDao implements PrenotazioneDao {
             LOGGER.log(Level.SEVERE, e, () -> "Errore durante il caricamento della prenotazione con ID: " + id);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public List<Prenotazione> getByData(LocalDate data) {
+        String query = "SELECT id, nomeCliente, orario, data, note, telefono, coperti FROM prenotazione WHERE data = ?";
+        List<Prenotazione> prenotazioni = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setDate(1, Date.valueOf(data));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    prenotazioni.add(mapResultSetToPrenotazione(rs));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, e, () -> String.format("Errore durante il recupero delle prenotazioni per la data: %s", data));
+        }
+        return prenotazioni;
+    }
+
+    @Override
+    public void delete(Integer id) {
+        String query = "DELETE FROM prenotazione WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                LOGGER.log(Level.WARNING, () -> "Nessuna prenotazione trovata con ID: " + id);
+            } else {
+                LOGGER.log(Level.INFO, () -> "Prenotazione con ID: " + id + " eliminata con successo");
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'eliminazione della prenotazione con ID: " + id);
+        }
+    }
+
+    @Override
+    public void update(Prenotazione prenotazione) {
+        String query = "UPDATE prenotazione " +
+                "SET nomeCliente = ?, orario = ?, data = ?, note = ?, telefono = ?, coperti = ? " +
+                "WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, prenotazione.getNomeCliente());
+            stmt.setTime(2, Time.valueOf(prenotazione.getOrario()));
+            stmt.setDate(3, Date.valueOf(prenotazione.getData()));
+            stmt.setString(4, prenotazione.getNote());
+            stmt.setString(5, prenotazione.getTelefono());
+            stmt.setInt(6, prenotazione.getCoperti());
+            stmt.setInt(7, prenotazione.getId());
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                LOGGER.log(Level.WARNING, () -> "Nessuna prenotazione trovata con ID: " + prenotazione.getId() + " per l'aggiornamento");
+            } else {
+                LOGGER.log(Level.INFO, () -> "Prenotazione con ID: " + prenotazione.getId() + " aggiornata con successo");
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'aggiornamento della prenotazione con ID: " + prenotazione.getId());
+        }
     }
 
     @Override
@@ -66,78 +138,6 @@ public class DatabasePrenotazioneDao implements PrenotazioneDao {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e, () -> "Errore durante il salvataggio della prenotazione");
-        }
-    }
-
-    @Override
-    public void delete(Integer id) {
-        String query = "DELETE FROM prenotazione WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) {
-                LOGGER.log(Level.WARNING, () -> "Nessuna prenotazione trovata con ID: " + id);
-            } else {
-                LOGGER.log(Level.INFO, () -> "Prenotazione con ID: " + id + " eliminata con successo");
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'eliminazione della prenotazione con ID: " + id);
-        }
-    }
-
-    @Override
-    public boolean exists(Integer id) {
-        String query = "SELECT COUNT(*) FROM prenotazione WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() && rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante la verifica dell'esistenza della prenotazione con ID: " + id);
-            return false;
-        }
-    }
-
-    @Override
-    public List<Prenotazione> getByData(LocalDate data) {
-        String query = "SELECT id, nomeCliente, orario, data, note, telefono, coperti FROM prenotazione WHERE data = ?";
-        List<Prenotazione> prenotazioni = new ArrayList<>();
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setDate(1, Date.valueOf(data));
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    prenotazioni.add(mapResultSetToPrenotazione(rs));
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> String.format("Errore durante il recupero delle prenotazioni per la data: %s", data));
-        }
-        return prenotazioni;
-    }
-
-    @Override
-    public void update(Prenotazione prenotazione) {
-        String query = "UPDATE prenotazione " +
-                "SET nomeCliente = ?, orario = ?, data = ?, note = ?, telefono = ?, coperti = ? " +
-                "WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, prenotazione.getNomeCliente());
-            stmt.setTime(2, Time.valueOf(prenotazione.getOrario()));
-            stmt.setDate(3, Date.valueOf(prenotazione.getData()));
-            stmt.setString(4, prenotazione.getNote());
-            stmt.setString(5, prenotazione.getTelefono());
-            stmt.setInt(6, prenotazione.getCoperti());
-            stmt.setInt(7, prenotazione.getId());
-
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) {
-                LOGGER.log(Level.WARNING, () -> "Nessuna prenotazione trovata con ID: " + prenotazione.getId() + " per l'aggiornamento");
-            } else {
-                LOGGER.log(Level.INFO, () -> "Prenotazione con ID: " + prenotazione.getId() + " aggiornata con successo");
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'aggiornamento della prenotazione con ID: " + prenotazione.getId());
         }
     }
 

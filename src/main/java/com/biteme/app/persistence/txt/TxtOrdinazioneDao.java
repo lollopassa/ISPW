@@ -25,6 +25,23 @@ public class TxtOrdinazioneDao implements OrdinazioneDao {
         currentId = calculateCurrentId();
     }
 
+
+    private void saveToFile() {
+        try {
+            Files.createDirectories(Paths.get("data"));
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Errore nella creazione della directory", e);
+        }
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
+            for (Ordinazione o : ordinazioni) {
+                bw.write(serialize(o));
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Errore durante il salvataggio delle ordinazioni", e);
+        }
+    }
+
     private List<Ordinazione> loadFromFile() {
         List<Ordinazione> list = new ArrayList<>();
         File file = new File(FILE_PATH);
@@ -44,23 +61,7 @@ public class TxtOrdinazioneDao implements OrdinazioneDao {
         }
         return list;
     }
-
-    private void saveToFile() {
-        try {
-            Files.createDirectories(Paths.get("data"));
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Errore nella creazione della directory", e);
-        }
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
-            for (Ordinazione o : ordinazioni) {
-                bw.write(serialize(o));
-                bw.newLine();
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Errore durante il salvataggio delle ordinazioni", e);
-        }
-    }
-
+    
     private int calculateCurrentId() {
         return ordinazioni.stream()
                 .mapToInt(Ordinazione::getId)

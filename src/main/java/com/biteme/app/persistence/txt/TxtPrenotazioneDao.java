@@ -26,23 +26,6 @@ public class TxtPrenotazioneDao implements PrenotazioneDao {
         currentId = calculateCurrentId();
     }
 
-    private List<Prenotazione> loadFromFile() {
-        List<Prenotazione> list = new ArrayList<>();
-        File file = new File(FILE_PATH);
-        if (!file.exists()) return list;
-
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                Prenotazione p = deserialize(line);
-                if (p != null) list.add(p);
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Errore durante il caricamento delle prenotazioni", e);
-        }
-        return list;
-    }
-
     private void saveToFile() {
         try {
             Files.createDirectories(Paths.get("data"));
@@ -69,6 +52,23 @@ public class TxtPrenotazioneDao implements PrenotazioneDao {
     @Override
     public Optional<Prenotazione> load(Integer id) {
         return prenotazioni.stream().filter(p -> p.getId() == id).findFirst();
+    }
+
+    private List<Prenotazione> loadFromFile() {
+        List<Prenotazione> list = new ArrayList<>();
+        File file = new File(FILE_PATH);
+        if (!file.exists()) return list;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                Prenotazione p = deserialize(line);
+                if (p != null) list.add(p);
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Errore durante il caricamento delle prenotazioni", e);
+        }
+        return list;
     }
 
     @Override
