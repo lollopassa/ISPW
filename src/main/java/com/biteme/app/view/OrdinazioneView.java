@@ -117,49 +117,95 @@ public class OrdinazioneView {
         String tavolo = tavoloField.getText().trim();
 
         // Validazione dei campi
-        if (nome.isEmpty()) {
-            showAlert(VALIDATION_ERROR, "Il campo Nome Cliente deve essere compilato.", Alert.AlertType.WARNING);
+        if (!validateFields(nome, tipoOrdine, orario, coperti, tavolo)) {
             return;
         }
-        if (tipoOrdine == null || tipoOrdine.isEmpty()) {
-            showAlert(VALIDATION_ERROR, "Seleziona un tipo di ordine: 'Al Tavolo' o 'Asporto'.", Alert.AlertType.WARNING);
-            return;
-        }
+
+        // Gestione degli ordini "Al Tavolo" e "Asporto"
         if ("Asporto".equals(tipoOrdine)) {
-            if (orario.isEmpty()) {
-                showAlert(VALIDATION_ERROR, "Il campo Orario deve essere compilato per Asporto.", Alert.AlertType.WARNING);
-                return;
-            }
-            if (!ordinazioneController.isValidTime(orario)) {
-                showAlert(VALIDATION_ERROR, "Il campo 'Orario' deve essere nel formato HH:mm (es. '12:20').", Alert.AlertType.ERROR);
-                return;
-            }
             coperti = "";
             tavolo = "";
         } else {
-            orario = java.time.LocalTime.now().toString().substring(0, 5);
-
+            orario = java.time.LocalTime.now().toString().substring(0, 5); // Imposta l'orario locale
         }
 
         // Crea il bean con i dati validati
+        OrdinazioneBean ordinazioneBean = createOrdinazione(nome, tipoOrdine, orario, coperti, tavolo);
+
+        try {
+            // Chiama il controller per creare l'ordine
+            ordinazioneController.creaOrdine(ordinazioneBean);
+            onSuccess(nome);
+        } catch (Exception e) {
+            showAlert(ERROR, "Si è verificato un errore durante la creazione dell'ordine: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    // Metodo per validare tutti i campi
+    private boolean validateFields(String nome, String tipoOrdine, String orario, String coperti, String tavolo) {
+        if (nome.isEmpty()) {
+            showAlert(VALIDATION_ERROR, "Il campo Nome Cliente deve essere compilato.", Alert.AlertType.WARNING);
+            return false;
+        }
+        if (tipoOrdine == null || tipoOrdine.isEmpty()) {
+            showAlert(VALIDATION_ERROR, "Seleziona un tipo di ordine: 'Al Tavolo' o 'Asporto'.", Alert.AlertType.WARNING);
+            return false;
+        }
+
+        if ("Al Tavolo".equals(tipoOrdine)) {
+            return validateAlTavoloFields(coperti, tavolo);
+        } else {
+            return validateAsportoFields(orario);
+        }
+    }
+
+    // Metodo specifico per validare i campi "Al Tavolo"
+    private boolean validateAlTavoloFields(String coperti, String tavolo) {
+        if (coperti.isEmpty()) {
+            showAlert(VALIDATION_ERROR, "Il numero di coperti è obbligatorio per gli ordini 'Al Tavolo'.", Alert.AlertType.WARNING);
+            return false;
+        }
+        if (!coperti.matches("\\d+")) { // Solo numeri interi
+            showAlert(VALIDATION_ERROR, "Il campo 'Numero di Coperti' deve contenere solo numeri interi.", Alert.AlertType.WARNING);
+            return false;
+        }
+        if (tavolo.isEmpty()) {
+            showAlert(VALIDATION_ERROR, "Il numero del tavolo è obbligatorio per gli ordini 'Al Tavolo'.", Alert.AlertType.WARNING);
+            return false;
+        }
+        return true;
+    }
+
+    // Metodo specifico per validare i campi "Asporto"
+    private boolean validateAsportoFields(String orario) {
+        if (orario.isEmpty()) {
+            showAlert(VALIDATION_ERROR, "Il campo Orario deve essere compilato per Asporto.", Alert.AlertType.WARNING);
+            return false;
+        }
+        if (!ordinazioneController.isValidTime(orario)) {
+            showAlert(VALIDATION_ERROR, "Il campo 'Orario' deve essere nel formato HH:mm (es. '12:20').", Alert.AlertType.ERROR);
+            return false;
+        }
+        return true;
+    }
+
+    // Metodo per creare il bean OrdinazioneBean
+    private OrdinazioneBean createOrdinazione(String nome, String tipoOrdine, String orario, String coperti, String tavolo) {
         OrdinazioneBean ordinazioneBean = new OrdinazioneBean();
         ordinazioneBean.setNome(nome);
         ordinazioneBean.setTipoOrdine(tipoOrdine);
         ordinazioneBean.setOrarioCreazione(orario);
         ordinazioneBean.setNumeroClienti(coperti);
         ordinazioneBean.setInfoTavolo(tavolo);
-
-        try {
-            // Chiama il controller per creare l'ordine
-            ordinazioneController.creaOrdine(ordinazioneBean);
-            showAlert(SUCCESS, "Ordine creato con successo per il cliente: " + nome, Alert.AlertType.INFORMATION);
-            clearFields();
-            refreshTable();
-        } catch (Exception e) {
-            showAlert(ERROR, "Si è verificato un errore durante la creazione dell'ordine: " + e.getMessage(), Alert.AlertType.ERROR);
-        }
+        return ordinazioneBean;
     }
 
+    // Metodo per gestire il successo della creazione dell'ordine
+    private void onSuccess(String nome) {
+        showAlert(SUCCESS, "Ordine creato con successo per il cliente: " + nome, Alert.AlertType.INFORMATION);
+        clearFields();
+        refreshTable();
+    }
     public static OrdinazioneBean getOrdineSelezionato() {
         return ordineSelezionato;
     }
