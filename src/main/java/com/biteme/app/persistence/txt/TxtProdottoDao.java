@@ -82,6 +82,13 @@ public class TxtProdottoDao implements ProdottoDao {
     }
 
     @Override
+    public List<Prodotto> getByDisponibilita(boolean disponibilita) {
+        return prodotti.stream()
+                .filter(p -> p.isDisponibile() == disponibilita)
+                .toList();
+    }
+
+    @Override
     public void delete(Integer id) {
         prodotti.removeIf(p -> p.getId() == id);
         saveToFile();
@@ -90,25 +97,6 @@ public class TxtProdottoDao implements ProdottoDao {
     @Override
     public boolean exists(Integer id) {
         return prodotti.stream().anyMatch(p -> p.getId() == id);
-    }
-
-    @Override
-    public List<Prodotto> getByCategoria(String categoria) {
-        return prodotti.stream()
-                .filter(p -> p.getCategoria().name().equalsIgnoreCase(categoria))
-                .toList();
-    }
-
-    @Override
-    public List<Prodotto> getByDisponibilita(boolean disponibilita) {
-        return prodotti.stream()
-                .filter(p -> p.isDisponibile() == disponibilita)
-                .toList();
-    }
-
-    @Override
-    public List<Prodotto> getAll() {
-        return new ArrayList<>(prodotti);
     }
 
     @Override
@@ -129,12 +117,25 @@ public class TxtProdottoDao implements ProdottoDao {
         saveToFile();
     }
 
+    @Override
+    public List<Prodotto> getAll() {
+        return new ArrayList<>(prodotti);
+    }
+
+
     private String serialize(Prodotto p) {
         return p.getId() + DELIMITER_OUT +
                 p.getNome() + DELIMITER_OUT +
                 p.getPrezzo().toPlainString() + DELIMITER_OUT +
                 p.getCategoria().name() + DELIMITER_OUT +
                 p.isDisponibile();
+    }
+
+    @Override
+    public List<Prodotto> getByCategoria(String categoria) {
+        return prodotti.stream()
+                .filter(p -> p.getCategoria().name().equalsIgnoreCase(categoria))
+                .toList();
     }
 
     private Prodotto deserialize(String line) {
