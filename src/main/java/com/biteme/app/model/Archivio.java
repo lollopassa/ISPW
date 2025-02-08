@@ -24,41 +24,44 @@ public class Archivio {
         this.dataArchiviazione = dataArchiviazione;
     }
 
-    // Getter e Setter per ciascun campo
     public int getIdOrdine() {
         return idOrdine;
-    }
-
-    public void setIdOrdine(int idOrdine) {
-        this.idOrdine = idOrdine;
     }
 
     public List<String> getProdotti() {
         return prodotti;
     }
 
-    public void setProdotti(List<String> prodotti) {
-        this.prodotti = prodotti;
-    }
-
     public List<Integer> getQuantita() {
         return quantita;
-    }
-
-    public void setQuantita(List<Integer> quantita) {
-        this.quantita = quantita;
     }
 
     public BigDecimal getTotale() {
         return totale;
     }
 
-    public void setTotale(BigDecimal totale) {
-        this.totale = totale;
-    }
-
     public LocalDateTime getDataArchiviazione() {
         return dataArchiviazione;
+    }
+
+
+    public void setIdOrdine(int idOrdine) {
+        this.idOrdine = idOrdine;
+    }
+
+
+    public void setProdotti(List<String> prodotti) {
+        this.prodotti = prodotti;
+    }
+
+
+
+    public void setQuantita(List<Integer> quantita) {
+        this.quantita = quantita;
+    }
+
+    public void setTotale(BigDecimal totale) {
+        this.totale = totale;
     }
 
     public void setDataArchiviazione(LocalDateTime dataArchiviazione) {

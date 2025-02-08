@@ -70,12 +70,6 @@ public class TxtArchivioDao implements ArchivioDao {
                 .orElse(0) + 1;
     }
 
-    @Override
-    public Optional<Archivio> load(Integer id) {
-        return archivi.stream()
-                .filter(a -> a.getIdOrdine() == id)
-                .findFirst();
-    }
 
     @Override
     public void store(Archivio archivio) {
@@ -109,6 +103,13 @@ public class TxtArchivioDao implements ArchivioDao {
         return archivi.stream()
                 .filter(a -> !a.getDataArchiviazione().isBefore(startDate) && !a.getDataArchiviazione().isAfter(endDate))
                 .toList();
+    }
+
+    @Override
+    public Optional<Archivio> load(Integer id) {
+        return archivi.stream()
+                .filter(a -> a.getIdOrdine() == id)
+                .findFirst();
     }
 
     private String serialize(Archivio a) {
