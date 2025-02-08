@@ -13,7 +13,7 @@
             <Rectangle fill="#303d68" height="120" width="1440" />
 
             <!-- Pulsante Indietro -->
-            <Button onAction="#handleIndietro" prefHeight="40" prefWidth="100" style="-fx-font-size: 16px; -fx-background-color: #e02189; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5px;" text="Indietro" StackPane.alignment="CENTER_LEFT">
+            <Button onAction="#handleIndietro" prefHeight="40" prefWidth="100" style="-fx-font-size: 16px; -fx-background-color: #e02189; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5px; -fx-cursor: hand;" text="Indietro" StackPane.alignment="CENTER_LEFT">
                 <StackPane.margin>
                     <Insets left="15" />
                 </StackPane.margin>
@@ -28,13 +28,13 @@
 
             <!-- Pulsante Salva -->
             <Button text="Salva" onAction="#handleSalva"
-                    style="-fx-font-size: 16px; -fx-background-color: #e02189; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5px;"
+                    style="-fx-font-size: 16px; -fx-background-color: #e02189; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5px; -fx-cursor: hand;"
                     prefHeight="40" prefWidth="100"
                     AnchorPane.rightAnchor="150" AnchorPane.bottomAnchor="40" />
 
             <!-- Pulsante Checkout -->
             <Button text="Checkout" onAction="#handleCheckout"
-                    style="-fx-font-size: 16px; -fx-background-color: #e02189; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5px;"
+                    style="-fx-font-size: 16px; -fx-background-color: #e02189; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5px; -fx-cursor: hand;"
                     prefHeight="40" prefWidth="100"
                     AnchorPane.rightAnchor="25" AnchorPane.bottomAnchor="40" />
         </AnchorPane>
@@ -44,17 +44,15 @@
     <left>
         <VBox alignment="CENTER" prefWidth="200" spacing="10" style="-fx-background-color: #f4f4f4;">
             <!-- Pulsanti delle categorie con azioni associate -->
-            <Button onAction="#handleCategoriaBevande" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" text="Bevande" />
-            <Button onAction="#handleCategoriaAntipasti" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" text="Antipasti" />
-            <Button onAction="#handleCategoriaPizze" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" text="Pizze" />
-            <Button onAction="#handleCategoriaPrimiPiatti" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" text="Primi Piatti" />
-            <Button onAction="#handleCategoriaSecondiPiatti" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" text="Secondi Piatti" />
-            <Button onAction="#handleCategoriaContorni" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" text="Contorni" />
-            <Button onAction="#handleCategoriaDolci" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white;" text="Dolci" />
+            <Button onAction="#handleCategoriaBevande" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white; -fx-cursor: hand;" text="Bevande" />
+            <Button onAction="#handleCategoriaAntipasti" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white; -fx-cursor: hand;" text="Antipasti" />
+            <Button onAction="#handleCategoriaPizze" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white; -fx-cursor: hand;" text="Pizze" />
+            <Button onAction="#handleCategoriaPrimiPiatti" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white; -fx-cursor: hand;" text="Primi Piatti" />
+            <Button onAction="#handleCategoriaSecondiPiatti" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white; -fx-cursor: hand;" text="Secondi Piatti" />
+            <Button onAction="#handleCategoriaContorni" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white; -fx-cursor: hand;" text="Contorni" />
+            <Button onAction="#handleCategoriaDolci" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white; -fx-cursor: hand;" text="Dolci" />
         </VBox>
     </left>
-
-
 
     <!-- Parte Centrale con i Prodotti -->
     <center>
@@ -67,14 +65,15 @@
                 <VBox>
                     <!-- Spaziatura in alto tramite un altro Region -->
                     <Region prefHeight="20" /> <!-- Spostamento verso il basso -->
-                    <FlowPane fx:id="flowPaneProdotti" hgap="20" vgap="20">                        <!-- Esempio di prodotto -->
+                    <FlowPane fx:id="flowPaneProdotti" hgap="20" vgap="20">
+                        <!-- Esempio di prodotto -->
                         <VBox alignment="CENTER" prefHeight="150" prefWidth="150" spacing="10" style="-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, lightgray, 10, 0, 3, 3);">
                             <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Prodotto 1" />
                             <Label style="-fx-font-size: 14px; -fx-text-fill: gray;" text="Quantità" />
                             <HBox alignment="CENTER" spacing="10">
-                                <Button prefHeight="30" prefWidth="30" text="-" />
+                                <Button prefHeight="30" prefWidth="30" style="-fx-cursor: hand;" text="-" />
                                 <Label fx:id="quantitaProdotto1" style="-fx-font-size: 14px;" text="0" />
-                                <Button prefHeight="30" prefWidth="30" text="+" />
+                                <Button prefHeight="30" prefWidth="30" style="-fx-cursor: hand;" text="+" />
                             </HBox>
                         </VBox>
 
@@ -83,51 +82,34 @@
                             <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Prodotto 2" />
                             <Label style="-fx-font-size: 14px; -fx-text-fill: gray;" text="Quantità" />
                             <HBox alignment="CENTER" spacing="10">
-                                <Button prefHeight="30" prefWidth="30" text="-" />
+                                <Button prefHeight="30" prefWidth="30" style="-fx-cursor: hand;" text="-" />
                                 <Label fx:id="quantitaProdotto2" style="-fx-font-size: 14px;" text="0" />
-                                <Button prefHeight="30" prefWidth="30" text="+" />
+                                <Button prefHeight="30" prefWidth="30" style="-fx-cursor: hand;" text="+" />
                             </HBox>
                         </VBox>
-
-                        <!-- Aggiungere altri rettangoli come necessario -->
                     </FlowPane>
                 </VBox>
             </HBox>
         </ScrollPane>
     </center>
 
-
     <!-- Colonna Destra per il Riepilogo -->
     <right>
-        <VBox alignment="TOP_CENTER" prefWidth="400" spacing="10" style="-fx-background-color: #e8e8e8; -fx-padding: 5;"> <!-- Padding uniforme -->
-
-            <!-- Contenuto -->
+        <VBox alignment="TOP_CENTER" prefWidth="400" spacing="10" style="-fx-background-color: #e8e8e8; -fx-padding: 5;">
             <Label fx:id="nomeTavolo" style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Tavolo 1" />
-
-            <!-- Titolo delle colonne -->
-            <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 3;"> <!-- Leggero padding -->
+            <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 3;">
                 <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="DESCRIZIONE" />
-                <Pane HBox.hgrow="ALWAYS" /> <!-- Spazio flessibile -->
+                <Pane HBox.hgrow="ALWAYS" />
                 <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="EURO" />
             </HBox>
-
             <Separator />
-
-            <!-- Scorrimento per il contenuto dinamico -->
             <ScrollPane fitToHeight="true" fitToWidth="true">
-                <VBox fx:id="riepilogoContenuto" spacing="10">
-
-                </VBox>
+                <VBox fx:id="riepilogoContenuto" spacing="10"></VBox>
             </ScrollPane>
-
             <Separator />
-
-            <!-- Totale in fondo: TOTALE EURO -->
-            <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 5;"> <!-- Leggero padding -->
-                <!-- Colonna Descrizione per la scritta 'Totale' -->
+            <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 5;">
                 <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="TOTALE EURO" />
-                <Pane HBox.hgrow="ALWAYS" /> <!-- Spazio flessibile -->
-                <!-- Colonna Euro per il totale -->
+                <Pane HBox.hgrow="ALWAYS" />
                 <Label fx:id="totaleOrdine" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="" />
             </HBox>
         </VBox>

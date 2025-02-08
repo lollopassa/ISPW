@@ -4,6 +4,7 @@ import com.biteme.app.bean.OrdineBean;
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.controller.OrdineController;
 import com.biteme.app.controller.ProdottoController;
+import com.biteme.app.exception.ProdottoException;
 
 import java.util.List;
 import java.util.Scanner;
@@ -115,13 +116,14 @@ public class OrdineCLI {
     private static void aggiungiProdotto(Scanner scanner, OrdineBean ordineBean) {
         System.out.print("Inserisci il nome del prodotto da aggiungere: ");
         String nomeProdottoInput = scanner.nextLine();
-        // Normalizza l'input: rimuove spazi superflui
         String nomeProdotto = nomeProdottoInput.trim();
 
-        // Recupera il ProdottoBean tramite il ProdottoController
-        ProdottoBean prodotto = prodottoController.getProdottoByNome(nomeProdotto);
-        if (prodotto == null) {
-            System.out.println("Prodotto non trovato per il nome: " + nomeProdotto);
+        ProdottoBean prodotto;
+        try {
+            // Prova a recuperare il prodotto; se non esiste viene lanciata un'eccezione
+            prodotto = prodottoController.getProdottoByNome(nomeProdotto);
+        } catch (ProdottoException e) {
+            System.out.println("Errore: " + e.getMessage());
             return;
         }
 
@@ -132,7 +134,6 @@ public class OrdineCLI {
                 System.out.println("La quantità deve essere maggiore di zero.");
                 return;
             }
-            // Aggiungi il nome del prodotto (ottenuto dal ProdottoBean) nell'OrdineBean
             ordineBean.getProdotti().add(prodotto.getNome());
             ordineBean.getQuantita().add(qty);
             System.out.println("Prodotto aggiunto: " + prodotto.getNome() + " - Quantità: " + qty);

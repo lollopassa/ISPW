@@ -235,7 +235,7 @@ public class OrdineView {
     private Button creaBottoneMeno(Label quantitaLabel, ProdottoBean prodotto) {
         Button meno = new Button("-");
         meno.setPrefSize(30, 30);
-        meno.setStyle("-fx-text-fill: red; -fx-font-weight: bold; -fx-font-size: 16px;");
+        meno.setStyle("-fx-text-fill: red; -fx-font-weight: bold; -fx-font-size: 16px;-fx-cursor: hand;");
         meno.setOnAction(event -> {
             int quantitaAttuale = Integer.parseInt(quantitaLabel.getText());
             if (quantitaAttuale > 0) {
@@ -268,7 +268,7 @@ public class OrdineView {
     private Button creaBottonePiu(Label quantitaLabel, ProdottoBean prodotto) {
         Button piu = new Button("+");
         piu.setPrefSize(30, 30);
-        piu.setStyle("-fx-text-fill: green; -fx-font-weight: bold; -fx-font-size: 16px;");
+        piu.setStyle("-fx-text-fill: green; -fx-font-weight: bold; -fx-font-size: 16px;-fx-cursor: hand;");
         piu.setOnAction(event -> {
             aumentaQuantita(quantitaLabel);
             aggiornaRiepilogo(prodotto.getNome(), prodotto.getPrezzo().doubleValue(), 1);
