@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 public class Configuration {
     private static final Logger logger = Logger.getLogger(Configuration.class.getName());
     private static final Properties properties = new Properties();
-    private static String persistenceMode = "in memory";
+    private static String persistenceMode = "database"; // Default: "in memory" oppure "database" oppure "txt"
 
     static {
         try (InputStream input = Configuration.class.getClassLoader().getResourceAsStream("config.properties")) {
@@ -50,6 +50,6 @@ public class Configuration {
     }
 
     public static String getUiMode() {
-        return properties.getProperty("ui.mode", "fx").toLowerCase(); // Default: "fx"
+        return properties.getProperty("ui.mode", "fx").toLowerCase(); // Default: "fx" oppure "cli"
     }
 }
