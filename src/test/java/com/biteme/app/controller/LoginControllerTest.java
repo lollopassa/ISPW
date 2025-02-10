@@ -14,6 +14,8 @@ import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+//@author Lorenzo Passacantilli
+
 class LoginControllerTest {
 
     private LoginController controller;
@@ -36,29 +38,32 @@ class LoginControllerTest {
     @AfterEach
     void tearDown() {
         // Se si usa la persistenza in memory, pulisci lo storage.
-        // Per txt e database non si svuota l'intero archivio per non eliminare dati persistenti.
+        // Per txt e database, elimino direttamente l'utente di test.
         if (Configuration.getPersistenceProvider().getDaoFactory()
                 instanceof com.biteme.app.persistence.inmemory.InMemoryDaoFactory) {
             Storage.getInstance().getUsers().clear();
+        } else {
+            // Proviamo a eliminare direttamente l'utente di test (username "testuser").
+            // Se l'utente non esiste, ignoriamo l'eccezione.
+            try {
+                userDao.delete("testuser");
+            } catch (Exception e) {
+                // Ignora eventuali errori, l'importante è che il test non lasci dati residui.
+            }
         }
+        // Pulisco la sessione utente
         UserSession.clear();
     }
 
     @Test
     void testAuthenticateUserSuccess() {
-        // Controlla se esiste già un utente con l'email "test@example.com"
-        // Se esiste, lo elimina tramite il delete (utilizzando il campo username come chiave).
-        userDao.load("test@example.com").ifPresent(existingUser ->
-                userDao.delete(existingUser.getUsername())
-        );
-
         // Creiamo un utente: la password viene passata in chiaro,
         // il sistema si occuperà dell'hashing quando verificherà l'autenticazione.
         String password = "password123";
         User user = new User("testuser", "test@example.com", password, UserRole.CAMERIERE);
         user.setGoogleUser(false);
 
-        // Salviamo l'utente tramite la DAO generica (la stessa iniettata nel controller)
+        // Salviamo l'utente tramite la DAO (già iniettata nel controller)
         userDao.store(user);
 
         // Creiamo un LoginBean con le credenziali in chiaro
