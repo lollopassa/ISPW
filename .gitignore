@@ -1,6 +1,9 @@
 # ide
 .idea
 
+# data
+data
+
 # target
 target/
 
