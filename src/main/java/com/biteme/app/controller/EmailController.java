@@ -3,8 +3,8 @@ package com.biteme.app.controller;
 import com.biteme.app.bean.EmailBean;
 import com.biteme.app.bean.PrenotazioneBean;
 import com.biteme.app.exception.GoogleAuthException;
-import com.biteme.app.service.GmailEmailSender;
-import com.biteme.app.util.GoogleAuthUtility;
+import com.biteme.app.google.GmailEmailSender;
+import com.biteme.app.google.GoogleAuthUtility;
 import javax.mail.MessagingException;
 import java.io.IOException;
 

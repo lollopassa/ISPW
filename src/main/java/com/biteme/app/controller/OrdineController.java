@@ -8,7 +8,7 @@ import com.biteme.app.model.Prodotto;
 import com.biteme.app.model.StatoOrdine;
 import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
-import com.biteme.app.util.Configuration;
+import com.biteme.app.persistence.Configuration;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;

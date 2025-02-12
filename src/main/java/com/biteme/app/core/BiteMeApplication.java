@@ -1,7 +1,7 @@
 package com.biteme.app.core;
 
 import com.biteme.app.cli.LoginCLI;
-import com.biteme.app.util.Configuration;
+import com.biteme.app.persistence.Configuration;
 import com.biteme.app.util.SceneLoader;
 import javafx.application.Application;
 import javafx.stage.Stage;

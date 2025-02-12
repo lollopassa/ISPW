@@ -5,7 +5,7 @@ import com.biteme.app.exception.ValidationException;
 import com.biteme.app.model.Prenotazione;
 import com.biteme.app.persistence.PrenotazioneDao;
 import com.biteme.app.persistence.inmemory.Storage; // Utilizzato solo se la persistenza è in memory
-import com.biteme.app.util.Configuration;
+import com.biteme.app.persistence.Configuration;
 import org.junit.jupiter.api.*;
 
 import java.lang.reflect.Field;

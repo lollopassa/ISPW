@@ -7,7 +7,7 @@ import com.biteme.app.model.StatoOrdine;
 import com.biteme.app.model.TipoOrdine;
 import com.biteme.app.persistence.OrdinazioneDao;
 import com.biteme.app.persistence.inmemory.Storage; // Utilizzato solo per il cleanup in modalità in memory
-import com.biteme.app.util.Configuration;
+import com.biteme.app.persistence.Configuration;
 import org.junit.jupiter.api.*;
 
 import java.lang.reflect.Field;

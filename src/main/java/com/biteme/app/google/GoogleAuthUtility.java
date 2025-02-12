@@ -1,7 +1,8 @@
-package com.biteme.app.util;
+package com.biteme.app.google;
 
 import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.exception.ServerInitializationException;
+import com.biteme.app.persistence.Configuration;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;

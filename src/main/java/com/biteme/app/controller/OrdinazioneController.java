@@ -7,7 +7,7 @@ import com.biteme.app.model.Ordinazione;
 import com.biteme.app.model.StatoOrdine;
 import com.biteme.app.model.TipoOrdine;
 import com.biteme.app.persistence.OrdinazioneDao;
-import com.biteme.app.util.Configuration;
+import com.biteme.app.persistence.Configuration;
 import com.biteme.app.util.SceneLoader;
 import com.biteme.app.view.OrdinazioneView;
 import java.util.ArrayList;

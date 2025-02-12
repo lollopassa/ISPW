@@ -36,4 +36,6 @@ module demo {
     opens com.biteme.app.view to javafx.fxml;
     exports com.biteme.app.bean;
     opens com.biteme.app.bean to javafx.fxml;
+    exports com.biteme.app.google;
+    opens com.biteme.app.google to javafx.fxml;
 }

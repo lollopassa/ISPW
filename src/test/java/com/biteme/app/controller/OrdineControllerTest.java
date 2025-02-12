@@ -11,7 +11,7 @@ import com.biteme.app.model.TipoOrdine;
 import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.persistence.OrdinazioneDao;
-import com.biteme.app.util.Configuration;
+import com.biteme.app.persistence.Configuration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -4,7 +4,7 @@ import com.biteme.app.bean.PrenotazioneBean;
 import com.biteme.app.exception.ValidationException;
 import com.biteme.app.model.Prenotazione;
 import com.biteme.app.persistence.PrenotazioneDao;
-import com.biteme.app.util.Configuration;
+import com.biteme.app.persistence.Configuration;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

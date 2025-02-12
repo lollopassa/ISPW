@@ -5,7 +5,7 @@ import com.biteme.app.exception.ProdottoException;
 import com.biteme.app.model.Prodotto;
 import com.biteme.app.model.Categoria;
 import com.biteme.app.persistence.ProdottoDao;
-import com.biteme.app.util.Configuration;
+import com.biteme.app.persistence.Configuration;
 
 import java.math.BigDecimal;
 import java.util.List;

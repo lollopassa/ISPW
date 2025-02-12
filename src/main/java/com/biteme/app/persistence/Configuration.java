@@ -1,6 +1,5 @@
-package com.biteme.app.util;
+package com.biteme.app.persistence;
 
-import com.biteme.app.persistence.PersistenceProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -10,7 +9,7 @@ import java.util.logging.Logger;
 public class Configuration {
     private static final Logger logger = Logger.getLogger(Configuration.class.getName());
     private static final Properties properties = new Properties();
-    private static String persistenceMode = "in memory"; // Default: "in memory" oppure "database" oppure "txt"
+    private static String persistenceMode = "database"; // Default: "in memory" oppure "database" oppure "txt"
 
     static {
         try (InputStream input = Configuration.class.getClassLoader().getResourceAsStream("config.properties")) {

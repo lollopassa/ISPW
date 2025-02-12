@@ -1,4 +1,4 @@
-package com.biteme.app.service;
+package com.biteme.app.google;
 
 import com.google.api.services.gmail.model.Message;
 import java.io.ByteArrayOutputStream;

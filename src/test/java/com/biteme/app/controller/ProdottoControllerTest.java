@@ -6,7 +6,7 @@ import com.biteme.app.model.Prodotto;
 import com.biteme.app.model.Categoria;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.persistence.inmemory.Storage;
-import com.biteme.app.util.Configuration;
+import com.biteme.app.persistence.Configuration;
 import org.junit.jupiter.api.*;
 
 import java.lang.reflect.Field;
