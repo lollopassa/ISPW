@@ -218,7 +218,7 @@ public class OrdinazioneView {
     private void modificaOrdine() {
         OrdinazioneBean ordinazione = ordinazioniTableView.getSelectionModel().getSelectedItem();
         if (ordinazione == null) {
-            showAlert(ERROR, "Seleziona un ordine da modificare.", Alert.AlertType.WARNING);
+            showAlert(ERROR, "Seleziona un ordinazione da modificare.", Alert.AlertType.WARNING);
             return;
         }
         OrdinazioneBean ordine = new OrdinazioneBean();

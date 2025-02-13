@@ -1,6 +1,7 @@
 package com.biteme.app.cli;
 
 import com.biteme.app.controller.LoginController;
+import com.biteme.app.util.CLIUtils;
 
 public class MenuCLI {
 

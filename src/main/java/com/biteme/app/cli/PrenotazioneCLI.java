@@ -8,6 +8,7 @@ import com.biteme.app.bean.EmailBean;
 import com.biteme.app.bean.PrenotazioneBean;
 import com.biteme.app.controller.EmailController;
 import com.biteme.app.controller.PrenotazioneController;
+import com.biteme.app.util.CLIUtils;
 
 public class PrenotazioneCLI {
 

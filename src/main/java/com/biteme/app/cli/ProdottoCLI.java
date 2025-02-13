@@ -5,6 +5,7 @@ import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.controller.LoginController;
 import com.biteme.app.controller.ProdottoController;
 import com.biteme.app.exception.ProdottoException;
+import com.biteme.app.util.CLIUtils;
 
 public class ProdottoCLI {
 

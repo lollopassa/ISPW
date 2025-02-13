@@ -2,6 +2,7 @@ package com.biteme.app.cli;
 
 import com.biteme.app.bean.SignupBean;
 import com.biteme.app.controller.SignupController;
+import com.biteme.app.util.CLIUtils;
 
 public class SignupCLI {
 
