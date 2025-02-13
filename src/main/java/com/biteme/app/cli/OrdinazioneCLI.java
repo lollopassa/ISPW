@@ -6,6 +6,7 @@ import java.util.Scanner;
 import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.controller.ArchivioController;
 import com.biteme.app.controller.OrdinazioneController;
+import com.biteme.app.util.CLIUtils;
 
 public class OrdinazioneCLI {
     private static final OrdinazioneController ORDINAZIONE_CONTROLLER = new OrdinazioneController();

@@ -1,4 +1,4 @@
-package com.biteme.app.cli;
+package com.biteme.app.util;
 
 import java.util.Scanner;
 
