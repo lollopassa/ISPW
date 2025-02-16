@@ -152,5 +152,5 @@ public class PrenotazioneController {
         } catch (Exception e) {
             throw new IllegalArgumentException("Errore durante l'invio dell'email di conferma: " + e.getMessage());
         }
-    }git add
+    }
 }
