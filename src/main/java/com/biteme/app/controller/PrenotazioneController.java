@@ -150,7 +150,7 @@ public class PrenotazioneController {
             emailBean.setDestinatario(bean.getEmail());
             emailController.sendEmail(emailBean);
         } catch (Exception e) {
-            System.err.println("Errore durante l'invio dell'email di conferma: " + e.getMessage());
+            throw new IllegalArgumentException("Errore durante l'invio dell'email di conferma: " + e.getMessage());
         }
-    }
+    }git add
 }
