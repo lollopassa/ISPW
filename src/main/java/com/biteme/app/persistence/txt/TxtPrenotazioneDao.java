@@ -114,7 +114,7 @@ public class TxtPrenotazioneDao implements PrenotazioneDao {
                 p.getOrario() + DELIMITER_OUT +
                 dataStr + DELIMITER_OUT +
                 (p.getNote() == null ? "" : p.getNote()) + DELIMITER_OUT +
-                (p.getTelefono() == null ? "" : p.getTelefono()) + DELIMITER_OUT +
+                (p.getEmail() == null ? "" : p.getEmail()) + DELIMITER_OUT +
                 p.getCoperti();
     }
 
@@ -129,9 +129,9 @@ public class TxtPrenotazioneDao implements PrenotazioneDao {
             LocalTime orario = LocalTime.parse(parts[2]);
             LocalDate data = LocalDate.parse(parts[3], DateTimeFormatter.ISO_LOCAL_DATE);
             String note = parts[4];
-            String telefono = parts[5];
+            String email = parts[5];
             int coperti = Integer.parseInt(parts[6]);
-            return new Prenotazione(id, nomeCliente, orario, data, note, telefono, coperti);
+            return new Prenotazione(id, nomeCliente, orario, data, note, email, coperti);
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Errore nella deserializzazione della riga: {0}", line);
             return null;

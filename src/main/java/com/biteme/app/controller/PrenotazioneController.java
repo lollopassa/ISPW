@@ -1,5 +1,6 @@
 package com.biteme.app.controller;
 
+import com.biteme.app.bean.EmailBean;
 import com.biteme.app.bean.PrenotazioneBean;
 import com.biteme.app.exception.ValidationException;
 import com.biteme.app.model.Prenotazione;
@@ -14,15 +15,17 @@ import java.util.List;
 public class PrenotazioneController {
 
     private final PrenotazioneDao prenotazioneDao;
+    private final EmailController emailController;
 
     public PrenotazioneController() {
         this.prenotazioneDao = Configuration.getPersistenceProvider()
                 .getDaoFactory()
                 .getPrenotazioneDao();
+        this.emailController = new EmailController();
     }
 
-    public void creaPrenotazione(String nomeCliente, String orarioStr, LocalDate data, String telefono, String note, String copertiStr) {
-        validazioneCampi(nomeCliente, orarioStr, data, telefono, copertiStr);
+    public void creaPrenotazione(String nomeCliente, String orarioStr, LocalDate data, String email, String note, String copertiStr) {
+        validazioneCampi(nomeCliente, orarioStr, data, email, copertiStr);
 
         LocalTime orario = parseOrario(orarioStr);
         int coperti = parseCoperti(copertiStr);
@@ -31,11 +34,17 @@ public class PrenotazioneController {
         bean.setNomeCliente(nomeCliente);
         bean.setOrario(orario);
         bean.setData(data);
-        bean.setTelefono(telefono);
+        bean.setEmail(email);
         bean.setNote(note);
         bean.setCoperti(coperti);
 
-        prenotazioneDao.store(convertToEntity(bean));
+        Prenotazione entity = convertToEntity(bean);
+        prenotazioneDao.store(entity);
+        bean.setId(entity.getId());
+
+        if(email != null && !email.isEmpty()) {
+            inviaEmailConferma(bean);
+        }
     }
 
     public List<PrenotazioneBean> getPrenotazioniByData(LocalDate data) {
@@ -44,8 +53,8 @@ public class PrenotazioneController {
                 .toList();
     }
 
-    public PrenotazioneBean modificaPrenotazione(int id, String nomeCliente, String orarioStr, LocalDate data, String telefono, String note, String copertiStr) {
-        validazioneCampi(nomeCliente, orarioStr, data, telefono, copertiStr);
+    public PrenotazioneBean modificaPrenotazione(int id, String nomeCliente, String orarioStr, LocalDate data, String email, String note, String copertiStr) {
+        validazioneCampi(nomeCliente, orarioStr, data, email, copertiStr);
 
         LocalTime orario = parseOrario(orarioStr);
         int coperti = parseCoperti(copertiStr);
@@ -55,15 +64,19 @@ public class PrenotazioneController {
         bean.setNomeCliente(nomeCliente);
         bean.setOrario(orario);
         bean.setData(data);
-        bean.setTelefono(telefono);
+        bean.setEmail(email);
         bean.setNote(note);
         bean.setCoperti(coperti);
 
         prenotazioneDao.update(convertToEntity(bean));
+
+        if(email != null && !email.isEmpty()) {
+            inviaEmailConferma(bean);
+        }
         return bean;
     }
 
-    private void validazioneCampi(String nomeCliente, String orarioStr, LocalDate data, String telefono, String copertiStr) {
+    private void validazioneCampi(String nomeCliente, String orarioStr, LocalDate data, String email, String copertiStr) {
         if (nomeCliente == null || nomeCliente.trim().isEmpty()) {
             throw new ValidationException("Il nome del cliente non può essere vuoto.");
         }
@@ -76,8 +89,8 @@ public class PrenotazioneController {
         if (copertiStr == null || copertiStr.trim().isEmpty()) {
             throw new ValidationException("Inserisci il numero di coperti.");
         }
-        if (telefono != null && !telefono.isEmpty() && !telefono.matches("\\d+")) {
-            throw new ValidationException("Il telefono deve contenere solo numeri.");
+        if (email != null && !email.isEmpty() && !email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,7}$")) {
+            throw new ValidationException("Formato email non valido.");
         }
     }
 
@@ -106,7 +119,7 @@ public class PrenotazioneController {
                 bean.getOrario(),
                 bean.getData(),
                 bean.getNote(),
-                bean.getTelefono(),
+                bean.getEmail(),
                 bean.getCoperti()
         );
     }
@@ -118,7 +131,7 @@ public class PrenotazioneController {
         bean.setData(entity.getData());
         bean.setOrario(entity.getOrario());
         bean.setNote(entity.getNote());
-        bean.setTelefono(entity.getTelefono());
+        bean.setEmail(entity.getEmail());
         bean.setCoperti(entity.getCoperti());
         return bean;
     }
@@ -128,6 +141,16 @@ public class PrenotazioneController {
             prenotazioneDao.delete(id);
         } else {
             throw new IllegalArgumentException("La prenotazione con ID " + id + " non esiste.");
+        }
+    }
+
+    private void inviaEmailConferma(PrenotazioneBean bean) {
+        try {
+            EmailBean emailBean = emailController.composeEmailFromPrenotazione(bean);
+            emailBean.setDestinatario(bean.getEmail());
+            emailController.sendEmail(emailBean);
+        } catch (Exception e) {
+            System.err.println("Errore durante l'invio dell'email di conferma: " + e.getMessage());
         }
     }
 }

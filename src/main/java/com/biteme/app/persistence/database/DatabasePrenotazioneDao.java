@@ -41,7 +41,7 @@ public class DatabasePrenotazioneDao implements PrenotazioneDao {
 
     @Override
     public Optional<Prenotazione> load(Integer id) {
-        String query = "SELECT id, nomeCliente, orario, data, note, telefono, coperti FROM prenotazione WHERE id = ?";
+        String query = "SELECT id, nomeCliente, orario, data, note, email, coperti FROM prenotazione WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -57,7 +57,7 @@ public class DatabasePrenotazioneDao implements PrenotazioneDao {
 
     @Override
     public List<Prenotazione> getByData(LocalDate data) {
-        String query = "SELECT id, nomeCliente, orario, data, note, telefono, coperti FROM prenotazione WHERE data = ?";
+        String query = "SELECT id, nomeCliente, orario, data, note, email, coperti FROM prenotazione WHERE data = ?";
         List<Prenotazione> prenotazioni = new ArrayList<>();
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setDate(1, Date.valueOf(data));
@@ -91,14 +91,14 @@ public class DatabasePrenotazioneDao implements PrenotazioneDao {
     @Override
     public void update(Prenotazione prenotazione) {
         String query = "UPDATE prenotazione " +
-                "SET nomeCliente = ?, orario = ?, data = ?, note = ?, telefono = ?, coperti = ? " +
+                "SET nomeCliente = ?, orario = ?, data = ?, note = ?, email = ?, coperti = ? " +
                 "WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, prenotazione.getNomeCliente());
             stmt.setTime(2, Time.valueOf(prenotazione.getOrario()));
             stmt.setDate(3, Date.valueOf(prenotazione.getData()));
             stmt.setString(4, prenotazione.getNote());
-            stmt.setString(5, prenotazione.getTelefono());
+            stmt.setString(5, prenotazione.getEmail());
             stmt.setInt(6, prenotazione.getCoperti());
             stmt.setInt(7, prenotazione.getId());
 
@@ -115,13 +115,13 @@ public class DatabasePrenotazioneDao implements PrenotazioneDao {
 
     @Override
     public void store(Prenotazione entity) {
-        String query = "INSERT INTO prenotazione (nomeCliente, orario, data, note, telefono, coperti) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO prenotazione (nomeCliente, orario, data, note, email, coperti) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, entity.getNomeCliente());
             stmt.setTime(2, Time.valueOf(entity.getOrario()));
             stmt.setDate(3, Date.valueOf(entity.getData()));
             stmt.setString(4, entity.getNote());
-            stmt.setString(5, entity.getTelefono());
+            stmt.setString(5, entity.getEmail());
             stmt.setInt(6, entity.getCoperti());
 
             int affectedRows = stmt.executeUpdate();
@@ -148,7 +148,7 @@ public class DatabasePrenotazioneDao implements PrenotazioneDao {
                 rs.getTime("orario").toLocalTime(),
                 rs.getDate("data").toLocalDate(),
                 rs.getString("note"),
-                rs.getString("telefono"),
+                rs.getString("email"),
                 rs.getInt("coperti")
         );
     }

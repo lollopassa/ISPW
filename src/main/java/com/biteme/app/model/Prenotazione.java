@@ -10,16 +10,16 @@ public class Prenotazione {
     private LocalTime orario;
     private LocalDate data;
     private String note;
-    private String telefono;
+    private String email;
     private int coperti;
 
-    public Prenotazione(int id, String nomeCliente, LocalTime orario, LocalDate data, String note, String telefono, int coperti) {
+    public Prenotazione(int id, String nomeCliente, LocalTime orario, LocalDate data, String note, String email, int coperti) {
         this.id = id;
         this.nomeCliente = nomeCliente;
         this.orario = orario;
         this.data = data;
         this.note = note;
-        this.telefono = telefono;
+        this.email = email;
         this.coperti = coperti;
     }
 
@@ -64,12 +64,12 @@ public class Prenotazione {
         this.note = note;
     }
 
-    public String getTelefono() {
-        return telefono;
+    public String getEmail() {
+        return email;
     }
 
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public int getCoperti() { // NUOVO CAMPO

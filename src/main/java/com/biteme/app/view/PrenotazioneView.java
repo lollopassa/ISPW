@@ -37,7 +37,7 @@ public class PrenotazioneView {
     @FXML private TextField orarioField;
     @FXML private TextField copertiField;
     @FXML private TextField noteField;
-    @FXML private TextField telefonoField;
+    @FXML private TextField emailField;
 
     @FXML private TableView<PrenotazioneBean> prenotazioniTableView;
     @FXML private TableColumn<PrenotazioneBean, Integer> idColumn;
@@ -45,7 +45,7 @@ public class PrenotazioneView {
     @FXML private TableColumn<PrenotazioneBean, LocalDate> dataColumn;
     @FXML private TableColumn<PrenotazioneBean, LocalTime> orarioColumn;
     @FXML private TableColumn<PrenotazioneBean, Integer> copertiColumn;
-    @FXML private TableColumn<PrenotazioneBean, String> telefonoColumn;
+    @FXML private TableColumn<PrenotazioneBean, String> emailColumn;
     @FXML private TableColumn<PrenotazioneBean, String> noteColumn;
 
     @FXML private Button modificaButton;
@@ -95,7 +95,7 @@ public class PrenotazioneView {
         dataColumn.setCellValueFactory(new PropertyValueFactory<>("data"));
         orarioColumn.setCellValueFactory(new PropertyValueFactory<>("orario"));
         copertiColumn.setCellValueFactory(new PropertyValueFactory<>("coperti"));
-        telefonoColumn.setCellValueFactory(new PropertyValueFactory<>("telefono"));
+        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
         noteColumn.setCellValueFactory(new PropertyValueFactory<>("note"));
     }
 
@@ -106,7 +106,7 @@ public class PrenotazioneView {
                     nomeClienteField.getText().trim(),
                     orarioField.getText().trim(),
                     giornoSelezionato,
-                    telefonoField.getText().trim(),
+                    emailField.getText().trim(),
                     noteField.getText().trim(),
                     copertiField.getText().trim()
             );
@@ -154,7 +154,7 @@ public class PrenotazioneView {
         DatePicker dataPicker = new DatePicker(prenotazione.getData());
         TextField orarioInput = new TextField(prenotazione.getOrario().toString());
         TextField copertiInput = new TextField(String.valueOf(prenotazione.getCoperti()));
-        TextField telefonoInput = new TextField(prenotazione.getTelefono());
+        TextField emailInput = new TextField(prenotazione.getEmail());
         TextField noteInput = new TextField(prenotazione.getNote());
 
         grid.add(new Label("Nome cliente:"), 0, 0);
@@ -165,8 +165,8 @@ public class PrenotazioneView {
         grid.add(orarioInput, 1, 2);
         grid.add(new Label("Coperti:"), 0, 3);
         grid.add(copertiInput, 1, 3);
-        grid.add(new Label("Telefono:"), 0, 4);
-        grid.add(telefonoInput, 1, 4);
+        grid.add(new Label("Email:"), 0, 4);
+        grid.add(emailInput, 1, 4);
         grid.add(new Label("Note:"), 0, 5);
         grid.add(noteInput, 1, 5);
 
@@ -183,7 +183,7 @@ public class PrenotazioneView {
                             nomeField.getText().trim(),
                             orarioInput.getText().trim(),
                             dataPicker.getValue(),
-                            telefonoInput.getText().trim(),
+                            emailInput.getText().trim(),
                             noteInput.getText().trim(),
                             copertiInput.getText().trim()
                     );
@@ -216,7 +216,7 @@ public class PrenotazioneView {
         bean.setOrario(selected.getOrario());
         bean.setCoperti(selected.getCoperti());
         bean.setNote(selected.getNote());
-        bean.setTelefono(selected.getTelefono());
+        bean.setEmail(selected.getEmail());
 
         // Mostra dialog per inserire l'indirizzo email del cliente
         Dialog<String> dialog = new Dialog<>();
@@ -228,14 +228,14 @@ public class PrenotazioneView {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        TextField emailField = new TextField();
-        emailField.setPromptText("Email del cliente");
+        TextField newemailField = new TextField();
+        newemailField.setPromptText("Email del cliente");
         grid.add(new Label("Email:"), 0, 0);
-        grid.add(emailField, 1, 0);
+        grid.add(newemailField, 1, 0);
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == inviaButtonType) {
-                return emailField.getText().trim();
+                return newemailField.getText().trim();
             }
             return null;
         });
@@ -253,7 +253,6 @@ public class PrenotazioneView {
                 showAlert(SUCCESS_TITLE, "Email inviata correttamente a " + email, Alert.AlertType.INFORMATION);
             } catch (Exception e) {
                 showAlert(ERROR_TITLE, "Errore durante l'invio dell'email: " + e.getMessage(), Alert.AlertType.ERROR);
-                e.printStackTrace();
             }
         });
     }
@@ -332,7 +331,7 @@ public class PrenotazioneView {
         orarioField.clear();
         copertiField.clear();
         noteField.clear();
-        telefonoField.clear();
+        emailField.clear();
     }
 
     private void showAlert(String title, String message, Alert.AlertType type) {

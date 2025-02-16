@@ -22,7 +22,6 @@ class PrenotazioneControllerTest {
 
     private PrenotazioneController controller;
     private PrenotazioneDao prenotazioneDao;
-    // Lista degli ID creati durante il test (per poterli eliminare al termine)
     private final List<Integer> createdPrenotazioniIds = new ArrayList<>();
 
     @BeforeEach
@@ -41,12 +40,10 @@ class PrenotazioneControllerTest {
 
     @AfterEach
     void tearDown() {
-        // Se la persistenza è in memory, pulisci lo storage per garantire test isolati.
         if (Configuration.getPersistenceProvider().getDaoFactory()
                 instanceof com.biteme.app.persistence.inmemory.InMemoryDaoFactory) {
             Storage.getInstance().getPrenotazioni().clear();
         } else {
-            // Per txt o database, elimina i record creati durante il test
             for (Integer id : createdPrenotazioniIds) {
                 if (prenotazioneDao.exists(id)) {
                     prenotazioneDao.delete(id);
@@ -56,10 +53,6 @@ class PrenotazioneControllerTest {
         createdPrenotazioniIds.clear();
     }
 
-    /**
-     * Helper: rimuove eventuali prenotazioni già presenti che corrispondano ai criteri specificati.
-     * Vengono confrontati il nome del cliente, la data e l'orario (convertito in LocalTime).
-     */
     private void removeExistingPrenotazione(String nome, LocalDate data, String orario) {
         List<Prenotazione> prenotazioni = prenotazioneDao.getByData(data);
         LocalTime time = LocalTime.parse(orario);
@@ -74,28 +67,24 @@ class PrenotazioneControllerTest {
 
     @Test
     void testCreaPrenotazione() {
-        // Rimuove eventuali prenotazioni duplicate per "Mario Rossi" nella data e orario indicati
         removeExistingPrenotazione("Mario Rossi", LocalDate.of(2025, 4, 15), "20:00");
 
         controller.creaPrenotazione(
                 "Mario Rossi",
                 "20:00",
                 LocalDate.of(2025, 4, 15),
-                "1234567890",
+                "",
                 "Cena di compleanno",
                 "3"
         );
 
-        // Recupera le prenotazioni per la data specificata
         List<Prenotazione> prenotazioni = prenotazioneDao.getByData(LocalDate.of(2025, 4, 15));
-        // Filtra per ottenere solo quelle di "Mario Rossi"
         List<Prenotazione> filtered = prenotazioni.stream()
                 .filter(p -> "Mario Rossi".equals(p.getNomeCliente()))
                 .toList();
         assertEquals(1, filtered.size());
 
         Prenotazione p = filtered.get(0);
-        // Aggiungo l'ID alla lista dei record creati
         createdPrenotazioniIds.add(p.getId());
 
         assertTrue(p.getId() > 0);
@@ -103,7 +92,7 @@ class PrenotazioneControllerTest {
         assertEquals(LocalDate.of(2025, 4, 15), p.getData());
         assertEquals(LocalTime.of(20, 0), p.getOrario());
         assertEquals("Cena di compleanno", p.getNote());
-        assertEquals("1234567890", p.getTelefono());
+        assertEquals("", p.getEmail());
         assertEquals(3, p.getCoperti());
     }
 
@@ -115,12 +104,11 @@ class PrenotazioneControllerTest {
                 LocalTime.of(19, 0),
                 LocalDate.of(2025, 5, 20),
                 "Cena di lavoro",
-                "3345678912",
+                "anna.verdi@example.com",
                 4
         );
         prenotazioneDao.store(initPrenotazione);
         int storedId = initPrenotazione.getId();
-        // Segnalo l'ID come creato
         createdPrenotazioniIds.add(storedId);
 
         PrenotazioneBean updatedBean = controller.modificaPrenotazione(
@@ -128,7 +116,7 @@ class PrenotazioneControllerTest {
                 "Anna Verdi Modificata",
                 "20:30",
                 LocalDate.of(2025, 5, 25),
-                "3345678912",
+                "",
                 "Cena privata",
                 "5"
         );
@@ -139,7 +127,7 @@ class PrenotazioneControllerTest {
         assertEquals(LocalTime.of(20, 30), updatedBean.getOrario());
         assertEquals(LocalDate.of(2025, 5, 25), updatedBean.getData());
         assertEquals("Cena privata", updatedBean.getNote());
-        assertEquals("3345678912", updatedBean.getTelefono());
+        assertEquals("", updatedBean.getEmail());
         assertEquals(5, updatedBean.getCoperti());
     }
 
@@ -151,7 +139,7 @@ class PrenotazioneControllerTest {
                 LocalTime.of(20, 0),
                 LocalDate.of(2025, 6, 15),
                 "Cena con amici",
-                "1234567890",
+                "mario.rossi@example.com",
                 4
         );
         prenotazioneDao.store(prenotazione);
@@ -174,7 +162,7 @@ class PrenotazioneControllerTest {
                 LocalTime.of(19, 30),
                 LocalDate.of(2025, 7, 20),
                 "Festa privata",
-                "3345678912",
+                "giovanna.bianchi@example.com",
                 6
         );
         prenotazioneDao.store(p);
@@ -183,7 +171,6 @@ class PrenotazioneControllerTest {
 
         List<PrenotazioneBean> prenotazioni = controller.getPrenotazioniByData(LocalDate.of(2025, 7, 20));
         assertNotNull(prenotazioni);
-        // Filtra per nome per assicurarsi di ottenere il record giusto
         List<PrenotazioneBean> filtered = prenotazioni.stream()
                 .filter(bean -> "Giovanna Bianchi".equals(bean.getNomeCliente()))
                 .toList();
@@ -195,33 +182,43 @@ class PrenotazioneControllerTest {
         assertEquals(LocalDate.of(2025, 7, 20), bean.getData());
         assertEquals(LocalTime.of(19, 30), bean.getOrario());
         assertEquals("Festa privata", bean.getNote());
-        assertEquals("3345678912", bean.getTelefono());
+        assertEquals("giovanna.bianchi@example.com", bean.getEmail());
         assertEquals(6, bean.getCoperti());
     }
 
     @Test
     void testCreaPrenotazioneConNomeVuoto() {
-        assertThrowsValidationException("Il nome del cliente non può essere vuoto.", "   ", "20:00", LocalDate.of(2025, 3, 15), "1234567890", "Test", "3");
+        assertThrowsValidationException("Il nome del cliente non può essere vuoto.",
+                "   ", "20:00", LocalDate.of(2025, 3, 15),
+                "mario.rossi@example.com", "Test", "3");
     }
 
     @Test
     void testCreaPrenotazioneConOrarioNonValido() {
-        assertThrowsValidationException("Formato orario non valido. Usa 'HH:mm'.", "Mario Rossi", "invalid", LocalDate.of(2025, 3, 15), "1234567890", "Test", "3");
+        assertThrowsValidationException("Formato orario non valido. Usa 'HH:mm'.",
+                "Mario Rossi", "invalid", LocalDate.of(2025, 3, 15),
+                "mario.rossi@example.com", "Test", "3");
     }
 
     @Test
     void testCreaPrenotazioneConDataNulla() {
-        assertThrowsValidationException("Seleziona una data valida.", "Mario Rossi", "20:00", null, "1234567890", "Test", "3");
+        assertThrowsValidationException("Seleziona una data valida.",
+                "Mario Rossi", "20:00", null,
+                "mario.rossi@example.com", "Test", "3");
     }
 
     @Test
-    void testCreaPrenotazioneConTelefonoNonValido() {
-        assertThrowsValidationException("Il telefono deve contenere solo numeri.", "Mario Rossi", "20:00", LocalDate.of(2025, 3, 15), "invalid_123", "Test", "3");
+    void testCreaPrenotazioneConEmailNonValida() {
+        assertThrowsValidationException("Formato email non valido.",
+                "Mario Rossi", "20:00", LocalDate.of(2025, 3, 15),
+                "invalid_123", "Test", "3");
     }
 
     @Test
     void testCreaPrenotazioneConCopertiNegativi() {
-        assertThrowsValidationException("I coperti devono essere maggiori di 0.", "Mario Rossi", "20:00", LocalDate.of(2025, 3, 15), "1234567890", "Test", "-1");
+        assertThrowsValidationException("I coperti devono essere maggiori di 0.",
+                "Mario Rossi", "20:00", LocalDate.of(2025, 3, 15),
+                "mario.rossi@example.com", "Test", "-1");
     }
 
     @Test
@@ -231,9 +228,9 @@ class PrenotazioneControllerTest {
     }
 
     // Metodo helper per centralizzare la gestione delle eccezioni di validazione
-    private void assertThrowsValidationException(String expectedMessage, String nome, String orario, LocalDate data, String telefono, String note, String coperti) {
+    private void assertThrowsValidationException(String expectedMessage, String nome, String orario, LocalDate data, String email, String note, String coperti) {
         Exception ex = assertThrows(ValidationException.class, () -> {
-            controller.creaPrenotazione(nome, orario, data, telefono, note, coperti);
+            controller.creaPrenotazione(nome, orario, data, email, note, coperti);
         });
         assertEquals(expectedMessage, ex.getMessage());
     }

@@ -9,7 +9,7 @@ public class PrenotazioneBean {
     private LocalDate data;
     private LocalTime orario;
     private String note;
-    private String telefono;
+    private String email;
     private Integer coperti;
 
     public int getId() {
@@ -37,10 +37,10 @@ public class PrenotazioneBean {
     public void setNote(String note) {
         this.note = note; }
 
-    public String getTelefono() {
-        return telefono; }
-    public void setTelefono(String telefono) {
-        this.telefono = telefono; }
+    public String getEmail() {
+        return email; }
+    public void setEmail(String email) {
+        this.email = email; }
 
     public Integer getCoperti() {
         return coperti; }
