@@ -10,7 +10,7 @@ public class PrenotazioneBean {
     private LocalTime orario;
     private String note;
     private String email;
-    private Integer coperti;
+    private int coperti;
 
     public int getId() {
         return id; }
@@ -42,8 +42,8 @@ public class PrenotazioneBean {
     public void setEmail(String email) {
         this.email = email; }
 
-    public Integer getCoperti() {
+    public int getCoperti() {
         return coperti; }
-    public void setCoperti(Integer coperti) {
+    public void setCoperti(int coperti) {
         this.coperti = coperti; }
 }
