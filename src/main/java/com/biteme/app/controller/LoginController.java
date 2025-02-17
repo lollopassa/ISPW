@@ -1,12 +1,12 @@
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.LoginBean;
-import com.biteme.app.model.User;
-import com.biteme.app.model.UserRole;
+import com.biteme.app.entities.User;
+import com.biteme.app.entities.UserRole;
 import com.biteme.app.exception.GoogleAuthException;
-import com.biteme.app.google.GoogleAuthService;
+import com.biteme.app.googleAPI.GoogleAuthService;
 import com.biteme.app.persistence.Configuration;
-import com.biteme.app.google.GoogleAuthUtility;
+import com.biteme.app.googleAPI.GoogleAuthUtility;
 import com.biteme.app.util.HashingUtil;
 import com.biteme.app.util.SceneLoader;
 import com.biteme.app.util.UserSession;
@@ -92,7 +92,7 @@ public class LoginController {
         String title = user.getRuolo() == UserRole.ADMIN
                 ? "Admin Home - BiteMe"
                 : "Home - BiteMe";
-        SceneLoader.loadScene(scenePath, title);
+        SceneLoader.getInstance().loadScene(scenePath, title);
     }
 
     // Nuovo metodo helper per il testing
@@ -104,7 +104,7 @@ public class LoginController {
     }
 
     public void navigateToSignup() {
-        SceneLoader.loadScene("/com/biteme/app/signup.fxml", "Registrati - BiteMe");
+        SceneLoader.getInstance().loadScene("/com/biteme/app/signup.fxml", "Registrati - BiteMe");
     }
 
     private boolean isValidEmail(String email) {

@@ -1,4 +1,4 @@
-package com.biteme.app.view;
+package com.biteme.app.boundary;
 
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.controller.LoginController;
@@ -14,7 +14,7 @@ import javafx.scene.layout.VBox;
 
 import java.math.BigDecimal;
 
-public class ProdottoView {
+public class ProdottoBoundary {
 
     private static final String ALERT_INFORMATION = "Informazione";
     private static final String ALERT_ERROR = "Errore";
@@ -49,7 +49,7 @@ public class ProdottoView {
     private final ProdottoController prodottoController;
     private final LoginController loginController;
 
-    public ProdottoView() {
+    public ProdottoBoundary() {
         this.prodottoController = new ProdottoController();
         this.loginController = new LoginController();
     }

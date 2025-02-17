@@ -1,4 +1,4 @@
-package com.biteme.app.view;
+package com.biteme.app.boundary;
 
 import com.biteme.app.bean.EmailBean;
 import com.biteme.app.bean.PrenotazioneBean;
@@ -19,7 +19,7 @@ import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 
-public class PrenotazioneView {
+public class PrenotazioneBoundary {
 
     private static final String SUCCESS_TITLE = "Successo";
     private static final String ERROR_TITLE = "Errore";

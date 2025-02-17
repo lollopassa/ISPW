@@ -1,9 +1,9 @@
 package com.biteme.app.persistence.inmemory;
 
-import com.biteme.app.model.Ordinazione;
-import com.biteme.app.model.Ordine;
+import com.biteme.app.entities.Ordinazione;
+import com.biteme.app.entities.Ordine;
 import com.biteme.app.persistence.OrdinazioneDao;
-import com.biteme.app.model.StatoOrdine;
+import com.biteme.app.entities.StatoOrdinazione;
 
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +57,7 @@ public class InMemoryOrdinazioneDao implements OrdinazioneDao {
     }
 
     @Override
-    public void aggiornaStato(int id, StatoOrdine nuovoStato) {
+    public void aggiornaStato(int id, StatoOrdinazione nuovoStato) {
         // Aggiorna lo stato solo se l'ordinazione esiste
         ordinazioni.stream()
                 .filter(o -> o.getId() == id)

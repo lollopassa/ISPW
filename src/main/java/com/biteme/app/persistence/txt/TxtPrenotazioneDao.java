@@ -1,6 +1,6 @@
 package com.biteme.app.persistence.txt;
 
-import com.biteme.app.model.Prenotazione;
+import com.biteme.app.entities.Prenotazione;
 import com.biteme.app.persistence.PrenotazioneDao;
 
 import java.io.*;

@@ -1,7 +1,7 @@
 package com.biteme.app.persistence.txt;
 
-import com.biteme.app.model.Categoria;
-import com.biteme.app.model.Prodotto;
+import com.biteme.app.entities.Categoria;
+import com.biteme.app.entities.Prodotto;
 import com.biteme.app.persistence.ProdottoDao;
 
 import java.io.*;

@@ -1,6 +1,6 @@
-package com.biteme.app.model;
+package com.biteme.app.entities;
 
-public enum StatoOrdine {
+public enum StatoOrdinazione {
     NUOVO("Nuovo"),
     IN_CORSO("In corso"),
     COMPLETATO("Completato");
@@ -8,7 +8,7 @@ public enum StatoOrdine {
 
     private final String displayName;
 
-    StatoOrdine(String displayName) {
+    StatoOrdinazione(String displayName) {
         this.displayName = displayName;
     }
 

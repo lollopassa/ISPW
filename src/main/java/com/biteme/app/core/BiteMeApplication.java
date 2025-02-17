@@ -16,9 +16,9 @@ public class BiteMeApplication extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            SceneLoader.setPrimaryStage(stage);
+            SceneLoader.getInstance(stage);
             logger.log(Level.INFO, "Caricamento della scena iniziale.");
-            SceneLoader.loadScene("/com/biteme/app/login.fxml", "Login - Applicazione BiteMe");
+            SceneLoader.getInstance().loadScene("/com/biteme/app/login.fxml", "Login - Applicazione BiteMe");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Errore durante l'avvio dell'applicazione: {0}", e.getMessage());
         }

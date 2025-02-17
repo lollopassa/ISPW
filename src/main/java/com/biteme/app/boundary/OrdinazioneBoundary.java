@@ -1,4 +1,4 @@
-package com.biteme.app.view;
+package com.biteme.app.boundary;
 
 import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.bean.ArchivioBean;
@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class OrdinazioneView {
+public class OrdinazioneBoundary {
 
     // Definizione delle costanti per evitare duplicazioni delle stringhe
     private static final String VALIDATION_ERROR = "Errore di Validazione";
@@ -231,7 +231,7 @@ public class OrdinazioneView {
         ordine.setOrarioCreazione(ordinazione.getOrarioCreazione());
 
         setOrdineSelezionato(ordine);
-        SceneLoader.loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
+        SceneLoader.getInstance().loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
     }
 
     @FXML

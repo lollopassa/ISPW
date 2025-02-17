@@ -3,7 +3,7 @@ package com.biteme.app.controller;
 import com.biteme.app.bean.EmailBean;
 import com.biteme.app.bean.PrenotazioneBean;
 import com.biteme.app.exception.ValidationException;
-import com.biteme.app.model.Prenotazione;
+import com.biteme.app.entities.Prenotazione;
 import com.biteme.app.persistence.PrenotazioneDao;
 import com.biteme.app.persistence.Configuration;
 

@@ -1,8 +1,8 @@
 package com.biteme.app.persistence.txt;
 
-import com.biteme.app.model.Ordinazione;
-import com.biteme.app.model.StatoOrdine;
-import com.biteme.app.model.TipoOrdine;
+import com.biteme.app.entities.Ordinazione;
+import com.biteme.app.entities.StatoOrdinazione;
+import com.biteme.app.entities.TipoOrdinazione;
 import com.biteme.app.persistence.OrdinazioneDao;
 
 import java.io.*;
@@ -102,7 +102,7 @@ public class TxtOrdinazioneDao implements OrdinazioneDao {
     }
 
     @Override
-    public void aggiornaStato(int id, StatoOrdine nuovoStato) {
+    public void aggiornaStato(int id, StatoOrdinazione nuovoStato) {
         ordinazioni.stream()
                 .filter(o -> o.getId() == id)
                 .findFirst()
@@ -129,11 +129,11 @@ public class TxtOrdinazioneDao implements OrdinazioneDao {
             int id = Integer.parseInt(parts[0]);
             String nomeCliente = parts[1];
             String numeroClienti = parts[2];
-            TipoOrdine tipoOrdine = TipoOrdine.valueOf(parts[3].toUpperCase());
+            TipoOrdinazione tipoOrdinazione = TipoOrdinazione.valueOf(parts[3].toUpperCase());
             String infoTavolo = parts[4];
-            StatoOrdine statoOrdine = StatoOrdine.valueOf(parts[5].toUpperCase());
+            StatoOrdinazione statoOrdinazione = StatoOrdinazione.valueOf(parts[5].toUpperCase());
             String orarioCreazione = parts[6];
-            return new Ordinazione(id, nomeCliente, numeroClienti, tipoOrdine, infoTavolo, statoOrdine, orarioCreazione);
+            return new Ordinazione(id, nomeCliente, numeroClienti, tipoOrdinazione, infoTavolo, statoOrdinazione, orarioCreazione);
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Errore nella deserializzazione della riga: {0}", line);
             return null;

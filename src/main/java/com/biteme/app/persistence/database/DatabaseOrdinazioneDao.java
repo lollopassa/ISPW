@@ -1,10 +1,10 @@
 package com.biteme.app.persistence.database;
 
-import com.biteme.app.model.Ordinazione;
+import com.biteme.app.entities.Ordinazione;
 import com.biteme.app.exception.DatabaseConfigurationException;
 import com.biteme.app.persistence.OrdinazioneDao;
-import com.biteme.app.model.StatoOrdine;
-import com.biteme.app.model.TipoOrdine;
+import com.biteme.app.entities.StatoOrdinazione;
+import com.biteme.app.entities.TipoOrdinazione;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -151,7 +151,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
     }
 
     @Override
-    public void aggiornaStato(int id, StatoOrdine nuovoStato) {
+    public void aggiornaStato(int id, StatoOrdinazione nuovoStato) {
         String query = "UPDATE Ordinazione SET statoOrdine = ? WHERE id = ?";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -173,9 +173,9 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
                 rs.getInt("id"),
                 rs.getString("nomeCliente"),
                 rs.getString("numeroClienti"),
-                TipoOrdine.valueOf(rs.getString("tipoOrdine").toUpperCase()),
+                TipoOrdinazione.valueOf(rs.getString("tipoOrdine").toUpperCase()),
                 rs.getString("infoTavolo"),
-                StatoOrdine.valueOf(rs.getString("statoOrdine").toUpperCase()),
+                StatoOrdinazione.valueOf(rs.getString("statoOrdine").toUpperCase()),
                 rs.getString("orarioCreazione")
         );
     }

@@ -1,6 +1,6 @@
 package com.biteme.app.persistence.txt;
 
-import com.biteme.app.model.Archivio;
+import com.biteme.app.entities.Archivio;
 import com.biteme.app.persistence.ArchivioDao;
 
 import java.io.*;

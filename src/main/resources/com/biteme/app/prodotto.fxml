@@ -4,9 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
-<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.view.ProdottoView">
+<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.ProdottoBoundary">
     <children>
 
         <!-- Inclusione del Menu Laterale -->
@@ -20,11 +18,11 @@
         </Label>
 
         <!-- Tabella del Magazzino -->
-        <VBox layoutX="350.0" layoutY="150.0" prefHeight="450.0" prefWidth="465.0">
-            <TableView fx:id="prodottiTableView" prefHeight="450.0" prefWidth="450.0">
+        <VBox layoutX="350.0" layoutY="150.0" prefHeight="450.0" prefWidth="552.0">
+            <TableView fx:id="prodottiTableView" prefHeight="450.0" prefWidth="550.0">
                 <columns>
                     <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
-                    <TableColumn fx:id="nomeColumn" text="Prodotto" prefWidth="100.0" />
+                    <TableColumn fx:id="nomeColumn" prefWidth="200.0" text="Prodotto" />
                     <TableColumn fx:id="categoriaColumn" prefWidth="100.0" text="Categoria" />
                     <TableColumn fx:id="prezzoColumn" prefWidth="100.0" text="Prezzo (€)" />
                     <TableColumn fx:id="disponibileColumn" prefWidth="100.0" text="Disponibile" />
@@ -33,7 +31,7 @@
         </VBox>
 
         <!-- HBox dei pulsanti per modifica ed eliminazione (sezione admin) -->
-        <HBox fx:id="adminButtonsHBox" alignment="BOTTOM_RIGHT" layoutX="658.0" layoutY="620.0" spacing="20">
+        <HBox fx:id="adminButtonsHBox" alignment="BOTTOM_RIGHT" layoutX="756.0" layoutY="620.0" spacing="20">
             <Button fx:id="modificaButton" onAction="#modificaProdotto" style="-fx-font-weight: bold; -fx-padding: 8px; -fx-background-color: #303d68; -fx-text-fill: white; -fx-cursor: hand;" text="Modifica" />
             <Button fx:id="eliminaButton" onAction="#eliminaProdotto" style="-fx-font-weight: bold; -fx-padding: 8px;-fx-background-color: #E0218A; -fx-text-fill: white; -fx-cursor: hand; " text="Elimina" />
         </HBox>
@@ -47,7 +45,7 @@
             <TextField fx:id="nomeProdottoField" prefHeight="35.0" prefWidth="250.0" promptText="Nome Prodotto" style="-fx-font-size: 14px;" />
 
             <!-- Campo Categoria -->
-            <ComboBox fx:id="categoriaComboBox" prefHeight="35.0" prefWidth="250.0" style="-fx-font-size: 14px;" promptText="Seleziona una categoria">
+            <ComboBox fx:id="categoriaComboBox" prefHeight="35.0" prefWidth="250.0" promptText="Seleziona una categoria" style="-fx-font-size: 14px;">
             </ComboBox>
 
             <!-- Campo Prezzo -->

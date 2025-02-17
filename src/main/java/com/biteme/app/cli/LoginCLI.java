@@ -3,6 +3,7 @@ package com.biteme.app.cli;
 import java.util.Scanner;
 import com.biteme.app.bean.LoginBean;
 import com.biteme.app.controller.LoginController;
+import com.biteme.app.util.CLIUtils;
 
 public class LoginCLI {
 
@@ -10,7 +11,7 @@ public class LoginCLI {
     private LoginCLI() {
     }
 
-    private static final Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = CLIUtils.getScanner();
 
     public static void login() {
         System.out.println("========== Benvenuto ==========");

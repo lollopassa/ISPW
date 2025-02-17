@@ -1,12 +1,12 @@
-package com.biteme.app.model;
+package com.biteme.app.entities;
 
-public enum TipoOrdine {
+public enum TipoOrdinazione {
     AL_TAVOLO("Al Tavolo"),
     ASPORTO("Asporto");
 
     private final String displayName;
 
-    TipoOrdine(String displayName) {
+    TipoOrdinazione(String displayName) {
         this.displayName = displayName;
     }
 

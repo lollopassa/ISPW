@@ -6,7 +6,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.view.SignupView">
+<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.SignupBoundary">
 
    <!-- Contenuto della scena -->
    <children>

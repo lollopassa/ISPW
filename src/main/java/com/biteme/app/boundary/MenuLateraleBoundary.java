@@ -1,4 +1,4 @@
-package com.biteme.app.view;
+package com.biteme.app.boundary;
 
 import com.biteme.app.controller.LoginController;
 import com.biteme.app.util.SceneLoader;
@@ -9,11 +9,11 @@ import javafx.scene.layout.StackPane;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MenuLateraleView {
+public class MenuLateraleBoundary {
 
     private LoginController loginController;
 
-    private static final Logger LOGGER = Logger.getLogger(MenuLateraleView.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MenuLateraleBoundary.class.getName());
 
     @FXML
     private Label usernameLabel; // Collegamento all'etichetta dell'username
@@ -41,7 +41,7 @@ public class MenuLateraleView {
             LOGGER.info("Effettuato il logout");
         }
         UserSession.clear();
-        SceneLoader.loadScene("/com/biteme/app/login.fxml", "Login");
+        SceneLoader.getInstance().loadScene("/com/biteme/app/login.fxml", "Login");
     }
 
     @FXML
@@ -52,14 +52,14 @@ public class MenuLateraleView {
         setUsernameLabel();
 
         if (loginController.isUserAdmin()) {
-            homeButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/adminHome.fxml", "Admin Home"));
+            homeButton.setOnMouseClicked(_ -> SceneLoader.getInstance().loadScene("/com/biteme/app/adminHome.fxml", "Admin Home"));
         } else {
-            homeButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/home.fxml", "Home Page"));
+            homeButton.setOnMouseClicked(_ -> SceneLoader.getInstance().loadScene("/com/biteme/app/home.fxml", "Home Page"));
         }
 
-        prenotazioniButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/prenotazioni.fxml", "Prenotazioni"));
-        ordiniButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/ordinazione.fxml", "Ordini"));
-        magazzinoButton.setOnMouseClicked(_ -> SceneLoader.loadScene("/com/biteme/app/prodotto.fxml", "Magazzino"));
+        prenotazioniButton.setOnMouseClicked(_ -> SceneLoader.getInstance().loadScene("/com/biteme/app/prenotazione.fxml", "Prenotazioni"));
+        ordiniButton.setOnMouseClicked(_ -> SceneLoader.getInstance().loadScene("/com/biteme/app/ordinazione.fxml", "Ordini"));
+        magazzinoButton.setOnMouseClicked(_ -> SceneLoader.getInstance().loadScene("/com/biteme/app/prodotto.fxml", "Magazzino"));
         logoutButton.setOnMouseClicked(_ -> onLogout());
     }
 

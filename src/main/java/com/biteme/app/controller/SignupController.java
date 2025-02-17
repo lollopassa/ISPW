@@ -2,7 +2,7 @@ package com.biteme.app.controller;
 
 import com.biteme.app.bean.SignupBean;
 import com.biteme.app.persistence.Configuration;
-import com.biteme.app.model.User;
+import com.biteme.app.entities.User;
 import com.biteme.app.persistence.UserDao;
 import com.biteme.app.util.SceneLoader;
 
@@ -60,6 +60,6 @@ public class SignupController {
 
     // Metodo per navigare al login
     public void navigateToLogin() {
-        SceneLoader.loadScene("/com/biteme/app/login.fxml", "Login - BiteMe");
+        SceneLoader.getInstance().loadScene("/com/biteme/app/login.fxml", "Login - BiteMe");
     }
 }

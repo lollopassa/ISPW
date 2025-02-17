@@ -5,6 +5,7 @@ import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.controller.OrdineController;
 import com.biteme.app.controller.ProdottoController;
 import com.biteme.app.exception.ProdottoException;
+import com.biteme.app.util.CLIUtils;
 
 import java.util.List;
 import java.util.Scanner;
@@ -19,7 +20,7 @@ public class OrdineCLI {
     private static ProdottoController prodottoController = new ProdottoController();
 
     public static void start(int orderId) {
-        Scanner scanner = new Scanner(System.in);
+        var scanner = CLIUtils.getScanner();
         // Recupera l'OrdineBean utilizzando l'ID
         OrdineBean ordineBean;
         try {

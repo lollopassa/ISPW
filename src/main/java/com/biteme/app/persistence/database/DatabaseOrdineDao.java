@@ -1,6 +1,6 @@
 package com.biteme.app.persistence.database;
 
-import com.biteme.app.model.Ordine;
+import com.biteme.app.entities.Ordine;
 import com.biteme.app.exception.DatabaseConfigurationException;
 import com.biteme.app.persistence.OrdineDao;
 

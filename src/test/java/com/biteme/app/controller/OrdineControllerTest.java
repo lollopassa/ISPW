@@ -2,12 +2,12 @@ package com.biteme.app.controller;
 
 import com.biteme.app.bean.OrdineBean;
 import com.biteme.app.bean.ProdottoBean;
-import com.biteme.app.model.Ordine;
-import com.biteme.app.model.Ordinazione;
-import com.biteme.app.model.Prodotto;
-import com.biteme.app.model.Categoria;
-import com.biteme.app.model.StatoOrdine;
-import com.biteme.app.model.TipoOrdine;
+import com.biteme.app.entities.Ordine;
+import com.biteme.app.entities.Ordinazione;
+import com.biteme.app.entities.Prodotto;
+import com.biteme.app.entities.Categoria;
+import com.biteme.app.entities.StatoOrdinazione;
+import com.biteme.app.entities.TipoOrdinazione;
 import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.persistence.OrdinazioneDao;
@@ -51,9 +51,9 @@ class OrdineControllerTest {
                 0,                    // id = 0 per auto-increment
                 "Alberto Verdi",      // nome fittizio
                 "1",                  // numero clienti fittizio
-                TipoOrdine.ASPORTO,   // valore arbitrario
+                TipoOrdinazione.ASPORTO,   // valore arbitrario
                 "None",
-                StatoOrdine.NUOVO,
+                StatoOrdinazione.NUOVO,
                 "12:00"
         );
         // Salviamo la dummy nel database

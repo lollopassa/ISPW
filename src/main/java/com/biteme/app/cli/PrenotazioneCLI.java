@@ -21,7 +21,7 @@ public class PrenotazioneCLI {
     private static final String PRENOTAZIONI_PER_DATA = "Prenotazioni per il ";
 
     public static void start() {
-        Scanner scanner = CLIUtils.getScanner();
+        var scanner = CLIUtils.getScanner();
         while (true) {
             showMenu();
             String scelta = scanner.nextLine();

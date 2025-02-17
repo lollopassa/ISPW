@@ -1,9 +1,9 @@
-package com.biteme.app.view;
+package com.biteme.app.boundary;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-public class HomeView {
+public class HomeBoundary {
 
     @FXML
     private Label welcomeMessageLabel; // Collegamento all'etichetta definita nel FXML

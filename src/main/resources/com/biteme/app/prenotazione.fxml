@@ -6,7 +6,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.view.PrenotazioneView">
+<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.PrenotazioneBoundary">
     <children>
 
         <!-- Inclusione del Menu Laterale -->
@@ -58,7 +58,7 @@
             <TextField fx:id="copertiField" prefHeight="35.0" prefWidth="300.0" promptText="Numero Coperti" style="-fx-font-size: 14px;" />
 
             <!-- Campo Note Prenotazione -->
-            <TextField fx:id="noteField" prefHeight="35.0" prefWidth="300.0" promptText="Note" style="-fx-font-size: 14px;" />
+            <TextField fx:id="noteField" prefHeight="35.0" prefWidth="300.0" promptText="Note(facoltativo)" style="-fx-font-size: 14px;" />
 
             <!-- Campo Numero Telefonico -->
             <TextField fx:id="emailField" prefHeight="35.0" prefWidth="300.0" promptText="Email (facoltativo)" style="-fx-font-size: 14px;" />

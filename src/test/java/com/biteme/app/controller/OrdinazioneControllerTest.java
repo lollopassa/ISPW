@@ -2,9 +2,9 @@ package com.biteme.app.controller;
 
 import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.exception.OrdinazioneException;
-import com.biteme.app.model.Ordinazione;
-import com.biteme.app.model.StatoOrdine;
-import com.biteme.app.model.TipoOrdine;
+import com.biteme.app.entities.Ordinazione;
+import com.biteme.app.entities.StatoOrdinazione;
+import com.biteme.app.entities.TipoOrdinazione;
 import com.biteme.app.persistence.OrdinazioneDao;
 import com.biteme.app.persistence.inmemory.Storage; // Utilizzato solo per il cleanup in modalità in memory
 import com.biteme.app.persistence.Configuration;
@@ -89,10 +89,10 @@ class OrdinazioneControllerTest {
         List<Ordinazione> filtered = ordinazioni.stream()
                 .filter(o -> "Mario Rossi".equals(o.getNomeCliente())
                         && "4".equals(String.valueOf(o.getNumeroClienti()))
-                        && TipoOrdine.AL_TAVOLO.equals(o.getTipoOrdine())
+                        && TipoOrdinazione.AL_TAVOLO.equals(o.getTipoOrdine())
                         && "5".equals(o.getInfoTavolo())
                         && "20:00".equals(o.getOrarioCreazione())
-                        && StatoOrdine.NUOVO.equals(o.getStatoOrdine()))
+                        && StatoOrdinazione.NUOVO.equals(o.getStatoOrdine()))
                 .toList();
 
         assertEquals(1, filtered.size(), "Dovrebbe esserci esattamente un ordine creato con i dati specificati.");
@@ -103,9 +103,9 @@ class OrdinazioneControllerTest {
         assertEquals("Mario Rossi", o.getNomeCliente());
         // Converte il numero di clienti (se memorizzato come int) in stringa per il confronto
         assertEquals("4", String.valueOf(o.getNumeroClienti()));
-        assertEquals(TipoOrdine.AL_TAVOLO, o.getTipoOrdine());
+        assertEquals(TipoOrdinazione.AL_TAVOLO, o.getTipoOrdine());
         assertEquals("5", o.getInfoTavolo());
-        assertEquals(StatoOrdine.NUOVO, o.getStatoOrdine());
+        assertEquals(StatoOrdinazione.NUOVO, o.getStatoOrdine());
         assertEquals("20:00", o.getOrarioCreazione());
     }
 
@@ -119,9 +119,9 @@ class OrdinazioneControllerTest {
                 1,              // L'ID verrà ignorato e sovrascritto dall'auto-increment
                 "Anna Verdi",
                 "3",          // Numero clienti come Stringa
-                TipoOrdine.ASPORTO,
+                TipoOrdinazione.ASPORTO,
                 "Nessuna",
-                StatoOrdine.NUOVO,
+                StatoOrdinazione.NUOVO,
                 "19:00"       // Orario come Stringa
         );
         ordinazioneDao.store(ordinazione);
@@ -164,9 +164,9 @@ class OrdinazioneControllerTest {
                 1,
                 "Mario Rossi",
                 "4",       // Numero clienti come Stringa
-                TipoOrdine.AL_TAVOLO,
+                TipoOrdinazione.AL_TAVOLO,
                 "Tavolo 5",
-                StatoOrdine.NUOVO,
+                StatoOrdinazione.NUOVO,
                 "20:00"    // Orario come Stringa
         );
         ordinazioneDao.store(ordinazione);
@@ -192,26 +192,26 @@ class OrdinazioneControllerTest {
                 1,
                 "Giovanna Bianchi",
                 "2",       // Numero clienti come Stringa
-                TipoOrdine.ASPORTO,
+                TipoOrdinazione.ASPORTO,
                 "Nessuna",
-                StatoOrdine.NUOVO,
+                StatoOrdinazione.NUOVO,
                 "18:00"    // Orario come Stringa
         );
         ordinazioneDao.store(ordinazione);
         int storedId = ordinazione.getId();
 
         // Aggiorna lo stato a IN_CORSO
-        controller.aggiornaStatoOrdinazione(storedId, StatoOrdine.IN_CORSO);
+        controller.aggiornaStatoOrdinazione(storedId, StatoOrdinazione.IN_CORSO);
 
         Ordinazione updatedOrdinazione = ordinazioneDao.load(storedId).orElse(null);
         assertNotNull(updatedOrdinazione);
-        assertEquals(StatoOrdine.IN_CORSO, updatedOrdinazione.getStatoOrdine());
+        assertEquals(StatoOrdinazione.IN_CORSO, updatedOrdinazione.getStatoOrdine());
     }
 
     @Test
     void testAggiornaStatoOrdinazioneNonEsistente() {
         // Verifica che, per un ID non esistente, non venga lanciata eccezione e che l'ordinazione non esista
-        assertDoesNotThrow(() -> controller.aggiornaStatoOrdinazione(999, StatoOrdine.IN_CORSO));
+        assertDoesNotThrow(() -> controller.aggiornaStatoOrdinazione(999, StatoOrdinazione.IN_CORSO));
         assertFalse(ordinazioneDao.exists(999));
     }
 

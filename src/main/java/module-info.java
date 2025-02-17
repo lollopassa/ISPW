@@ -26,16 +26,16 @@ module demo {
     opens com.biteme.app.controller to javafx.fxml;
     exports com.biteme.app.util;
     opens com.biteme.app.util to javafx.fxml;
-    exports com.biteme.app.model;
-    opens com.biteme.app.model to javafx.fxml;
+    exports com.biteme.app.entities;
+    opens com.biteme.app.entities to javafx.fxml;
     exports com.biteme.app.persistence;
     opens com.biteme.app.persistence to javafx.fxml;
     exports com.biteme.app.persistence.database;
     opens com.biteme.app.persistence.database to javafx.fxml;
-    exports com.biteme.app.view;
-    opens com.biteme.app.view to javafx.fxml;
+    exports com.biteme.app.boundary;
+    opens com.biteme.app.boundary to javafx.fxml;
     exports com.biteme.app.bean;
     opens com.biteme.app.bean to javafx.fxml;
-    exports com.biteme.app.google;
-    opens com.biteme.app.google to javafx.fxml;
+    exports com.biteme.app.googleAPI;
+    opens com.biteme.app.googleAPI to javafx.fxml;
 }

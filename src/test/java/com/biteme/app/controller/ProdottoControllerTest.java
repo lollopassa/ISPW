@@ -2,8 +2,8 @@ package com.biteme.app.controller;
 
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.exception.ProdottoException;
-import com.biteme.app.model.Prodotto;
-import com.biteme.app.model.Categoria;
+import com.biteme.app.entities.Prodotto;
+import com.biteme.app.entities.Categoria;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.persistence.inmemory.Storage;
 import com.biteme.app.persistence.Configuration;

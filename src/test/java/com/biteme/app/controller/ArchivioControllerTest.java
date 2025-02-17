@@ -1,7 +1,7 @@
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.ArchivioBean;
-import com.biteme.app.model.Archivio;
+import com.biteme.app.entities.Archivio;
 import com.biteme.app.persistence.ArchivioDao;
 import com.biteme.app.persistence.inmemory.Storage;
 import com.biteme.app.persistence.Configuration;

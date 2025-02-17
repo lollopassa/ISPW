@@ -1,4 +1,4 @@
-package com.biteme.app.view;
+package com.biteme.app.boundary;
 
 import com.biteme.app.bean.SignupBean;
 import com.biteme.app.controller.SignupController;
@@ -7,7 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
-public class SignupView {
+public class SignupBoundary {
 
     @FXML
     private TextField nomeUtenteTextField;

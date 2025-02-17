@@ -3,13 +3,13 @@ package com.biteme.app.controller;
 import com.biteme.app.bean.OrdineBean;
 import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.exception.OrdinazioneException;
-import com.biteme.app.model.Ordinazione;
-import com.biteme.app.model.StatoOrdine;
-import com.biteme.app.model.TipoOrdine;
+import com.biteme.app.entities.Ordinazione;
+import com.biteme.app.entities.StatoOrdinazione;
+import com.biteme.app.entities.TipoOrdinazione;
 import com.biteme.app.persistence.OrdinazioneDao;
 import com.biteme.app.persistence.Configuration;
 import com.biteme.app.util.SceneLoader;
-import com.biteme.app.view.OrdinazioneView;
+import com.biteme.app.boundary.OrdinazioneBoundary;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class OrdinazioneController {
     public void creaOrdine(OrdinazioneBean ordinazioneBean) {
         try {
             Ordinazione ordinazione = convertToModel(ordinazioneBean);
-            ordinazione.setStatoOrdine(StatoOrdine.NUOVO);
+            ordinazione.setStatoOrdine(StatoOrdinazione.NUOVO);
             ordinazioneDao.store(ordinazione);
             ordinazioneBean.setId(ordinazione.getId());
             OrdineBean ordineBean = new OrdineBean();
@@ -61,7 +61,7 @@ public class OrdinazioneController {
 
     // Metodo per ottenere l'ID dell'ordinazione selezionata dalla view
     public int getIdOrdineSelezionato() {
-        OrdinazioneBean ordinazioneBean = OrdinazioneView.getOrdineSelezionato();
+        OrdinazioneBean ordinazioneBean = OrdinazioneBoundary.getOrdineSelezionato();
         if (ordinazioneBean == null) {
             throw new OrdinazioneException("Nessuna ordinazione selezionata.");
         }
@@ -69,7 +69,7 @@ public class OrdinazioneController {
     }
 
     // Metodo per aggiornare lo stato dell'ordinazione
-    public void aggiornaStatoOrdinazione(int ordineId, StatoOrdine nuovoStato) {
+    public void aggiornaStatoOrdinazione(int ordineId, StatoOrdinazione nuovoStato) {
         try {
             ordinazioneDao.aggiornaStato(ordineId, nuovoStato);
         } catch (Exception e) {
@@ -78,7 +78,7 @@ public class OrdinazioneController {
     }
 
     public void cambiaASchermataOrdinazione() {
-        SceneLoader.loadScene("/com/biteme/app/ordinazione.fxml", "Torna a Ordinazione");
+        SceneLoader.getInstance().loadScene("/com/biteme/app/ordinazione.fxml", "Torna a Ordinazione");
     }
 
     public boolean isValidTime(String time) {
@@ -96,22 +96,22 @@ public class OrdinazioneController {
 
     // --- Private helper methods ---
     private Ordinazione convertToModel(OrdinazioneBean bean) {
-        TipoOrdine tipoOrdine;
+        TipoOrdinazione tipoOrdinazione;
         if ("Al Tavolo".equals(bean.getTipoOrdine())) {
-            tipoOrdine = TipoOrdine.AL_TAVOLO;
+            tipoOrdinazione = TipoOrdinazione.AL_TAVOLO;
         } else if ("Asporto".equals(bean.getTipoOrdine())) {
-            tipoOrdine = TipoOrdine.ASPORTO;
+            tipoOrdinazione = TipoOrdinazione.ASPORTO;
         } else {
             throw new IllegalArgumentException("Tipo Ordine non valido: " + bean.getTipoOrdine());
         }
-        StatoOrdine statoOrdine = StatoOrdine.NUOVO;
+        StatoOrdinazione statoOrdinazione = StatoOrdinazione.NUOVO;
         return new Ordinazione(
                 bean.getId(),
                 bean.getNome(),
                 bean.getNumeroClienti(),
-                tipoOrdine,
+                tipoOrdinazione,
                 bean.getInfoTavolo(),
-                statoOrdine,
+                statoOrdinazione,
                 bean.getOrarioCreazione()
         );
     }

@@ -1,4 +1,4 @@
-package com.biteme.app.google;
+package com.biteme.app.googleAPI;
 
 import java.util.Properties;
 import javax.mail.MessagingException;

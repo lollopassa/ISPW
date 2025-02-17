@@ -1,6 +1,6 @@
 package com.biteme.app.persistence;
 import java.time.LocalDate;
-import com.biteme.app.model.Prenotazione;
+import com.biteme.app.entities.Prenotazione;
 
 import java.util.List;
 

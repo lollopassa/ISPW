@@ -1,4 +1,4 @@
-package com.biteme.app.view;
+package com.biteme.app.boundary;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,7 +17,7 @@ import com.biteme.app.controller.ArchivioController;
 import javafx.scene.layout.Pane;
 import java.util.logging.Logger;
 
-public class AdminHomeView {
+public class AdminHomeBoundary {
 
     private static final String GUADAGNI_LABEL = "Guadagni";
     private static final String GUADAGNI_GIORNALIERO = "Guadagni Giornalieri";
@@ -56,9 +56,9 @@ public class AdminHomeView {
     // Flag per decidere se, in modalità guadagni, visualizzare i dati aggregati per periodo oppure per giorno
     private boolean usaGuadagniAggregati;
 
-    private static final Logger logger = Logger.getLogger(AdminHomeView.class.getName());
+    private static final Logger logger = Logger.getLogger(AdminHomeBoundary.class.getName());
 
-    public AdminHomeView() {
+    public AdminHomeBoundary() {
         this.archivioController = new ArchivioController();
         this.mostraGuadagni = false;     // Default: mostra prodotti ordinati
         this.usaGuadagniAggregati = false; // Default: in modalità guadagni, mostra dati giornalieri

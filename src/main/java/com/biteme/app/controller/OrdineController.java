@@ -3,9 +3,9 @@ package com.biteme.app.controller;
 import com.biteme.app.bean.OrdineBean;
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.exception.OrdineException;
-import com.biteme.app.model.Ordine;
-import com.biteme.app.model.Prodotto;
-import com.biteme.app.model.StatoOrdine;
+import com.biteme.app.entities.Ordine;
+import com.biteme.app.entities.Prodotto;
+import com.biteme.app.entities.StatoOrdinazione;
 import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.persistence.Configuration;
@@ -44,7 +44,7 @@ public class OrdineController {
 
     public void salvaOrdineEStato(int ordineId, String statoStr) {
         try {
-            StatoOrdine stato = convertStringToStatoOrdine(statoStr);
+            StatoOrdinazione stato = convertStringToStatoOrdine(statoStr);
             List<String> prodotti = recuperaProdottiDalRiepilogo();
             List<Integer> quantita = new ArrayList<>();
             for (String prodotto : prodotti) {
@@ -153,15 +153,15 @@ public class OrdineController {
                 .toList();
     }
 
-    private StatoOrdine convertStringToStatoOrdine(String statoStr) {
+    private StatoOrdinazione convertStringToStatoOrdine(String statoStr) {
         if (statoStr == null) {
             throw new IllegalArgumentException("Stato ordine non può essere null");
         }
         switch (statoStr.toUpperCase()) {
             case "IN_CORSO":
-                return StatoOrdine.IN_CORSO;
+                return StatoOrdinazione.IN_CORSO;
             case "COMPLETATO":
-                return StatoOrdine.COMPLETATO;
+                return StatoOrdinazione.COMPLETATO;
             default:
                 throw new IllegalArgumentException("Stato ordine non valido: " + statoStr);
         }
