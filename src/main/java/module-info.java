@@ -38,4 +38,5 @@ module demo {
     opens com.biteme.app.bean to javafx.fxml;
     exports com.biteme.app.googleapi;
     opens com.biteme.app.googleapi to javafx.fxml;
+    exports com.biteme.app.exception;
 }

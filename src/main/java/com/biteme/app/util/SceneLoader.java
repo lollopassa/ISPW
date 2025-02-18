@@ -5,12 +5,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SceneLoader {
     private static SceneLoader instance;
     private Stage primaryStage;
+    private static final Logger logger = Logger.getLogger(SceneLoader.class.getName());
 
     // Costruttore privato
     private SceneLoader(Stage stage) {
@@ -36,6 +40,7 @@ public class SceneLoader {
         return instance;
     }
 
+    // Carica una scena con gestione errori avanzata
     public void loadScene(String fxmlPath, String title) {
         if (fxmlPath == null || fxmlPath.trim().isEmpty()) {
             throw new IllegalArgumentException("Il percorso del file FXML non può essere vuoto.");
@@ -48,7 +53,23 @@ public class SceneLoader {
             primaryStage.setScene(new Scene(root));
             primaryStage.show();
         } catch (IOException e) {
-            throw new SceneLoadingException("Errore durante il caricamento del file FXML: " + fxmlPath, e);
+            // Rileva l'errore e lancia l'eccezione personalizzata
+            SceneLoadingException exception = new SceneLoadingException("Errore durante il caricamento del file FXML: " + fxmlPath, e);
+            handleSceneLoadingError(exception);
         }
+    }
+
+    // Gestisce l'eccezione SceneLoadingException
+    private void handleSceneLoadingError(SceneLoadingException e) {
+        // Log dell'errore
+        logger.log(Level.SEVERE, "Errore nel caricamento della scena: ", e);
+
+        // Mostra un Alert all'utente
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Errore nel Caricamento della Scena");
+        alert.setHeaderText("Impossibile caricare la scena.");
+        alert.setContentText("Si è verificato un errore durante il caricamento della scena.\n\nDettagli: " + e.getMessage());
+        alert.showAndWait();
+
     }
 }

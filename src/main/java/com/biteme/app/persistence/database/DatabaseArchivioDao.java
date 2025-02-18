@@ -16,7 +16,7 @@ public class DatabaseArchivioDao implements ArchivioDao {
     private static final Logger LOGGER = Logger.getLogger(DatabaseArchivioDao.class.getName());
     private final Connection connection;
 
-    public DatabaseArchivioDao() {
+    public DatabaseArchivioDao() throws DatabaseConfigurationException {
         try {
             this.connection = DatabaseConnection.getConnection();
         } catch (SQLException e) {

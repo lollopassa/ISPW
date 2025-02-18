@@ -69,7 +69,7 @@ class OrdinazioneControllerTest {
     }
 
     @Test
-    void testCreaOrdine() {
+    void testCreaOrdine() throws Exception {
         // Rimuove eventuali ordinazioni già presenti con gli stessi dati
         removeExistingOrdine("Mario Rossi", "4", "20:00");
 
@@ -101,7 +101,6 @@ class OrdinazioneControllerTest {
 
         assertTrue(o.getId() > 0); // L'ID deve essere maggiore di 0
         assertEquals("Mario Rossi", o.getNomeCliente());
-        // Converte il numero di clienti (se memorizzato come int) in stringa per il confronto
         assertEquals("4", String.valueOf(o.getNumeroClienti()));
         assertEquals(TipoOrdinazione.AL_TAVOLO, o.getTipoOrdine());
         assertEquals("5", o.getInfoTavolo());
@@ -110,7 +109,7 @@ class OrdinazioneControllerTest {
     }
 
     @Test
-    void testGetOrdini() {
+    void testGetOrdini() throws Exception {
         // Rimuove eventuali ordinazioni duplicate per "Anna Verdi"
         removeExistingOrdine("Anna Verdi", "3", "19:00");
 
@@ -156,7 +155,7 @@ class OrdinazioneControllerTest {
     }
 
     @Test
-    void testEliminaOrdinazione() {
+    void testEliminaOrdinazione() throws Exception {
         // Rimuove eventuali ordinazioni duplicate per "Mario Rossi"
         removeExistingOrdine("Mario Rossi", "4", "20:00");
 
@@ -184,7 +183,7 @@ class OrdinazioneControllerTest {
     }
 
     @Test
-    void testAggiornaStatoOrdinazione() {
+    void testAggiornaStatoOrdinazione() throws Exception {
         // Rimuove eventuali ordinazioni duplicate per "Giovanna Bianchi"
         removeExistingOrdine("Giovanna Bianchi", "2", "18:00");
 
@@ -209,7 +208,7 @@ class OrdinazioneControllerTest {
     }
 
     @Test
-    void testAggiornaStatoOrdinazioneNonEsistente() {
+    void testAggiornaStatoOrdinazioneNonEsistente() throws Exception {
         // Verifica che, per un ID non esistente, non venga lanciata eccezione e che l'ordinazione non esista
         assertDoesNotThrow(() -> controller.aggiornaStatoOrdinazione(999, StatoOrdinazione.IN_CORSO));
         assertFalse(ordinazioneDao.exists(999));

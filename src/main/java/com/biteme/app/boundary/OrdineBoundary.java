@@ -4,6 +4,7 @@ import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.controller.OrdinazioneController;
 import com.biteme.app.controller.OrdineController;
+import com.biteme.app.exception.OrdinazioneException;
 import com.biteme.app.util.SceneLoader;
 import com.biteme.app.bean.OrdineBean;
 import javafx.event.ActionEvent;
@@ -23,9 +24,17 @@ import java.util.logging.Logger;
 
 public class OrdineBoundary {
 
+    // Constants for error messages
+    private static final String ERROR_TITLE = "Errore";
+    private static final String ERROR_ORDINE_NOT_FOUND = "Ordine non trovato per l'ID: ";
+    private static final String ERROR_NO_ORDINE_SELECTED = "Nessuna ordinazione selezionata.";
+    private static final String ASPORTO = "Asporto";
+
+    // Controllers
     private final OrdineController controller = new OrdineController();
     private final OrdinazioneController ordinazioneController = new OrdinazioneController();
 
+    // FXML elements
     @FXML
     private FlowPane flowPaneProdotti;
 
@@ -38,29 +47,43 @@ public class OrdineBoundary {
     @FXML
     private Label totaleOrdine;
 
-    private static final String ASPORTO = "Asporto";
-
+    // Handle saving an order
     @FXML
     private void handleSalva() {
-        int ordineId = ordinazioneController.getIdOrdineSelezionato();
-        controller.salvaOrdineEStato(ordineId, "IN_CORSO");
-        showAlert("Ordine salvato", "L'ordine è stato salvato con successo.", AlertType.INFORMATION);
-        ordinazioneController.cambiaASchermataOrdinazione();
+        try {
+            int ordineId = ordinazioneController.getIdOrdineSelezionato();
+            controller.salvaOrdineEStato(ordineId, "IN_CORSO");
+            showAlert("Ordine salvato", "L'ordine è stato salvato con successo.", AlertType.INFORMATION);
+            ordinazioneController.cambiaASchermataOrdinazione();
+        } catch (OrdinazioneException e) {
+            showAlert(ERROR_TITLE, "Nessun ordine selezionato. Seleziona un ordine prima di salvare.", AlertType.ERROR);
+        } catch (Exception e) {
+            showAlert(ERROR_TITLE, "Si è verificato un errore durante il salvataggio dell'ordine.", AlertType.ERROR);
+        }
     }
 
+    // Handle completing the checkout
     @FXML
     public void handleCheckout(ActionEvent actionEvent) {
-        int ordineId = ordinazioneController.getIdOrdineSelezionato();
-        controller.salvaOrdineEStato(ordineId, "COMPLETATO");
-        showAlert("Checkout completato", "Il checkout dell'ordine è stato completato con successo.", AlertType.INFORMATION);
-        ordinazioneController.cambiaASchermataOrdinazione();
+        try {
+            int ordineId = ordinazioneController.getIdOrdineSelezionato();
+            controller.salvaOrdineEStato(ordineId, "COMPLETATO");
+            showAlert("Checkout completato", "Il checkout dell'ordine è stato completato con successo.", AlertType.INFORMATION);
+            ordinazioneController.cambiaASchermataOrdinazione();
+        } catch (OrdinazioneException e) {
+            showAlert(ERROR_TITLE, "Nessun ordine selezionato. Seleziona un ordine prima di effettuare il checkout.", AlertType.ERROR);
+        } catch (Exception e) {
+            showAlert(ERROR_TITLE, "Si è verificato un errore durante il checkout dell'ordine.", AlertType.ERROR);
+        }
     }
 
+    // Handle back button
     @FXML
-    private void handleIndietro(){
+    private void handleIndietro() {
         SceneLoader.getInstance().loadScene("/com/biteme/app/ordinazione.fxml", "Torna a Ordinazione");
     }
 
+    // Initialize method that runs when the screen is loaded
     @FXML
     public void initialize() {
         controller.setRiepilogoContenuto(this.riepilogoContenuto);
@@ -71,23 +94,23 @@ public class OrdineBoundary {
             OrdineBean ordineBean = controller.load(ordineId);
             if (ordineBean != null) {
                 String infoTavolo = ordinazioneBean.getInfoTavolo();
-                if (infoTavolo == null || infoTavolo.trim().isEmpty() || ASPORTO.equalsIgnoreCase(infoTavolo)) {
-                    this.nomeTavolo.setText(ASPORTO);
-                } else {
-                    this.nomeTavolo.setText("Tavolo: " + infoTavolo);
-                }
+                nomeTavolo.setText(infoTavolo == null || infoTavolo.trim().isEmpty() || ASPORTO.equalsIgnoreCase(infoTavolo) ?
+                        ASPORTO : "Tavolo: " + infoTavolo);
                 caricaProdottiAssociati();
                 caricaProdottiNelRiepilogo(ordineBean);
             } else {
-                Logger.getLogger(OrdineBoundary.class.getName())
-                        .log(Level.SEVERE, () -> "OrdineBean non trovato per l'ID: " + ordineId);
-                showAlert("Errore", "Ordine non trovato per l'ID: " + ordineId, AlertType.ERROR);
+                logAndShowAlert(ERROR_ORDINE_NOT_FOUND + ordineId);
             }
         } else {
-            Logger.getLogger(OrdineBoundary.class.getName())
-                    .warning("Nessuna ordinazione selezionata.");
-            showAlert("Errore", "Nessuna ordinazione selezionata.", AlertType.ERROR);
+            logAndShowAlert(ERROR_NO_ORDINE_SELECTED);
         }
+    }
+
+    // Helper method to log errors and show alerts
+    private void logAndShowAlert(String message) {
+        Logger.getLogger(OrdineBoundary.class.getName())
+                .log(Level.SEVERE, message);
+        showAlert(ERROR_TITLE, message, AlertType.ERROR);
     }
 
     private void caricaProdottiNelRiepilogo(OrdineBean ordineBean) {

@@ -8,6 +8,7 @@ import com.biteme.app.bean.EmailBean;
 import com.biteme.app.bean.PrenotazioneBean;
 import com.biteme.app.controller.EmailController;
 import com.biteme.app.controller.PrenotazioneController;
+import com.biteme.app.exception.PrenotationValidationException;
 import com.biteme.app.util.CLIUtils;
 
 public class PrenotazioneCLI {
@@ -74,9 +75,17 @@ public class PrenotazioneCLI {
         System.out.print("Note: ");
         String note = scanner.nextLine().trim();
 
+        // Creazione e popolamento della bean con i valori raw
+        PrenotazioneBean bean = new PrenotazioneBean();
+        bean.setNomeCliente(nomeCliente);
+        bean.setData(data);
+        bean.setOrarioStr(orarioStr);
+        bean.setCopertiStr(copertiStr);
+        bean.setEmail(email);
+        bean.setNote(note);
+
         try {
-            prenotazioneController.creaPrenotazione(
-                    nomeCliente, orarioStr, data, email, note, copertiStr);
+            prenotazioneController.creaPrenotazione(bean);
             System.out.println("Prenotazione creata con successo.");
         } catch (Exception e) {
             System.out.println("Errore nella creazione della prenotazione: " + e.getMessage());
@@ -140,7 +149,7 @@ public class PrenotazioneCLI {
             System.out.println("L'indirizzo email non può essere vuoto.");
             return;
         }
-        // Composizione e invio dell'email tramite Gmail
+        // Composizione e invio dell'email tramite EmailController
         EmailBean emailBean = emailController.composeEmailFromPrenotazione(selected);
         emailBean.setDestinatario(email);
         try {
@@ -217,9 +226,18 @@ public class PrenotazioneCLI {
         if (note.isEmpty())
             note = prenotazioneEsistente.getNote();
 
+        // Creazione della bean per la modifica
+        PrenotazioneBean bean = new PrenotazioneBean();
+        bean.setId(prenotazioneEsistente.getId());
+        bean.setNomeCliente(nomeCliente);
+        bean.setData(nuovaData);
+        bean.setOrarioStr(orarioStr);
+        bean.setCopertiStr(copertiStr);
+        bean.setEmail(email);
+        bean.setNote(note);
+
         try {
-            PrenotazioneBean updated = prenotazioneController.modificaPrenotazione(
-                    id, nomeCliente, orarioStr, nuovaData, email, note, copertiStr);
+            PrenotazioneBean updated = prenotazioneController.modificaPrenotazione(bean);
             System.out.println("Prenotazione modificata con successo.");
             System.out.println("Dettagli aggiornati: ");
             System.out.println("ID: " + updated.getId());
@@ -229,8 +247,7 @@ public class PrenotazioneCLI {
             System.out.println("Coperti: " + updated.getCoperti());
             System.out.println("Email: " + updated.getEmail());
             System.out.println("Note: " + updated.getNote());
-            System.out.println("Prenotazione modificata con successo!");
-        } catch (Exception e) {
+        } catch (PrenotationValidationException e) {
             System.out.println("Errore nella modifica della prenotazione: " + e.getMessage());
         }
     }

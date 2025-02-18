@@ -10,7 +10,4 @@ public class OrdineException extends RuntimeException {
         super(message, cause);
     }
 
-    public OrdineException(Throwable cause) {
-        super(cause);
-    }
 }

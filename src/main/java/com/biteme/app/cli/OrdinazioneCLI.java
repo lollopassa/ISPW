@@ -6,6 +6,7 @@ import java.util.Scanner;
 import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.controller.ArchivioController;
 import com.biteme.app.controller.OrdinazioneController;
+import com.biteme.app.exception.OrdinazioneException;
 import com.biteme.app.util.CLIUtils;
 
 public class OrdinazioneCLI {
@@ -58,33 +59,42 @@ public class OrdinazioneCLI {
     private static void handleCreateOrder() {
         OrdinazioneBean bean = new OrdinazioneBean();
 
-        System.out.print("Nome Cliente: ");
-        bean.setNome(SCANNER.nextLine());
+        try {
+            System.out.print("Nome Cliente: ");
+            bean.setNome(SCANNER.nextLine());
 
-        System.out.print("Tipo Ordine (Al Tavolo/Asporto): ");
-        String inputTipo = SCANNER.nextLine().trim();
-        // Convertiamo l'input (eventualmente in maiuscolo) nel formato atteso dal bean
-        if (inputTipo.equalsIgnoreCase("AL_TAVOLO") || inputTipo.equalsIgnoreCase("Al Tavolo")) {
-            bean.setTipoOrdine("Al Tavolo");
-        } else if (inputTipo.equalsIgnoreCase("ASPORTO") || inputTipo.equalsIgnoreCase("Asporto")) {
-            bean.setTipoOrdine("Asporto");
-        } else {
-            System.out.println("Tipo Ordine non valido. Operazione annullata.");
-            return;
+            System.out.print("Tipo Ordine (Al Tavolo/Asporto): ");
+            String inputTipo = SCANNER.nextLine().trim();
+            // Convertiamo l'input (eventualmente in maiuscolo) nel formato atteso dal bean
+            if (inputTipo.equalsIgnoreCase("AL_TAVOLO") || inputTipo.equalsIgnoreCase("Al Tavolo")) {
+                bean.setTipoOrdine("Al Tavolo");
+            } else if (inputTipo.equalsIgnoreCase("ASPORTO") || inputTipo.equalsIgnoreCase("Asporto")) {
+                bean.setTipoOrdine("Asporto");
+            } else {
+                System.out.println("Tipo Ordine non valido. Operazione annullata.");
+                return;
+            }
+
+            System.out.print("Orario (HH:mm): ");
+            bean.setOrarioCreazione(SCANNER.nextLine());
+
+            System.out.print("Coperti: ");
+            bean.setNumeroClienti(SCANNER.nextLine());
+
+            System.out.print("Info Tavolo (se applicabile): ");
+            bean.setInfoTavolo(SCANNER.nextLine());
+
+            ORDINAZIONE_CONTROLLER.creaOrdine(bean);
+            System.out.println("Ordine creato con successo.");
+        } catch (OrdinazioneException e) {
+            // Handle the exception: Print an error message or log it
+            System.err.println("Errore durante la creazione dell'ordine: " + e.getMessage());
+        } catch (Exception e) {
+            // Catch any other unexpected exceptions
+            System.err.println("Si è verificato un errore imprevisto: " + e.getMessage());
         }
-
-        System.out.print("Orario (HH:mm): ");
-        bean.setOrarioCreazione(SCANNER.nextLine());
-
-        System.out.print("Coperti: ");
-        bean.setNumeroClienti(SCANNER.nextLine());
-
-        System.out.print("Info Tavolo (se applicabile): ");
-        bean.setInfoTavolo(SCANNER.nextLine());
-
-        ORDINAZIONE_CONTROLLER.creaOrdine(bean);
-        System.out.println("Ordine creato con successo.");
     }
+
 
     private static void handleModifyOrder() {
         List<OrdinazioneBean> orders = ORDINAZIONE_CONTROLLER.getOrdini();
@@ -103,10 +113,19 @@ public class OrdinazioneCLI {
 
         int id = promptForOrderId();
         if (id != -1) {
-            ORDINAZIONE_CONTROLLER.eliminaOrdinazione(id);
-            System.out.println("Ordine eliminato.");
+            try {
+                ORDINAZIONE_CONTROLLER.eliminaOrdinazione(id);
+                System.out.println("Ordine eliminato.");
+            } catch (OrdinazioneException e) {
+                // Handle the exception when deleting an order
+                System.err.println("Errore durante l'eliminazione dell'ordine: " + e.getMessage());
+            } catch (Exception e) {
+                // Catch any other unexpected exceptions
+                System.err.println("Si è verificato un errore imprevisto durante l'eliminazione: " + e.getMessage());
+            }
         }
     }
+
 
     private static void handleArchiveOrder() {
         List<OrdinazioneBean> orders = ORDINAZIONE_CONTROLLER.getOrdini();

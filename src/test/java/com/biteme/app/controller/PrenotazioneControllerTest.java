@@ -1,7 +1,7 @@
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.PrenotazioneBean;
-import com.biteme.app.exception.ValidationException;
+import com.biteme.app.exception.PrenotationValidationException;
 import com.biteme.app.entities.Prenotazione;
 import com.biteme.app.persistence.PrenotazioneDao;
 import com.biteme.app.persistence.inmemory.Storage; // Utilizzato solo se la persistenza è in memory
@@ -69,14 +69,16 @@ class PrenotazioneControllerTest {
     void testCreaPrenotazione() {
         removeExistingPrenotazione("Mario Rossi", LocalDate.of(2025, 4, 15), "20:00");
 
-        controller.creaPrenotazione(
-                "Mario Rossi",
-                "20:00",
-                LocalDate.of(2025, 4, 15),
-                "",
-                "Cena di compleanno",
-                "3"
-        );
+        // Creazione della bean con i parametri raw
+        PrenotazioneBean bean = new PrenotazioneBean();
+        bean.setNomeCliente("Mario Rossi");
+        bean.setOrarioStr("20:00");
+        bean.setData(LocalDate.of(2025, 4, 15));
+        bean.setEmail("");
+        bean.setNote("Cena di compleanno");
+        bean.setCopertiStr("3");
+
+        controller.creaPrenotazione(bean);
 
         List<Prenotazione> prenotazioni = prenotazioneDao.getByData(LocalDate.of(2025, 4, 15));
         List<Prenotazione> filtered = prenotazioni.stream()
@@ -98,6 +100,7 @@ class PrenotazioneControllerTest {
 
     @Test
     void testModificaPrenotazione() {
+        // Creazione di una prenotazione iniziale
         Prenotazione initPrenotazione = new Prenotazione(
                 0,
                 "Anna Verdi",
@@ -111,15 +114,17 @@ class PrenotazioneControllerTest {
         int storedId = initPrenotazione.getId();
         createdPrenotazioniIds.add(storedId);
 
-        PrenotazioneBean updatedBean = controller.modificaPrenotazione(
-                storedId,
-                "Anna Verdi Modificata",
-                "20:30",
-                LocalDate.of(2025, 5, 25),
-                "",
-                "Cena privata",
-                "5"
-        );
+        // Creazione della bean per la modifica
+        PrenotazioneBean modBean = new PrenotazioneBean();
+        modBean.setId(storedId);
+        modBean.setNomeCliente("Anna Verdi Modificata");
+        modBean.setOrarioStr("20:30");
+        modBean.setData(LocalDate.of(2025, 5, 25));
+        modBean.setEmail("");
+        modBean.setNote("Cena privata");
+        modBean.setCopertiStr("5");
+
+        PrenotazioneBean updatedBean = controller.modificaPrenotazione(modBean);
 
         assertNotNull(updatedBean);
         assertEquals(storedId, updatedBean.getId());
@@ -144,7 +149,6 @@ class PrenotazioneControllerTest {
         );
         prenotazioneDao.store(prenotazione);
         int storedId = prenotazione.getId();
-        // Anche se verrà eliminata nel test, segnalo l'ID per eventuale cleanup
         createdPrenotazioniIds.add(storedId);
 
         controller.eliminaPrenotazione(storedId);
@@ -227,10 +231,22 @@ class PrenotazioneControllerTest {
         assertEquals("La prenotazione con ID 999 non esiste.", ex.getMessage());
     }
 
+    // Metodo helper per creare una bean e invocare creaPrenotazione
+    private void createPrenotazioneWithParams(String nome, String orario, LocalDate data, String email, String note, String coperti) {
+        PrenotazioneBean bean = new PrenotazioneBean();
+        bean.setNomeCliente(nome);
+        bean.setOrarioStr(orario);
+        bean.setData(data);
+        bean.setEmail(email);
+        bean.setNote(note);
+        bean.setCopertiStr(coperti);
+        controller.creaPrenotazione(bean);
+    }
+
     // Metodo helper per centralizzare la gestione delle eccezioni di validazione
     private void assertThrowsValidationException(String expectedMessage, String nome, String orario, LocalDate data, String email, String note, String coperti) {
-        Exception ex = assertThrows(ValidationException.class, () -> {
-            controller.creaPrenotazione(nome, orario, data, email, note, coperti);
+        Exception ex = assertThrows(PrenotationValidationException.class, () -> {
+            createPrenotazioneWithParams(nome, orario, data, email, note, coperti);
         });
         assertEquals(expectedMessage, ex.getMessage());
     }

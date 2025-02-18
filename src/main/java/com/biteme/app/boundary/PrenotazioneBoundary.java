@@ -4,7 +4,7 @@ import com.biteme.app.bean.EmailBean;
 import com.biteme.app.bean.PrenotazioneBean;
 import com.biteme.app.controller.EmailController;
 import com.biteme.app.controller.PrenotazioneController;
-import com.biteme.app.exception.ValidationException;
+import com.biteme.app.exception.PrenotationValidationException;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -99,26 +99,30 @@ public class PrenotazioneBoundary {
         noteColumn.setCellValueFactory(new PropertyValueFactory<>("note"));
     }
 
+    /**
+     * Crea una nuova prenotazione partendo dai dati inseriti dall'utente.
+     */
     @FXML
     private void creaPrenotazione() {
         try {
-            prenotazioneController.creaPrenotazione(
-                    nomeClienteField.getText().trim(),
-                    orarioField.getText().trim(),
-                    giornoSelezionato,
-                    emailField.getText().trim(),
-                    noteField.getText().trim(),
-                    copertiField.getText().trim()
-            );
+            PrenotazioneBean bean = new PrenotazioneBean();
+            bean.setNomeCliente(nomeClienteField.getText().trim());
+            bean.setOrarioStr(orarioField.getText().trim());
+            bean.setData(giornoSelezionato);
+            bean.setEmail(emailField.getText().trim());
+            bean.setNote(noteField.getText().trim());
+            bean.setCopertiStr(copertiField.getText().trim());
+
+            prenotazioneController.creaPrenotazione(bean);
 
             showAlert(SUCCESS_TITLE, "Prenotazione creata con successo!", Alert.AlertType.INFORMATION);
             resetForm();
             refreshTable(giornoSelezionato);
-        } catch (ValidationException e) {
+        } catch (PrenotationValidationException e) {
             showAlert(ERROR_TITLE, e.getMessage(), Alert.AlertType.ERROR);
+            resetForm();
         }
     }
-
 
     @FXML
     private void eliminaPrenotazione() {
@@ -141,7 +145,6 @@ public class PrenotazioneBoundary {
         mostraDialogModifica(selected);
     }
 
-
     private void mostraDialogModifica(PrenotazioneBean prenotazione) {
         Dialog<PrenotazioneBean> dialog = new Dialog<>();
         dialog.setTitle("Modifica Prenotazione");
@@ -152,8 +155,9 @@ public class PrenotazioneBoundary {
         grid.setVgap(10);
         TextField nomeField = new TextField(prenotazione.getNomeCliente());
         DatePicker dataPicker = new DatePicker(prenotazione.getData());
-        TextField orarioInput = new TextField(prenotazione.getOrario().toString());
-        TextField copertiInput = new TextField(String.valueOf(prenotazione.getCoperti()));
+        // Se è già stato convertito, mostra l'orario; altrimenti, lascia vuoto
+        TextField orarioInput = new TextField(prenotazione.getOrario() != null ? prenotazione.getOrario().toString() : "");
+        TextField copertiInput = new TextField(prenotazione.getCoperti() != 0 ? String.valueOf(prenotazione.getCoperti()) : "");
         TextField emailInput = new TextField(prenotazione.getEmail());
         TextField noteInput = new TextField(prenotazione.getNote());
 
@@ -178,16 +182,16 @@ public class PrenotazioneBoundary {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == salvaButtonType) {
                 try {
-                    return prenotazioneController.modificaPrenotazione(
-                            prenotazione.getId(),
-                            nomeField.getText().trim(),
-                            orarioInput.getText().trim(),
-                            dataPicker.getValue(),
-                            emailInput.getText().trim(),
-                            noteInput.getText().trim(),
-                            copertiInput.getText().trim()
-                    );
-                } catch (ValidationException e) {
+                    PrenotazioneBean bean = new PrenotazioneBean();
+                    bean.setId(prenotazione.getId());
+                    bean.setNomeCliente(nomeField.getText().trim());
+                    bean.setData(dataPicker.getValue());
+                    bean.setOrarioStr(orarioInput.getText().trim());
+                    bean.setCopertiStr(copertiInput.getText().trim());
+                    bean.setEmail(emailInput.getText().trim());
+                    bean.setNote(noteInput.getText().trim());
+                    return prenotazioneController.modificaPrenotazione(bean);
+                } catch (PrenotationValidationException e) {
                     showAlert(ERROR_TITLE, e.getMessage(), Alert.AlertType.ERROR);
                     return null;
                 }
