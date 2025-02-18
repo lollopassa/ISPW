@@ -109,7 +109,7 @@ class OrdinazioneControllerTest {
     }
 
     @Test
-    void testGetOrdini() throws Exception {
+    void testGetOrdini() {
         // Rimuove eventuali ordinazioni duplicate per "Anna Verdi"
         removeExistingOrdine("Anna Verdi", "3", "19:00");
 
@@ -208,7 +208,7 @@ class OrdinazioneControllerTest {
     }
 
     @Test
-    void testAggiornaStatoOrdinazioneNonEsistente() throws Exception {
+    void testAggiornaStatoOrdinazioneNonEsistente() {
         // Verifica che, per un ID non esistente, non venga lanciata eccezione e che l'ordinazione non esista
         assertDoesNotThrow(() -> controller.aggiornaStatoOrdinazione(999, StatoOrdinazione.IN_CORSO));
         assertFalse(ordinazioneDao.exists(999));
