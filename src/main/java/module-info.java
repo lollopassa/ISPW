@@ -36,6 +36,6 @@ module demo {
     opens com.biteme.app.boundary to javafx.fxml;
     exports com.biteme.app.bean;
     opens com.biteme.app.bean to javafx.fxml;
-    exports com.biteme.app.googleAPI;
-    opens com.biteme.app.googleAPI to javafx.fxml;
+    exports com.biteme.app.googleapi;
+    opens com.biteme.app.googleapi to javafx.fxml;
 }

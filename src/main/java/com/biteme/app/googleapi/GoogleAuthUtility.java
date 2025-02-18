@@ -1,4 +1,4 @@
-package com.biteme.app.googleAPI;
+package com.biteme.app.googleapi;
 
 import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.exception.ServerInitializationException;
