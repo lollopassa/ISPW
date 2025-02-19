@@ -8,7 +8,8 @@ import java.util.Optional;
 
 public class InMemoryPrenotazioneDao implements PrenotazioneDao {
 
-    private final List<Prenotazione> prenotazioni = Storage.getInstance().getPrenotazioni();     private int currentId = 1;
+    private final List<Prenotazione> prenotazioni = Storage.getInstance().getPrenotazioni();
+    private int currentId = 1;
 
     @Override
     public Optional<Prenotazione> load(Integer key) {

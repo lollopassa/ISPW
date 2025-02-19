@@ -76,7 +76,8 @@ public class OrdineController {
         List<String> prodotti = new ArrayList<>();
         for (Node nodo : riepilogoContenuto.getChildren()) {
             if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
-                String testo = nomeEQuantitaLabel.getText();                 String[] parti = testo.split(" x ");
+                String testo = nomeEQuantitaLabel.getText();
+                String[] parti = testo.split(" x ");
                 if (parti.length > 1) {
                     String nomeProdotto = parti[0].trim();
                     prodotti.add(nomeProdotto);

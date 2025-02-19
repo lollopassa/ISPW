@@ -10,7 +10,9 @@ import java.util.Optional;
 
 public class InMemoryOrdinazioneDao implements OrdinazioneDao {
 
-    private final List<Ordine> ordini = Storage.getInstance().getOrdini();     private int currentId = 1;     private final List<Ordinazione> ordinazioni = Storage.getInstance().getOrdinazioni(); 
+    private final List<Ordine> ordini = Storage.getInstance().getOrdini();
+    private int currentId = 1;
+    private final List<Ordinazione> ordinazioni = Storage.getInstance().getOrdinazioni();
     @Override
     public Optional<Ordinazione> load(Integer key) {
         return ordinazioni.stream()

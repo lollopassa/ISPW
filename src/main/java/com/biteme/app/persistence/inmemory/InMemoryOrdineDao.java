@@ -8,7 +8,8 @@ import java.util.Optional;
 
 public class InMemoryOrdineDao implements OrdineDao {
 
-    private final List<Ordine> ordini = Storage.getInstance().getOrdini();     private int currentId = 1;
+    private final List<Ordine> ordini = Storage.getInstance().getOrdini();
+    private int currentId = 1;
 
     @Override
     public Optional<Ordine> load(Integer key) {

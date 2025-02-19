@@ -10,7 +10,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class DatabaseConnection {
-    private static final String CONFIG_FILE = "/config.properties";     private static String url;
+    private static final String CONFIG_FILE = "/config.properties";
+    private static String url;
     private static String user;
     private static String password;
 

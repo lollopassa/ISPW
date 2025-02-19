@@ -10,7 +10,8 @@ import java.util.Optional;
 
 public class InMemoryProdottoDao implements ProdottoDao {
 
-    private final List<Prodotto> prodotti = Storage.getInstance().getProdotti();     private int currentId = 1;
+    private final List<Prodotto> prodotti = Storage.getInstance().getProdotti();
+    private int currentId = 1;
 
     @Override
     public Optional<Prodotto> load(Integer key) {
