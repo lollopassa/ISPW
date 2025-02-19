@@ -8,8 +8,7 @@ public class User {
     private UserRole ruolo;
     private boolean googleUser;
 
-    // Costruttori
-    public User(String username) {
+        public User(String username) {
         this.username = username;
     }
 
@@ -20,8 +19,7 @@ public class User {
         this.ruolo = ruolo;
     }
 
-    // Getter e Setter per username
-    public String getUsername() {
+        public String getUsername() {
         return username;
     }
 
@@ -29,8 +27,7 @@ public class User {
         this.username = username;
     }
 
-    // Getter e Setter per email
-    public String getEmail() {
+        public String getEmail() {
         return email;
     }
 
@@ -38,8 +35,7 @@ public class User {
         this.email = email;
     }
 
-    // Getter e Setter per password
-    public String getPassword() {
+        public String getPassword() {
         return password;
     }
 
@@ -47,8 +43,7 @@ public class User {
         this.password = password;
     }
 
-    // Getter e Setter per ruolo
-    public UserRole getRuolo() {
+        public UserRole getRuolo() {
         return ruolo;
     }
 

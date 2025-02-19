@@ -23,8 +23,7 @@ public class Prenotazione {
         this.coperti = coperti;
     }
 
-    // Getter e Setter
-    public int getId() {
+        public int getId() {
         return id;
     }
 
@@ -72,8 +71,7 @@ public class Prenotazione {
         this.email = email;
     }
 
-    public int getCoperti() { // NUOVO CAMPO
-        return coperti;
+    public int getCoperti() {         return coperti;
     }
 
     public void setCoperti(int coperti) {

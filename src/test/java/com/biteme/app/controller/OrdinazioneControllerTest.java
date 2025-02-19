@@ -6,7 +6,7 @@ import com.biteme.app.entities.Ordinazione;
 import com.biteme.app.entities.StatoOrdinazione;
 import com.biteme.app.entities.TipoOrdinazione;
 import com.biteme.app.persistence.OrdinazioneDao;
-import com.biteme.app.persistence.inmemory.Storage; // Utilizzato solo per il cleanup in modalità in memory
+import com.biteme.app.persistence.inmemory.Storage;
 import com.biteme.app.persistence.Configuration;
 import org.junit.jupiter.api.*;
 
@@ -24,18 +24,18 @@ class OrdinazioneControllerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        // Inizializza il controller
+
         controller = new OrdinazioneController();
 
-        // Recupera il DAO generico per Ordinazioni tramite la configurazione
+
         ordinazioneDao = Configuration.getPersistenceProvider().getDaoFactory().getOrdinazioneDao();
 
-        // Usa reflection per iniettare il DAO nella classe OrdinazioneController
+
         Field daoField = OrdinazioneController.class.getDeclaredField("ordinazioneDao");
         daoField.setAccessible(true);
         daoField.set(controller, ordinazioneDao);
 
-        // Inietta anche il controller per l'ordine, se richiesto
+
         Field ordineControllerField = OrdinazioneController.class.getDeclaredField("ordineController");
         ordineControllerField.setAccessible(true);
         ordineControllerField.set(controller, new OrdineController());
@@ -43,12 +43,12 @@ class OrdinazioneControllerTest {
 
     @AfterEach
     void tearDown() {
-        // Se la persistenza è in memory, pulisci lo storage per garantire test isolati
+
         if (Configuration.getPersistenceProvider().getDaoFactory()
                 instanceof com.biteme.app.persistence.inmemory.InMemoryDaoFactory) {
             Storage.getInstance().getOrdinazioni().clear();
         } else {
-            // Per la modalità database, rimuovo soltanto i record creati per i test
+
             removeExistingOrdine("Mario Rossi", "4", "20:00");
             removeExistingOrdine("Anna Verdi", "3", "19:00");
             removeExistingOrdine("Giovanna Bianchi", "2", "18:00");
@@ -70,22 +70,22 @@ class OrdinazioneControllerTest {
 
     @Test
     void testCreaOrdine() throws Exception {
-        // Rimuove eventuali ordinazioni già presenti con gli stessi dati
+
         removeExistingOrdine("Mario Rossi", "4", "20:00");
 
         OrdinazioneBean ordinazioneBean = new OrdinazioneBean();
         ordinazioneBean.setNome("Mario Rossi");
-        ordinazioneBean.setNumeroClienti("4"); // Passato come Stringa
+        ordinazioneBean.setNumeroClienti("4");
         ordinazioneBean.setTipoOrdine("Al Tavolo");
         ordinazioneBean.setInfoTavolo("5");
-        ordinazioneBean.setOrarioCreazione("20:00"); // Orario come Stringa
+        ordinazioneBean.setOrarioCreazione("20:00");
 
         controller.creaOrdine(ordinazioneBean);
 
-        // Recupera tutte le ordinazioni salvate
+
         List<Ordinazione> ordinazioni = ordinazioneDao.getAll();
 
-        // Filtra per trovare l'ordine appena creato in base ai dati specifici
+
         List<Ordinazione> filtered = ordinazioni.stream()
                 .filter(o -> "Mario Rossi".equals(o.getNomeCliente())
                         && "4".equals(String.valueOf(o.getNumeroClienti()))
@@ -99,7 +99,7 @@ class OrdinazioneControllerTest {
 
         Ordinazione o = filtered.get(0);
 
-        assertTrue(o.getId() > 0); // L'ID deve essere maggiore di 0
+        assertTrue(o.getId() > 0);
         assertEquals("Mario Rossi", o.getNomeCliente());
         assertEquals("4", String.valueOf(o.getNumeroClienti()));
         assertEquals(TipoOrdinazione.AL_TAVOLO, o.getTipoOrdine());
@@ -110,26 +110,23 @@ class OrdinazioneControllerTest {
 
     @Test
     void testGetOrdini() {
-        // Rimuove eventuali ordinazioni duplicate per "Anna Verdi"
+
         removeExistingOrdine("Anna Verdi", "3", "19:00");
 
-        // Crea e salva un'ordinazione di esempio
+
         Ordinazione ordinazione = new Ordinazione(
-                1,              // L'ID verrà ignorato e sovrascritto dall'auto-increment
+                1,
                 "Anna Verdi",
-                "3",          // Numero clienti come Stringa
-                TipoOrdinazione.ASPORTO,
+                "3",                          TipoOrdinazione.ASPORTO,
                 "Nessuna",
                 StatoOrdinazione.NUOVO,
-                "19:00"       // Orario come Stringa
-        );
+                "19:00"               );
         ordinazioneDao.store(ordinazione);
 
         List<OrdinazioneBean> ordinazioni = controller.getOrdini();
         assertNotNull(ordinazioni);
 
-        // Filtra per ottenere solamente l'ordine con i dati di Anna Verdi
-        List<OrdinazioneBean> filtered = ordinazioni.stream()
+                List<OrdinazioneBean> filtered = ordinazioni.stream()
                 .filter(b -> "Anna Verdi".equals(b.getNome())
                         && "3".equals(b.getNumeroClienti())
                         && "Asporto".equals(b.getTipoOrdine())
@@ -142,11 +139,9 @@ class OrdinazioneControllerTest {
 
         OrdinazioneBean bean = filtered.get(0);
 
-        // Invece di verificare che l'ID sia 1, verifichiamo che sia uguale all'ID dell'ordinazione salvata
-        assertEquals(ordinazione.getId(), bean.getId());
+                assertEquals(ordinazione.getId(), bean.getId());
 
-        // Altre asserzioni rimangono invariate
-        assertEquals("Anna Verdi", bean.getNome());
+                assertEquals("Anna Verdi", bean.getNome());
         assertEquals("3", bean.getNumeroClienti());
         assertEquals("Asporto", bean.getTipoOrdine());
         assertEquals("Nessuna", bean.getInfoTavolo());
@@ -156,18 +151,15 @@ class OrdinazioneControllerTest {
 
     @Test
     void testEliminaOrdinazione() throws Exception {
-        // Rimuove eventuali ordinazioni duplicate per "Mario Rossi"
-        removeExistingOrdine("Mario Rossi", "4", "20:00");
+                removeExistingOrdine("Mario Rossi", "4", "20:00");
 
         Ordinazione ordinazione = new Ordinazione(
                 1,
                 "Mario Rossi",
-                "4",       // Numero clienti come Stringa
-                TipoOrdinazione.AL_TAVOLO,
+                "4",                       TipoOrdinazione.AL_TAVOLO,
                 "Tavolo 5",
                 StatoOrdinazione.NUOVO,
-                "20:00"    // Orario come Stringa
-        );
+                "20:00"            );
         ordinazioneDao.store(ordinazione);
         int storedId = ordinazione.getId();
 
@@ -184,23 +176,19 @@ class OrdinazioneControllerTest {
 
     @Test
     void testAggiornaStatoOrdinazione() throws Exception {
-        // Rimuove eventuali ordinazioni duplicate per "Giovanna Bianchi"
-        removeExistingOrdine("Giovanna Bianchi", "2", "18:00");
+                removeExistingOrdine("Giovanna Bianchi", "2", "18:00");
 
         Ordinazione ordinazione = new Ordinazione(
                 1,
                 "Giovanna Bianchi",
-                "2",       // Numero clienti come Stringa
-                TipoOrdinazione.ASPORTO,
+                "2",                       TipoOrdinazione.ASPORTO,
                 "Nessuna",
                 StatoOrdinazione.NUOVO,
-                "18:00"    // Orario come Stringa
-        );
+                "18:00"            );
         ordinazioneDao.store(ordinazione);
         int storedId = ordinazione.getId();
 
-        // Aggiorna lo stato a IN_CORSO
-        controller.aggiornaStatoOrdinazione(storedId, StatoOrdinazione.IN_CORSO);
+                controller.aggiornaStatoOrdinazione(storedId, StatoOrdinazione.IN_CORSO);
 
         Ordinazione updatedOrdinazione = ordinazioneDao.load(storedId).orElse(null);
         assertNotNull(updatedOrdinazione);
@@ -209,16 +197,12 @@ class OrdinazioneControllerTest {
 
     @Test
     void testAggiornaStatoOrdinazioneNonEsistente() {
-        // Verifica che, per un ID non esistente, non venga lanciata eccezione e che l'ordinazione non esista
-        assertDoesNotThrow(() -> controller.aggiornaStatoOrdinazione(999, StatoOrdinazione.IN_CORSO));
+                assertDoesNotThrow(() -> controller.aggiornaStatoOrdinazione(999, StatoOrdinazione.IN_CORSO));
         assertFalse(ordinazioneDao.exists(999));
     }
 
     @Test
     void testIsValidTime() {
         assertTrue(controller.isValidTime("12:30"));
-        assertFalse(controller.isValidTime("25:00")); // Ora non valida
-        assertFalse(controller.isValidTime("12:60")); // Minuti non validi
-        assertFalse(controller.isValidTime("invalid")); // Formato non valido
-    }
+        assertFalse(controller.isValidTime("25:00"));         assertFalse(controller.isValidTime("12:60"));         assertFalse(controller.isValidTime("invalid"));     }
 }

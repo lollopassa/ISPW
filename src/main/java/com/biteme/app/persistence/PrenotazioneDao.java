@@ -5,6 +5,5 @@ import com.biteme.app.entities.Prenotazione;
 import java.util.List;
 
 public interface PrenotazioneDao extends Dao<Integer, Prenotazione> {
-    List<Prenotazione> getByData(LocalDate data); // Nuovo metodo per filtrare con la data
-    void update(Prenotazione prenotazione);
+    List<Prenotazione> getByData(LocalDate data);     void update(Prenotazione prenotazione);
 }

@@ -31,19 +31,16 @@ public class InMemoryUserDao implements UserDao {
             user.setRuolo(UserRole.CAMERIERE);
         }
 
-        // Gestione utente Google
-        if (!user.isGoogleUser()) {
+                if (!user.isGoogleUser()) {
             String hashedPassword = HashingUtil.hashPassword(user.getPassword());
             user.setPassword(hashedPassword);
         }
 
-        users.put(user.getUsername(), user); // Usa ancora username come chiave
-    }
+        users.put(user.getUsername(), user);     }
 
     @Override
     public void delete(String key) {
-        users.remove(key); // Rimuove per username
-    }
+        users.remove(key);     }
 
     @Override
     public boolean exists(String identifier) {

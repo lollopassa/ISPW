@@ -8,8 +8,7 @@ public class Ordine {
     private List<String> prodotti;
     private List<Integer> quantita;
 
-    // Costruttore
-    public Ordine(int id,  List<String> prodotti, List<Integer> quantita) {
+        public Ordine(int id,  List<String> prodotti, List<Integer> quantita) {
         this.id = id;
         this.prodotti = prodotti;
         this.quantita = quantita;

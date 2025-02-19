@@ -27,13 +27,11 @@ public class BiteMeApplication extends Application {
     public static void main(String[] args) {
         logger.log(Level.INFO, "Avvio dell'applicazione BiteMe.");
 
-        String uiMode = Configuration.getUiMode(); // Legge dal config.properties
-        if ("cli".equalsIgnoreCase(uiMode)) {
+        String uiMode = Configuration.getUiMode();         if ("cli".equalsIgnoreCase(uiMode)) {
             logger.log(Level.INFO, "Avvio in modalità CLI.");
             LoginCLI.login();
         } else {
             logger.log(Level.INFO, "Avvio in modalità JavaFX.");
-            launch(); // Metodo standard JavaFX
-        }
+            launch();         }
     }
 }

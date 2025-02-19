@@ -2,7 +2,7 @@ package com.biteme.app.cli;
 
 public class HomeCLI {
 
-    // Costruttore privato per evitare istanziazioni
+    
     private HomeCLI() {
     }
 

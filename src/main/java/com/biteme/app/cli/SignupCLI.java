@@ -6,7 +6,7 @@ import com.biteme.app.util.CLIUtils;
 
 public class SignupCLI {
 
-    // Costruttore privato per evitare istanziazioni
+    
     private SignupCLI() {
     }
 
@@ -28,7 +28,7 @@ public class SignupCLI {
         System.out.print("Conferma Password: ");
         String confirmPassword = scanner.nextLine();
 
-        // Usa il costruttore vuoto e imposta i valori con i setter
+        
         SignupBean signupBean = new SignupBean();
         signupBean.setUsername(username);
         signupBean.setEmail(email);
@@ -38,13 +38,13 @@ public class SignupCLI {
         SignupController signupController = new SignupController();
 
         try {
-            // Esegui la registrazione dell'utente
+            
             signupController.registerUser(signupBean);
             System.out.println("Registrazione completata con successo!");
             System.out.println("Prosegui con il login...");
             LoginCLI.login();
         } catch (IllegalArgumentException ex) {
-            // Mostra messaggio d'errore e riprova
+            
             System.out.println("Errore: " + ex.getMessage());
             System.out.println(RETRY_MESSAGE);
             start();

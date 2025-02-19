@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class OrdineCLI {
 
-    // Costruttore privato per evitare istanziazioni
+    
     private OrdineCLI() {
     }
 
@@ -21,7 +21,7 @@ public class OrdineCLI {
 
     public static void start(int orderId) {
         var scanner = CLIUtils.getScanner();
-        // Recupera l'OrdineBean utilizzando l'ID
+        
         OrdineBean ordineBean;
         try {
             ordineBean = ordineController.getOrdineById(orderId);
@@ -30,17 +30,17 @@ public class OrdineCLI {
             return;
         }
 
-        // Se le liste non sono inizializzate oppure sono immutabili, creale come nuove ArrayList
+        
         if (ordineBean.getProdotti() == null) {
             ordineBean.setProdotti(new java.util.ArrayList<>());
         } else {
-            // Crea una copia mutabile
+            
             ordineBean.setProdotti(new java.util.ArrayList<>(ordineBean.getProdotti()));
         }
         if (ordineBean.getQuantita() == null) {
             ordineBean.setQuantita(new java.util.ArrayList<>());
         } else {
-            // Crea una copia mutabile
+            
             ordineBean.setQuantita(new java.util.ArrayList<>(ordineBean.getQuantita()));
         }
 
@@ -68,7 +68,7 @@ public class OrdineCLI {
                     modificaQuantita(scanner, ordineBean);
                     break;
                 case "4":
-                    // Salva le modifiche chiamando il metodo del controller
+                    
                     try {
                         ordineController.salvaOrdine(ordineBean, orderId);
                         System.out.println("Modifiche salvate.");
@@ -102,7 +102,7 @@ public class OrdineCLI {
                 String nomeProdotto = prodotti.get(i);
                 int qta = quantita.get(i);
 
-                // Recupera i dettagli del prodotto tramite il controller
+                
                 ProdottoBean prodotto = prodottoController.getProdottoByNome(nomeProdotto);
                 if (prodotto != null) {
                     System.out.println((i + 1) + ". "
@@ -126,7 +126,7 @@ public class OrdineCLI {
 
         ProdottoBean prodotto;
         try {
-            // Prova a recuperare il prodotto; se non esiste viene lanciata un'eccezione
+            
             prodotto = prodottoController.getProdottoByNome(nomeProdotto);
         } catch (ProdottoException e) {
             System.out.println("Errore: " + e.getMessage());

@@ -25,20 +25,20 @@ public class SignupBoundary {
 
     @FXML
     private void onRegistratiButtonClick() {
-        // Creazione del bean con i dati forniti dall'utente
+        
         SignupBean signupBean = new SignupBean();
         signupBean.setUsername(nomeUtenteTextField.getText());
         signupBean.setEmail(emailTextField.getText());
         signupBean.setPassword(passwordTextField.getText());
         signupBean.setConfirmPassword(confirmPasswordTextField.getText());
 
-        // Il controller si occupa di validare e registrare l'utente.
+        
         try {
             signupController.registerUser(signupBean);
             showAlert("Successo", "Registrazione completata!", Alert.AlertType.INFORMATION);
             signupController.navigateToLogin();
         } catch (IllegalArgumentException ex) {
-            // Se c'è un errore di validazione o l'utente esiste già, viene mostrato l'errore
+            
             showAlert("Errore di Registrazione", ex.getMessage(), Alert.AlertType.ERROR);
         }
     }

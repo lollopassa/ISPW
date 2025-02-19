@@ -6,14 +6,11 @@ import com.biteme.app.persistence.txt.TxtDaoFactory;
 
 public enum PersistenceProvider {
 
-    // Persistenza in memory
-    IN_MEMORY("in memory", new InMemoryDaoFactory()),
+        IN_MEMORY("in memory", new InMemoryDaoFactory()),
 
-    // Persistenza tramite connessione al database
-    DATABASE("database", new DatabaseDaoFactory()),
+        DATABASE("database", new DatabaseDaoFactory()),
 
-    // Persistenza tramite file di testo
-    TXT("txt", new TxtDaoFactory());
+        TXT("txt", new TxtDaoFactory());
 
 
     private final String name;

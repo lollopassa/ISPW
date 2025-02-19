@@ -50,7 +50,7 @@ public class PrenotazioneBoundary {
 
     @FXML private Button modificaButton;
     @FXML private Button eliminaButton;
-    @FXML private Button emailButton;  // Pulsante per inviare l'email della prenotazione
+    @FXML private Button emailButton;  
 
     private final PrenotazioneController prenotazioneController = new PrenotazioneController();
     private final EmailController emailController = new EmailController();
@@ -155,7 +155,7 @@ public class PrenotazioneBoundary {
         grid.setVgap(10);
         TextField nomeField = new TextField(prenotazione.getNomeCliente());
         DatePicker dataPicker = new DatePicker(prenotazione.getData());
-        // Se è già stato convertito, mostra l'orario; altrimenti, lascia vuoto
+        
         TextField orarioInput = new TextField(prenotazione.getOrario() != null ? prenotazione.getOrario().toString() : "");
         TextField copertiInput = new TextField(prenotazione.getCoperti() != 0 ? String.valueOf(prenotazione.getCoperti()) : "");
         TextField emailInput = new TextField(prenotazione.getEmail());
@@ -213,7 +213,7 @@ public class PrenotazioneBoundary {
             showAlert(ERROR_TITLE, "Seleziona una prenotazione dalla tabella.", Alert.AlertType.ERROR);
             return;
         }
-        // Uso il bean per comporre l'email
+        
         PrenotazioneBean bean = new PrenotazioneBean();
         bean.setNomeCliente(selected.getNomeCliente());
         bean.setData(selected.getData());
@@ -222,7 +222,7 @@ public class PrenotazioneBoundary {
         bean.setNote(selected.getNote());
         bean.setEmail(selected.getEmail());
 
-        // Mostra dialog per inserire l'indirizzo email del cliente
+        
         Dialog<String> dialog = new Dialog<>();
         dialog.setTitle("Invia Prenotazione via Email");
         dialog.setHeaderText("Inserisci l'indirizzo email del cliente");
@@ -249,7 +249,7 @@ public class PrenotazioneBoundary {
                 showAlert(ERROR_TITLE, "L'indirizzo email non può essere vuoto.", Alert.AlertType.ERROR);
                 return;
             }
-            // Componi ed invia la mail utilizzando EmailController
+            
             EmailBean emailBean = emailController.composeEmailFromPrenotazione(bean);
             emailBean.setDestinatario(email);
             try {

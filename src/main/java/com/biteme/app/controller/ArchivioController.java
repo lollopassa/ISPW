@@ -53,8 +53,7 @@ public class ArchivioController {
         }
 
         return conteggioPiatti.entrySet().stream()
-                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordine decrescente
-                .collect(Collectors.toMap(
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         e -> (Number) e.getValue(),
                         (e1, e2) -> e1,
@@ -108,8 +107,7 @@ public class ArchivioController {
 
         Map<String, BigDecimal> guadagni = new HashMap<>();
         for (Archivio archivio : archivi) {
-            // Per ogni archivio, itera sui prodotti e somma il totale
-            for (int i = 0; i < archivio.getProdotti().size(); i++) {
+                        for (int i = 0; i < archivio.getProdotti().size(); i++) {
                 String prodotto = archivio.getProdotti().get(i);
                 BigDecimal totale = archivio.getTotale();
 
@@ -117,8 +115,7 @@ public class ArchivioController {
             }
         }
 
-        // Converte i valori da BigDecimal a double
-        return guadagni.entrySet().stream()
+                return guadagni.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         e -> e.getValue().doubleValue(),
@@ -129,23 +126,19 @@ public class ArchivioController {
 
 
     public Map<String, Number> guadagniPerGiorno(String periodo) {
-        // Ottieni il range di date tramite il metodo helper
-        LocalDateTime[] dateRange = getDateRange(periodo);
+                LocalDateTime[] dateRange = getDateRange(periodo);
         LocalDateTime startDate = dateRange[0];
         LocalDateTime endDate = dateRange[1];
 
-        // Recupera gli archivi per il range di date specificato
-        List<Archivio> archivi = archivioDao.findByDateRange(startDate, endDate);
+                List<Archivio> archivi = archivioDao.findByDateRange(startDate, endDate);
 
-        // Inizializza la mappa per contenere i guadagni per ogni giorno della settimana
-        Map<String, BigDecimal> guadagniGiorno = new LinkedHashMap<>();
+                Map<String, BigDecimal> guadagniGiorno = new LinkedHashMap<>();
         String[] giorni = { "Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom" };
         for (String giorno : giorni) {
             guadagniGiorno.put(giorno, BigDecimal.ZERO);
         }
 
-        // Per ogni archivio, somma il totale al giorno corrispondente
-        for (Archivio archivio : archivi) {
+                for (Archivio archivio : archivi) {
             String giornoAbbreviato = switch (archivio.getDataArchiviazione().getDayOfWeek()) {
                 case MONDAY -> "Lun";
                 case TUESDAY -> "Mar";
@@ -159,8 +152,7 @@ public class ArchivioController {
             guadagniGiorno.put(giornoAbbreviato, totaleGiorno.add(archivio.getTotale()));
         }
 
-        // Converte i BigDecimal in double per il risultato finale
-        Map<String, Number> result = new LinkedHashMap<>();
+                Map<String, Number> result = new LinkedHashMap<>();
         guadagniGiorno.forEach((g, tot) -> result.put(g, tot.doubleValue()));
 
         return result;

@@ -23,18 +23,18 @@ class ProdottoControllerTest {
 
     private ProdottoController controller;
     private ProdottoDao prodottoDao;
-    // Lista per tracciare gli ID dei prodotti creati durante i test
+
     private final List<Integer> createdProdottoIds = new ArrayList<>();
 
     @BeforeEach
     void setUp() throws Exception {
-        // Inizializza il controller
+
         controller = new ProdottoController();
 
-        // Recupera il DAO generico per i prodotti tramite la configurazione
+
         prodottoDao = Configuration.getPersistenceProvider().getDaoFactory().getProdottoDao();
 
-        // Usa reflection per iniettare il DAO nella classe ProdottoController
+
         Field daoField = ProdottoController.class.getDeclaredField("prodottoDao");
         daoField.setAccessible(true);
         daoField.set(controller, prodottoDao);
@@ -42,12 +42,12 @@ class ProdottoControllerTest {
 
     @AfterEach
     void tearDown() {
-        // Se la persistenza è in memory, pulisci lo storage per garantire test isolati.
+
         if (Configuration.getPersistenceProvider().getDaoFactory()
                 instanceof com.biteme.app.persistence.inmemory.InMemoryDaoFactory) {
             Storage.getInstance().getProdotti().clear();
         } else {
-            // Per txt o database, elimina i record creati durante il test
+
             for (Integer id : createdProdottoIds) {
                 if (prodottoDao.exists(id)) {
                     prodottoDao.delete(id);
@@ -59,21 +59,21 @@ class ProdottoControllerTest {
 
     @Test
     void testAggiungiProdotto() {
-        // Prepara un bean per il nuovo prodotto
+
         ProdottoBean bean = preparaProdottoBean("Pasta", "PRIMI", new BigDecimal("12"), true);
 
-        // Aggiunge il prodotto tramite il controller
+
         controller.aggiungiProdotto(bean);
 
-        // Recupera il prodotto tramite nome usando il metodo del controller
+
         ProdottoBean result = controller.getProdottoByNome("Pasta");
         assertNotNull(result, "Il prodotto non deve essere nullo.");
         createdProdottoIds.add(result.getId());
 
-        // Verifica che i dati siano stati salvati correttamente
+
         assertTrue(result.getId() > 0);
         assertEquals("Pasta", result.getNome());
-        // Confronta i prezzi usando compareTo per evitare differenze di scale (es. 12 vs. 12.00)
+
         assertEquals(0, result.getPrezzo().compareTo(new BigDecimal("12")));
         assertEquals("PRIMI", result.getCategoria());
         assertTrue(result.getDisponibile());
@@ -81,17 +81,17 @@ class ProdottoControllerTest {
 
     @Test
     void testModificaProdotto() {
-        // Crea e salva un prodotto iniziale
+
         Prodotto prodotto = new Prodotto(0, "Fiorentina", new BigDecimal("75.00"), Categoria.SECONDI, true);
         prodottoDao.store(prodotto);
         int prodId = prodotto.getId();
         createdProdottoIds.add(prodId);
 
-        // Prepara il bean con i dettagli aggiornati
+
         ProdottoBean bean = preparaProdottoBean(prodId, "Bistecca alla Fiorentina", "SECONDI", new BigDecimal("95.00"), false);
         controller.modificaProdotto(bean);
 
-        // Recupera il prodotto aggiornato tramite il DAO
+
         Optional<Prodotto> updatedProdotto = prodottoDao.load(prodId);
         assertTrue(updatedProdotto.isPresent(), "Il prodotto aggiornato deve essere presente.");
         Prodotto p = updatedProdotto.get();
@@ -103,24 +103,22 @@ class ProdottoControllerTest {
 
     @Test
     void testEliminaProdotto() {
-        // Aggiunge un prodotto di esempio
+
         Prodotto prodotto = new Prodotto(0, "Brodo di Carne", new BigDecimal("18.30"), Categoria.PRIMI, true);
         prodottoDao.store(prodotto);
         int prodId = prodotto.getId();
         createdProdottoIds.add(prodId);
 
-        // Elimina il prodotto tramite il controller
+
         controller.eliminaProdotto(prodId);
 
-        // Verifica che il prodotto non esista più
-        assertFalse(prodottoDao.exists(prodId));
+                assertFalse(prodottoDao.exists(prodId));
         createdProdottoIds.remove(Integer.valueOf(prodId));
     }
 
     @Test
     void testGetProdotti() {
-        // Aggiunge diversi prodotti al DAO
-        Prodotto p1 = new Prodotto(0, "Pizza Margherita", new BigDecimal("5.50"), Categoria.PIZZE, true);
+                Prodotto p1 = new Prodotto(0, "Pizza Margherita", new BigDecimal("5.50"), Categoria.PIZZE, true);
         Prodotto p2 = new Prodotto(0, "Tiramisu", new BigDecimal("8.50"), Categoria.DOLCI, false);
         Prodotto p3 = new Prodotto(0, "Insalata Mista", new BigDecimal("6.00"), Categoria.ANTIPASTI, true);
 
@@ -131,14 +129,11 @@ class ProdottoControllerTest {
         createdProdottoIds.add(p2.getId());
         createdProdottoIds.add(p3.getId());
 
-        // Recupera i prodotti disponibili tramite il controller
-        List<ProdottoBean> prodottiDisponibili = controller.getProdotti();
-        // Filtra solo i prodotti che sono stati creati durante il test
-        List<ProdottoBean> createdProducts = prodottiDisponibili.stream()
+                List<ProdottoBean> prodottiDisponibili = controller.getProdotti();
+                List<ProdottoBean> createdProducts = prodottiDisponibili.stream()
                 .filter(bean -> createdProdottoIds.contains(bean.getId()))
                 .toList();
-        // Dovrebbero essere presenti solo i prodotti creati con disponibile == true (p1 e p3)
-        assertEquals(2, createdProducts.size(), "I prodotti creati e disponibili devono essere 2.");
+                assertEquals(2, createdProducts.size(), "I prodotti creati e disponibili devono essere 2.");
         for (ProdottoBean bean : createdProducts) {
             assertTrue(bean.getDisponibile());
         }
@@ -146,14 +141,12 @@ class ProdottoControllerTest {
 
     @Test
     void testGetProdottoByNome() {
-        // Aggiunge un prodotto specifico
-        Prodotto prodotto = new Prodotto(0, "Gattò", new BigDecimal("15.00"), Categoria.SECONDI, true);
+                Prodotto prodotto = new Prodotto(0, "Gattò", new BigDecimal("15.00"), Categoria.SECONDI, true);
         prodottoDao.store(prodotto);
         int prodId = prodotto.getId();
         createdProdottoIds.add(prodId);
 
-        // Recupera il prodotto tramite nome
-        ProdottoBean bean = controller.getProdottoByNome("Gattò");
+                ProdottoBean bean = controller.getProdottoByNome("Gattò");
         assertNotNull(bean);
         assertEquals("Gattò", bean.getNome());
         assertEquals(0, bean.getPrezzo().compareTo(new BigDecimal("15.00")));
@@ -161,7 +154,6 @@ class ProdottoControllerTest {
         assertTrue(bean.getDisponibile());
     }
 
-    // Test per la gestione degli errori
 
     @Test
     void testAggiungiProdottoConNomeVuoto() {
@@ -196,7 +188,6 @@ class ProdottoControllerTest {
         assertEquals("L'ID del prodotto da eliminare non è valido.", exception.getMessage());
     }
 
-    // Metodi utilitari per preparare i bean
 
     private ProdottoBean preparaProdottoBean(String nome, String categoria, BigDecimal prezzo, boolean disponibile) {
         return preparaProdottoBean(0, nome, categoria, prezzo, disponibile);

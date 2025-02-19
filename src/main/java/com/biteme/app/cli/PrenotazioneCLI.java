@@ -13,7 +13,7 @@ import com.biteme.app.util.CLIUtils;
 
 public class PrenotazioneCLI {
 
-    // Costruttore privato per evitare istanziazioni
+    
     private PrenotazioneCLI() {
     }
 
@@ -43,7 +43,7 @@ public class PrenotazioneCLI {
                     eliminaPrenotazione(scanner);
                     break;
                 case "6":
-                    return; // Esci dal ciclo
+                    return; 
                 default:
                     System.out.println("Opzione non valida.");
             }
@@ -75,7 +75,7 @@ public class PrenotazioneCLI {
         System.out.print("Note: ");
         String note = scanner.nextLine().trim();
 
-        // Creazione e popolamento della bean con i valori raw
+        
         PrenotazioneBean bean = new PrenotazioneBean();
         bean.setNomeCliente(nomeCliente);
         bean.setData(data);
@@ -128,7 +128,7 @@ public class PrenotazioneCLI {
         for (PrenotazioneBean p : prenotazioni) {
             System.out.println(p.getId() + " - " + p.getNomeCliente() + " alle " + p.getOrario());
         }
-        // Selezione della prenotazione tramite ID
+        
         System.out.print("Inserisci l'ID della prenotazione per inviare l'email: ");
         int id = Integer.parseInt(scanner.nextLine());
         PrenotazioneBean selected = null;
@@ -142,14 +142,14 @@ public class PrenotazioneCLI {
             System.out.println("Prenotazione non trovata.");
             return;
         }
-        // Inserimento dell'indirizzo email
+        
         System.out.print("Inserisci l'indirizzo email del cliente: ");
         String email = scanner.nextLine().trim();
         if (email.isEmpty()) {
             System.out.println("L'indirizzo email non può essere vuoto.");
             return;
         }
-        // Composizione e invio dell'email tramite EmailController
+        
         EmailBean emailBean = emailController.composeEmailFromPrenotazione(selected);
         emailBean.setDestinatario(email);
         try {
@@ -226,7 +226,7 @@ public class PrenotazioneCLI {
         if (note.isEmpty())
             note = prenotazioneEsistente.getNote();
 
-        // Creazione della bean per la modifica
+        
         PrenotazioneBean bean = new PrenotazioneBean();
         bean.setId(prenotazioneEsistente.getId());
         bean.setNomeCliente(nomeCliente);

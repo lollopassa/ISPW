@@ -6,7 +6,6 @@ public class UserSession {
     private static User currentUser;
 
     private UserSession() {
-        // Prevenire l'uso del costruttore
     }
 
     public static void setCurrentUser(User user) {

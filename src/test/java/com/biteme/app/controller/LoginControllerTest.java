@@ -7,7 +7,7 @@ import com.biteme.app.persistence.UserDao;
 import com.biteme.app.persistence.Configuration;
 import com.biteme.app.util.HashingUtil;
 import com.biteme.app.util.UserSession;
-import com.biteme.app.persistence.inmemory.Storage; // Solo per cleanup in memory
+import com.biteme.app.persistence.inmemory.Storage;
 import org.junit.jupiter.api.*;
 
 import java.lang.reflect.Field;
@@ -25,7 +25,7 @@ class LoginControllerTest {
     void setUp() throws Exception {
         controller = new LoginController();
         userDao = Configuration.getPersistenceProvider().getDaoFactory().getUserDao();
-        // Inietta la stessa istanza di UserDao nel controller, per avere dati condivisi
+
         injectMockUserDao();
     }
 
@@ -37,42 +37,31 @@ class LoginControllerTest {
 
     @AfterEach
     void tearDown() {
-        // Se si usa la persistenza in memory, pulisci lo storage.
-        // Per txt e database, elimino direttamente l'utente di test.
         if (Configuration.getPersistenceProvider().getDaoFactory()
                 instanceof com.biteme.app.persistence.inmemory.InMemoryDaoFactory) {
             Storage.getInstance().getUsers().clear();
         } else {
-            // Proviamo a eliminare direttamente l'utente di test (username "testuser").
-            // Se l'utente non esiste, ignoriamo l'eccezione.
             try {
                 userDao.delete("testuser");
             } catch (Exception e) {
-                // Ignora eventuali errori, l'importante è che il test non lasci dati residui.
+                throw new RuntimeException("Errore durante la cancellazione dell'utente testuser", e);
             }
         }
-        // Pulisco la sessione utente
         UserSession.clear();
     }
 
     @Test
     void testAuthenticateUserSuccess() {
-        // Creiamo un utente: la password viene passata in chiaro,
-        // il sistema si occuperà dell'hashing quando verificherà l'autenticazione.
         String password = "password123";
         User user = new User("testuser", "test@example.com", password, UserRole.CAMERIERE);
         user.setGoogleUser(false);
 
-        // Salviamo l'utente tramite la DAO (già iniettata nel controller)
         userDao.store(user);
 
-        // Creiamo un LoginBean con le credenziali in chiaro
         LoginBean loginBean = createLoginBean("test@example.com", password);
 
-        // Eseguiamo l'autenticazione
         assertDoesNotThrow(() -> controller.authenticateUser(loginBean));
 
-        // Dal momento che non abbiamo ridefinito equals() in User, confrontiamo i campi chiave.
         User actualUser = UserSession.getCurrentUser();
         assertNotNull(actualUser, "L'utente corrente non dovrebbe essere nullo");
         assertEquals(user.getUsername(), actualUser.getUsername(), "Username non corrispondente");

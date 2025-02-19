@@ -19,13 +19,13 @@ public class LoginBoundary {
 
     @FXML
     private void onLoginButtonClick() {
-        // Crea il bean con i dati inseriti dall'utente
-        LoginBean loginBean = new LoginBean(); // Usa il costruttore senza parametri
+        
+        LoginBean loginBean = new LoginBean(); 
         loginBean.setEmailOrUsername(emailOrUsernameTextField.getText());
         loginBean.setPassword(passwordTextField.getText());
 
         try {
-            // Il controller esegue la validazione e imposta l'utente corrente; in caso di errore lancia un'eccezione
+            
             loginController.authenticateUser(loginBean);
             showAlert("Successo", "Login effettuato con successo!", Alert.AlertType.INFORMATION);
             loginController.navigateToHome();

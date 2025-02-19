@@ -16,7 +16,7 @@ public class MenuLateraleBoundary {
     private static final Logger LOGGER = Logger.getLogger(MenuLateraleBoundary.class.getName());
 
     @FXML
-    private Label usernameLabel; // Collegamento all'etichetta dell'username
+    private Label usernameLabel; 
 
     @FXML
     private StackPane homeButton;
@@ -48,7 +48,7 @@ public class MenuLateraleBoundary {
     public void initialize() {
         this.loginController = new LoginController();
 
-        // Imposta il nome utente in alto a destra
+        
         setUsernameLabel();
 
         if (loginController.isUserAdmin()) {

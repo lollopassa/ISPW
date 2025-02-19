@@ -16,8 +16,7 @@ import java.io.IOException;
 public class GmailEmailSender {
 
     private GmailEmailSender() {
-        //costruttore privato
-    }
+            }
 
     private static final String APPLICATION_NAME = "BiteMeApp";
     private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
@@ -27,18 +26,14 @@ public class GmailEmailSender {
     public static void sendEmail(String accessToken, String from, String to, String subject, String bodyText)
             throws MessagingException, IOException {
 
-        // Crea le credenziali usando l'access token
-        Credential credential = new GoogleCredential().setAccessToken(accessToken);
+                Credential credential = new GoogleCredential().setAccessToken(accessToken);
         Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
 
-        // Utilizza CreateEmail per creare il MimeMessage
-        MimeMessage email = CreateEmail.createEmail(to, from, subject, bodyText);
-        // Utilizza CreateMessage per convertire il MimeMessage in Message (Gmail API)
-        Message message = CreateMessage.createMessageWithEmail(email);
+                MimeMessage email = CreateEmail.createEmail(to, from, subject, bodyText);
+                Message message = CreateMessage.createMessageWithEmail(email);
 
-        // Invia l'email
-        service.users().messages().send("me", message).execute();
+                service.users().messages().send("me", message).execute();
     }
 }

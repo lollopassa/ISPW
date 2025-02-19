@@ -27,11 +27,11 @@ public class AdminHomeBoundary {
     @FXML
     private ComboBox<String> periodoComboBox;
 
-    // Campo rinominato per corrispondere all'fx:id="switchButton" definito nell'FXML
+    
     @FXML
     private Button switchButton;
 
-    // Campo per lo switch del tipo di aggregazione (potrebbe non essere presente nell'FXML)
+    
     @FXML
     private Button switchAggregationButton;
 
@@ -51,17 +51,17 @@ public class AdminHomeBoundary {
 
     private ArchivioController archivioController;
 
-    // Flag per la visualizzazione: mostraGuadagni = true -> visualizza guadagni, false -> visualizza prodotti ordinati
+    
     private boolean mostraGuadagni;
-    // Flag per decidere se, in modalità guadagni, visualizzare i dati aggregati per periodo oppure per giorno
+    
     private boolean usaGuadagniAggregati;
 
     private static final Logger logger = Logger.getLogger(AdminHomeBoundary.class.getName());
 
     public AdminHomeBoundary() {
         this.archivioController = new ArchivioController();
-        this.mostraGuadagni = false;     // Default: mostra prodotti ordinati
-        this.usaGuadagniAggregati = false; // Default: in modalità guadagni, mostra dati giornalieri
+        this.mostraGuadagni = false;     
+        this.usaGuadagniAggregati = false; 
     }
 
     @FXML
@@ -69,7 +69,7 @@ public class AdminHomeBoundary {
         colonnaPiatto.setCellValueFactory(new PropertyValueFactory<>("piatto"));
         colonnaOrdini.setCellValueFactory(new PropertyValueFactory<>("totale"));
 
-        // Imposta le etichette degli assi in base al tipo di visualizzazione
+        
         if (mostraGuadagni) {
             xAxis.setLabel(GIORNO_DELLA_SETTIMANA);
             yAxis.setLabel(GUADAGNI_LABEL);
@@ -84,7 +84,7 @@ public class AdminHomeBoundary {
 
         barChart.setCategoryGap(10);
 
-        // Se il pulsante di switch aggregazione è presente, imposta il testo iniziale
+        
         if (switchAggregationButton != null) {
             switchAggregationButton.setText(usaGuadagniAggregati ? GUADAGNI_AGGREGATI : GUADAGNI_GIORNALIERO);
         }
@@ -108,12 +108,12 @@ public class AdminHomeBoundary {
             logger.severe("Nessun dato disponibile per il periodo selezionato o periodo non valido.");
         }
 
-        // Aggiorna la tabella con i dati ottenuti
+        
         ObservableList<PiattoStatistiche> data = FXCollections.observableArrayList();
         statistiche.forEach((key, value) -> data.add(new PiattoStatistiche(key, value)));
         statisticheTable.setItems(data);
 
-        // Crea un nuovo grafico in base allo stato corrente
+        
         BarChart<String, Number> newChart = createNewBarChart(mostraGuadagni);
 
         XYChart.Series<String, Number> serie = new XYChart.Series<>();
@@ -127,7 +127,7 @@ public class AdminHomeBoundary {
         statistiche.forEach((key, value) -> serie.getData().add(new XYChart.Data<>(key, value)));
         newChart.getData().add(serie);
 
-        // Sostituisce il vecchio grafico con il nuovo
+        
         Pane parent = (Pane) barChart.getParent();
         int index = parent.getChildren().indexOf(barChart);
         parent.getChildren().remove(barChart);
@@ -138,7 +138,7 @@ public class AdminHomeBoundary {
     @FXML
     public void switchView() {
         mostraGuadagni = !mostraGuadagni;
-        // Aggiorna il testo del pulsante switchView (qui il campo si chiama switchButton, in base all'FXML)
+        
         if (switchButton != null) {
             switchButton.setText(mostraGuadagni ? "Prodotti" : GUADAGNI_LABEL);
         } else {
@@ -149,12 +149,12 @@ public class AdminHomeBoundary {
 
     @FXML
     public void switchAggregation() {
-        // Inverte il flag per il tipo di aggregazione dei guadagni
+        
         usaGuadagniAggregati = !usaGuadagniAggregati;
         if (switchAggregationButton != null) {
             switchAggregationButton.setText(usaGuadagniAggregati ? GUADAGNI_AGGREGATI : GUADAGNI_GIORNALIERO);
         } else {
-            // Se il pulsante non è presente nell'FXML, logghiamo l'informazione (ma non blocchiamo l'esecuzione)
+            
             logger.info("switchAggregationButton non presente nell'FXML.");
         }
         aggiornaDati();

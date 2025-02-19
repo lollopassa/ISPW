@@ -37,8 +37,7 @@ public class ProdottoController {
                 prodottoBean.getDisponibile() != null && prodottoBean.getDisponibile()
         );
         prodottoDao.store(prodotto);
-        // Non mostriamo alert qui: il controller si limita a eseguire la logica.
-    }
+            }
 
     public void modificaProdotto(ProdottoBean prodottoBean) {
         if (prodottoBean.getId() == null || prodottoBean.getId() <= 0) {

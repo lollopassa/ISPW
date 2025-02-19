@@ -119,7 +119,7 @@ public class ProdottoBoundary {
             ProdottoBean prodottoBean = new ProdottoBean();
             prodottoBean.setNome(nomeProdottoField.getText());
             prodottoBean.setCategoria(categoriaComboBox.getValue());
-            prodottoBean.setPrezzo(parsePrezzo(prezzoField.getText())); // Blocchi nidificati eliminati
+            prodottoBean.setPrezzo(parsePrezzo(prezzoField.getText())); 
             prodottoBean.setDisponibile(true);
 
             prodottoController.aggiungiProdotto(prodottoBean);
@@ -139,13 +139,13 @@ public class ProdottoBoundary {
             return;
         }
 
-        // Creazione del dialogo per la modifica
+        
         Dialog<ProdottoBean> dialog = new Dialog<>();
         dialog.setTitle("Modifica Prodotto");
         dialog.setHeaderText("Modifica i dati del prodotto:");
         dialog.setResizable(true);
 
-        // Campi di input per la modifica
+        
         TextField nomeField = new TextField(selectedProdotto.getNome());
         ComboBox<String> categoriaComboBoxModifica = new ComboBox<>(FXCollections.observableArrayList(
                 "ANTIPASTI","PIZZE", "PRIMI", "SECONDI", "CONTORNI", "BEVANDE", "DOLCI"
@@ -153,7 +153,7 @@ public class ProdottoBoundary {
         categoriaComboBoxModifica.setValue(selectedProdotto.getCategoria());
         TextField prezzoFieldModifica = new TextField(selectedProdotto.getPrezzo().toString());
 
-        // Layout per i campi
+        
         VBox vbox = new VBox(10);
         vbox.getChildren().addAll(
                 new Label("Nome Prodotto:"), nomeField,
@@ -162,27 +162,27 @@ public class ProdottoBoundary {
         );
         dialog.getDialogPane().setContent(vbox);
 
-        // Pulsanti OK e Annulla
+        
         ButtonType okButtonType = new ButtonType("Modifica", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
 
-        // Gestione della conferma
+        
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == okButtonType) {
-                // Aggiorna il prodotto con i nuovi valori
+                
                 ProdottoBean prodottoModificato = new ProdottoBean();
-                prodottoModificato.setId(selectedProdotto.getId()); // Manteniamo l'ID invariato
+                prodottoModificato.setId(selectedProdotto.getId()); 
                 prodottoModificato.setNome(nomeField.getText());
                 prodottoModificato.setCategoria(categoriaComboBoxModifica.getValue());
                 prodottoModificato.setPrezzo(parsePrezzo(prezzoFieldModifica.getText()));
-                prodottoModificato.setDisponibile(selectedProdotto.getDisponibile()); // Manteniamo lo stato di disponibilità
+                prodottoModificato.setDisponibile(selectedProdotto.getDisponibile()); 
 
-                return prodottoModificato; // Restituiamo il nuovo prodotto
+                return prodottoModificato; 
             }
             return null;
         });
 
-        // Mostra il dialogo e gestisce il risultato
+        
         dialog.showAndWait().ifPresent(prodottoModificato -> {
             try {
                 prodottoController.modificaProdotto(prodottoModificato);

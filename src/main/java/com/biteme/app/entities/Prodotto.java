@@ -10,8 +10,7 @@ public class Prodotto {
     private Categoria categoria;
     private boolean disponibile;
 
-    // Costruttore
-    public Prodotto(int id, String nome, BigDecimal prezzo, Categoria categoria, boolean disponibile) {
+        public Prodotto(int id, String nome, BigDecimal prezzo, Categoria categoria, boolean disponibile) {
         this.id = id;
         this.nome = nome;
         this.prezzo = prezzo;
@@ -19,8 +18,7 @@ public class Prodotto {
         this.disponibile = disponibile;
     }
 
-    // Getter e Setter
-    public int getId() {
+        public int getId() {
         return id;
     }
 

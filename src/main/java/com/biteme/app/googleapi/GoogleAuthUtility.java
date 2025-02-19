@@ -16,13 +16,11 @@ import java.util.Scanner;
 
 public class GoogleAuthUtility {
 
-    // Costruttore privato per impedire l'istanziazione
-    private GoogleAuthUtility() {
+        private GoogleAuthUtility() {
         throw new UnsupportedOperationException("Questa è una classe utility e non può essere istanziata.");
     }
 
-    // Autenticazione che restituisce direttamente l'access token
-    public static String authenticate() throws GoogleAuthException, InterruptedException {
+        public static String authenticate() throws GoogleAuthException, InterruptedException {
         try {
             String accessToken = performAuthentication();
             if (accessToken == null) {
@@ -37,8 +35,7 @@ public class GoogleAuthUtility {
         }
     }
 
-    // Metodo che ottiene i dati dell'utente da Google usando l'access token
-    public static GoogleUserData getGoogleUserData(String accessToken) throws GoogleAuthException {
+        public static GoogleUserData getGoogleUserData(String accessToken) throws GoogleAuthException {
         try {
             String url = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + accessToken;
             try (Scanner scanner = new Scanner(new URL(url).openStream())) {
@@ -55,8 +52,7 @@ public class GoogleAuthUtility {
         }
     }
 
-    // Classe di supporto per contenere i dati dell'utente
-    public static class GoogleUserData {
+        public static class GoogleUserData {
         private final String email;
         private final String name;
 
@@ -69,8 +65,7 @@ public class GoogleAuthUtility {
         public String getName() { return name; }
     }
 
-    // Metodo privato per gestire il flusso di autenticazione e ottenere l'access token
-    private static String performAuthentication() throws GoogleAuthException, InterruptedException {
+        private static String performAuthentication() throws GoogleAuthException, InterruptedException {
         try {
             GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                     new NetHttpTransport(),
@@ -101,16 +96,14 @@ public class GoogleAuthUtility {
                     .setRedirectUri(Configuration.getGoogleRedirectUri())
                     .execute();
 
-            return response.getAccessToken(); // Restituisce l'access token
-        } catch (InterruptedException e) {
+            return response.getAccessToken();         } catch (InterruptedException e) {
             throw e;
         } catch (Exception e) {
             throw new GoogleAuthException("Errore durante il processo di autenticazione", e);
         }
     }
 
-    // Classe per gestire il server locale per ottenere il codice di autenticazione
-    private static class LocalServer {
+        private static class LocalServer {
         private com.sun.net.httpserver.HttpServer server;
         private String authCode;
 

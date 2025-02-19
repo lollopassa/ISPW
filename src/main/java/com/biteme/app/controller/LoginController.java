@@ -26,36 +26,30 @@ public class LoginController {
     }
 
     public void authenticateUser(LoginBean loginBean) {
-        // Controllo che i campi non siano vuoti
-        if (loginBean.getEmailOrUsername() == null || loginBean.getEmailOrUsername().trim().isEmpty() ||
+                if (loginBean.getEmailOrUsername() == null || loginBean.getEmailOrUsername().trim().isEmpty() ||
                 loginBean.getPassword() == null || loginBean.getPassword().trim().isEmpty()) {
             throw new IllegalArgumentException("Email/Username e password sono obbligatori.");
         }
 
-        // Se si tratta di un'email, controlla il formato
-        if (loginBean.getEmailOrUsername().contains("@") && !isValidEmail(loginBean.getEmailOrUsername())) {
+                if (loginBean.getEmailOrUsername().contains("@") && !isValidEmail(loginBean.getEmailOrUsername())) {
             throw new IllegalArgumentException("Il formato dell'email non è valido.");
         }
 
-        // Prova a caricare l'utente dal DAO
-        Optional<User> optionalUser = userDao.load(loginBean.getEmailOrUsername());
+                Optional<User> optionalUser = userDao.load(loginBean.getEmailOrUsername());
         if (!optionalUser.isPresent()) {
             throw new IllegalArgumentException("Utente non trovato.");
         }
         User user = optionalUser.get();
 
-        // Se l'utente è stato creato tramite Google, non può autenticarsi con password tradizionale
-        if (user.isGoogleUser()) {
+                if (user.isGoogleUser()) {
             throw new IllegalArgumentException("Utente Google non può autenticarsi tramite metodo tradizionale.");
         }
 
-        // Verifica la password (hashata) corrisponda a quella salvata
-        if (!user.getPassword().equals(HashingUtil.hashPassword(loginBean.getPassword()))) {
+                if (!user.getPassword().equals(HashingUtil.hashPassword(loginBean.getPassword()))) {
             throw new IllegalArgumentException("Password errata.");
         }
 
-        // Se tutto è valido, imposta l'utente corrente
-        UserSession.setCurrentUser(user);
+                UserSession.setCurrentUser(user);
     }
 
     public void authenticateWithGoogle() throws GoogleAuthException {
@@ -95,8 +89,7 @@ public class LoginController {
         SceneLoader.getInstance().loadScene(scenePath, title);
     }
 
-    // Nuovo metodo helper per il testing
-    String getHomeScenePath() {
+        String getHomeScenePath() {
         User user = UserSession.getCurrentUser();
         return user.getRuolo() == UserRole.ADMIN
                 ? "/com/biteme/app/adminHome.fxml"

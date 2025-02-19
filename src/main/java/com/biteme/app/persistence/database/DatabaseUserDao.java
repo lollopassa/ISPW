@@ -27,8 +27,7 @@ public class DatabaseUserDao implements UserDao {
 
     @Override
     public Optional<User> load(String identifier) {
-        // Modifica la query SQL per includere is_google_user
-        String query = "SELECT username, email, passwordHash, ruolo, is_google_user FROM user WHERE username = ? OR email = ?";
+                String query = "SELECT username, email, passwordHash, ruolo, is_google_user FROM user WHERE username = ? OR email = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, identifier);
@@ -40,11 +39,9 @@ public class DatabaseUserDao implements UserDao {
                     user.setEmail(rs.getString("email"));
                     user.setPassword(rs.getString("passwordHash"));
 
-                    // Imposta lo stato Google dell'utente
-                    user.setGoogleUser(rs.getBoolean("is_google_user"));
+                                        user.setGoogleUser(rs.getBoolean("is_google_user"));
 
-                    // Imposta il ruolo
-                    String ruolo = rs.getString("ruolo");
+                                        String ruolo = rs.getString("ruolo");
                     if (ruolo != null) {
                         user.setRuolo(UserRole.fromString(ruolo));
                     }
@@ -131,7 +128,6 @@ public class DatabaseUserDao implements UserDao {
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Errore durante la verifica dell'email", e);
         }
-        return false; // Return false if there's an exception during the check
-    }
+        return false;     }
 
 }

@@ -20,8 +20,7 @@ public class OrdineController {
 
     private final ProdottoDao prodottoDao;
     private final OrdineDao ordineDao;
-    private VBox riepilogoContenuto; // Set by the view
-
+    private VBox riepilogoContenuto;
     public OrdineController() {
         this.prodottoDao = Configuration.getPersistenceProvider()
                 .getDaoFactory()
@@ -52,8 +51,7 @@ public class OrdineController {
             }
             OrdineBean ordineBean = preparaOrdineBean(prodotti, quantita);
             salvaOrdine(ordineBean, ordineId);
-            // Aggiorna lo stato dell'ordinazione tramite il controller delle ordinazioni
-            OrdinazioneController ordinazioneController = new OrdinazioneController();
+                        OrdinazioneController ordinazioneController = new OrdinazioneController();
             ordinazioneController.aggiornaStatoOrdinazione(ordineId, stato);
         } catch (Exception e) {
             throw new OrdineException("Errore nel salvataggio dell'ordine e nell'aggiornamento dello stato: "
@@ -74,13 +72,11 @@ public class OrdineController {
         }
     }
 
-    // Recupera la lista dei nomi dei prodotti dal riepilogo (VBox)
-    private List<String> recuperaProdottiDalRiepilogo() {
+        private List<String> recuperaProdottiDalRiepilogo() {
         List<String> prodotti = new ArrayList<>();
         for (Node nodo : riepilogoContenuto.getChildren()) {
             if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
-                String testo = nomeEQuantitaLabel.getText(); // es. "Pizza Margherita x 2"
-                String[] parti = testo.split(" x ");
+                String testo = nomeEQuantitaLabel.getText();                 String[] parti = testo.split(" x ");
                 if (parti.length > 1) {
                     String nomeProdotto = parti[0].trim();
                     prodotti.add(nomeProdotto);
@@ -90,8 +86,7 @@ public class OrdineController {
         return prodotti;
     }
 
-    // Recupera la quantità per un prodotto specifico dal riepilogo
-    public int recuperaQuantitaDalRiepilogo(String nomeProdotto) {
+        public int recuperaQuantitaDalRiepilogo(String nomeProdotto) {
         for (Node nodo : riepilogoContenuto.getChildren()) {
             if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
                 String testo = nomeEQuantitaLabel.getText();

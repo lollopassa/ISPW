@@ -10,8 +10,7 @@ import javax.mail.internet.MimeMessage;
 public class CreateMessage {
 
     private CreateMessage() {
-        //costruttore privato
-    }
+            }
 
     public static Message createMessageWithEmail(MimeMessage emailContent)
             throws MessagingException, IOException {
@@ -19,8 +18,7 @@ public class CreateMessage {
         emailContent.writeTo(buffer);
         byte[] bytes = buffer.toByteArray();
 
-        // Utilizzo del Base64 nativo di Java
-        String encodedEmail = Base64.getUrlEncoder().encodeToString(bytes);
+                String encodedEmail = Base64.getUrlEncoder().encodeToString(bytes);
         Message message = new Message();
         message.setRaw(encodedEmail);
         return message;

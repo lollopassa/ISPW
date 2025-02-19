@@ -1,26 +1,20 @@
 module demo {
-    // Moduli JavaFX
-    requires javafx.controls;
+        requires javafx.controls;
     requires javafx.fxml;
 
-    // Altri moduli Java SE
-    requires java.desktop;
+        requires java.desktop;
     requires jdk.httpserver;
 
-    // Librerie di terze parti
-    requires com.google.gson;
+        requires com.google.gson;
     requires google.api.client;
     requires com.google.api.client.json.gson;
     requires com.google.api.client;
     requires com.google.api.client.auth;
-    requires com.google.api.services.gmail; // Aggiunto per la Gmail API
-    requires java.mail;
+    requires com.google.api.services.gmail;     requires java.mail;
 
-    // Aprire il pacchetto principale per JavaFX
-    opens com.biteme.app to javafx.fxml;
+        opens com.biteme.app to javafx.fxml;
 
-    // Esportazioni e opens dei pacchetti del progetto
-    exports com.biteme.app.core;
+        exports com.biteme.app.core;
     opens com.biteme.app.core to javafx.fxml;
     exports com.biteme.app.controller;
     opens com.biteme.app.controller to javafx.fxml;

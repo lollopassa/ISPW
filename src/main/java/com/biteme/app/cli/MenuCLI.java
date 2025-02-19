@@ -5,7 +5,7 @@ import com.biteme.app.util.CLIUtils;
 
 public class MenuCLI {
 
-    // Costruttore privato per evitare istanziazioni
+    
     private MenuCLI() {
     }
 
@@ -26,12 +26,12 @@ public class MenuCLI {
             System.out.print("Scegli un'opzione: ");
             String scelta = scanner.nextLine();
 
-            // Verifica se l'utente è admin tramite LoginController
+            
             boolean isAdmin = loginController.isUserAdmin();
 
             switch (scelta) {
                 case "1":
-                    // If the user is ADMIN, show the admin home; otherwise, show a general home.
+                    
                     if (isAdmin) {
                         AdminHomeCLI.start();
                     } else {
@@ -45,7 +45,7 @@ public class MenuCLI {
                     OrdinazioneCLI.start();
                     break;
                 case "4":
-                    // Verifica se l'utente è admin prima di permettere l'accesso alla sezione Magazzino
+                    
                     if (isAdmin) {
                         ProdottoCLI.start();
                     } else {
@@ -53,7 +53,7 @@ public class MenuCLI {
                     }
                     break;
                 case "5":
-                    // Clear the user session and return to login or exit.
+                    
                     loginController.logout();
                     System.out.println("Logout effettuato. Arrivederci!");
                     LoginCLI.login();

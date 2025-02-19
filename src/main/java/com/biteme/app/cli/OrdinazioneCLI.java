@@ -26,7 +26,7 @@ public class OrdinazioneCLI {
             "6. Torna al Menu"
     };
 
-    // Costruttore privato per evitare istanziazioni
+    
     private OrdinazioneCLI() {
     }
 
@@ -65,7 +65,7 @@ public class OrdinazioneCLI {
 
             System.out.print("Tipo Ordine (Al Tavolo/Asporto): ");
             String inputTipo = SCANNER.nextLine().trim();
-            // Convertiamo l'input (eventualmente in maiuscolo) nel formato atteso dal bean
+            
             if (inputTipo.equalsIgnoreCase("AL_TAVOLO") || inputTipo.equalsIgnoreCase("Al Tavolo")) {
                 bean.setTipoOrdine("Al Tavolo");
             } else if (inputTipo.equalsIgnoreCase("ASPORTO") || inputTipo.equalsIgnoreCase("Asporto")) {
@@ -87,10 +87,10 @@ public class OrdinazioneCLI {
             ORDINAZIONE_CONTROLLER.creaOrdine(bean);
             System.out.println("Ordine creato con successo.");
         } catch (OrdinazioneException e) {
-            // Handle the exception: Print an error message or log it
+            
             System.err.println("Errore durante la creazione dell'ordine: " + e.getMessage());
         } catch (Exception e) {
-            // Catch any other unexpected exceptions
+            
             System.err.println("Si è verificato un errore imprevisto: " + e.getMessage());
         }
     }
@@ -102,7 +102,7 @@ public class OrdinazioneCLI {
 
         int id = promptForOrderId();
         if (id != -1) {
-            // Avvia la CLI di modifica (presumibilmente OrdineCLI è l'interfaccia per la modifica)
+            
             OrdineCLI.start(id);
         }
     }
@@ -117,10 +117,10 @@ public class OrdinazioneCLI {
                 ORDINAZIONE_CONTROLLER.eliminaOrdinazione(id);
                 System.out.println("Ordine eliminato.");
             } catch (OrdinazioneException e) {
-                // Handle the exception when deleting an order
+                
                 System.err.println("Errore durante l'eliminazione dell'ordine: " + e.getMessage());
             } catch (Exception e) {
-                // Catch any other unexpected exceptions
+                
                 System.err.println("Si è verificato un errore imprevisto durante l'eliminazione: " + e.getMessage());
             }
         }
@@ -134,7 +134,7 @@ public class OrdinazioneCLI {
         int id = promptForOrderId();
         if (id != -1) {
             try {
-                // Se necessario, recupera e compila i dati dell'ArchivioBean (qui viene passato un bean vuoto)
+                
                 ARCHIVIO_CONTROLLER.archiviaOrdine(new com.biteme.app.bean.ArchivioBean());
                 ORDINAZIONE_CONTROLLER.eliminaOrdinazione(id);
                 System.out.println("Ordine archiviato con successo.");

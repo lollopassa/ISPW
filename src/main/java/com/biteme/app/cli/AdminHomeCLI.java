@@ -25,7 +25,7 @@ public class AdminHomeCLI {
     private static final String GUADAGNI_GIORNALIERO = "Guadagni Giornalieri";
     private static final String GUADAGNI_AGGREGATI = "Guadagni Aggregati";
 
-    // Costruttore privato per evitare istanziazioni
+    
     private AdminHomeCLI() {
     }
 
@@ -60,7 +60,7 @@ public class AdminHomeCLI {
 
         Map<String, Number> statistiche;
         if (mostraGuadagni) {
-            // Se in modalità guadagni, decidiamo in base al flag usaGuadagniAggregati
+            
             if (usaGuadagniAggregati) {
                 statistiche = ARCHIVIO_CONTROLLER.guadagniPerPeriodo(periodo);
             } else {
@@ -86,7 +86,7 @@ public class AdminHomeCLI {
     }
 
     private static void toggleAggregazione() {
-        // Invertiamo il flag per l'aggregazione dei guadagni
+        
         usaGuadagniAggregati = !usaGuadagniAggregati;
         System.out.printf(AGGREGATION_SWITCH_FORMAT + "%n", getCurrentAggregationView());
     }

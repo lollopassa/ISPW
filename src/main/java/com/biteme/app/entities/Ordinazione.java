@@ -10,20 +10,17 @@ public class Ordinazione {
     private StatoOrdinazione statoOrdinazione;
     private String orarioCreazione;
 
-    // Costruttore completo
-    public Ordinazione(int id, String nomeCliente, String numeroClienti, TipoOrdinazione tipoOrdinazione,
+        public Ordinazione(int id, String nomeCliente, String numeroClienti, TipoOrdinazione tipoOrdinazione,
                        String infoTavolo, StatoOrdinazione statoOrdinazione, String orarioCreazione) {
         this.id = id;
         this.nomeCliente = nomeCliente;
         this.numeroClienti = numeroClienti;
         this.tipoOrdinazione = tipoOrdinazione;
         this.infoTavolo = infoTavolo;
-        this.statoOrdinazione = statoOrdinazione; // Cambiato a StatoOrdine
-        this.orarioCreazione = orarioCreazione;
+        this.statoOrdinazione = statoOrdinazione;         this.orarioCreazione = orarioCreazione;
     }
 
-    // Getter e Setter
-    public int getId() {
+        public int getId() {
         return id;
     }
 

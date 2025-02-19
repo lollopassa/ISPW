@@ -122,12 +122,12 @@ public class OrdinazioneBoundary {
                     copertiField.getText().trim(),
                     tavoloField.getText().trim()
             );
-            // Se la validazione ha avuto successo, prosegui con la creazione dell'ordine
+            
             ordinazioneController.creaOrdine(ordinazioneBean);
             onSuccess(ordinazioneBean.getNome());
         } catch (OrdinazioneException e) {
-            // In caso di errori di validazione o business, oltre a mostrare l'alert,
-            // riposizioniamo il focus sul campo "Nome Cliente" per agevolare la correzione
+            
+            
             handleFormError(e, VALIDATION_ERROR, Alert.AlertType.WARNING);
         } catch (Exception e) {
             handleFormError(e, ERROR, Alert.AlertType.ERROR);
@@ -178,7 +178,7 @@ public class OrdinazioneBoundary {
         try {
             ordinazioneController.eliminaOrdinazione(ordinazioneSelezionata.getId());
             showAlert(SUCCESS, "Ordine eliminato con successo.", Alert.AlertType.INFORMATION);
-            // Reset selezione e aggiorna la tabella
+            
             ordinazioniTableView.getSelectionModel().clearSelection();
             refreshTable();
         } catch (Exception e) {
@@ -208,7 +208,7 @@ public class OrdinazioneBoundary {
             ordinazioneController.eliminaOrdinazione(ordinazioneSelezionata.getId());
 
             showAlert(SUCCESS, "Ordine archiviato con successo.", Alert.AlertType.INFORMATION);
-            // Reset selezione e aggiorna la tabella
+            
             ordinazioniTableView.getSelectionModel().clearSelection();
             refreshTable();
         } catch (Exception e) {
@@ -224,7 +224,7 @@ public class OrdinazioneBoundary {
             List<Integer> quantita = ordineBean.getQuantita();
             if (prodotti != null && quantita != null && prodotti.size() == quantita.size()) {
                 for (int i = 0; i < prodotti.size(); i++) {
-                    // Prezzo fisso di esempio: 10 per ogni unitÃ
+                    
                     BigDecimal prezzoUnitario = BigDecimal.valueOf(10);
                     totale = totale.add(prezzoUnitario.multiply(BigDecimal.valueOf(quantita.get(i))));
                 }

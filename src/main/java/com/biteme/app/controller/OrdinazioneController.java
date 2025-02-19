@@ -17,8 +17,7 @@ import java.util.List;
 public class OrdinazioneController {
 
     private final OrdinazioneDao ordinazioneDao;
-    private final OrdineController ordineController; // Per salvare l'ordine collegato
-
+    private final OrdineController ordineController;
     public OrdinazioneController() {
         this.ordinazioneDao = Configuration.getPersistenceProvider()
                 .getDaoFactory()
@@ -37,12 +36,10 @@ public class OrdinazioneController {
 
         if ("Al Tavolo".equals(tipoOrdine)) {
             validateAlTavolo(coperti, tavolo);
-            // Imposta l'orario corrente formattato in HH:mm
-            orario = LocalTime.now().toString().substring(0, 5);
+                        orario = LocalTime.now().toString().substring(0, 5);
         } else if ("Asporto".equals(tipoOrdine)) {
             validateAsporto(orario);
-            // Per Asporto, i campi coperti e tavolo non sono necessari
-            coperti = "";
+                        coperti = "";
             tavolo = "";
         } else {
             throw new OrdinazioneException("Tipo di ordine non valido: " + tipoOrdine);
@@ -150,8 +147,7 @@ public class OrdinazioneController {
         }
     }
 
-    // --- Metodi di conversione (già esistenti) ---
-    private Ordinazione convertToModel(OrdinazioneBean bean) {
+        private Ordinazione convertToModel(OrdinazioneBean bean) {
         TipoOrdinazione tipoOrdine;
         if ("Al Tavolo".equals(bean.getTipoOrdine())) {
             tipoOrdine = TipoOrdinazione.AL_TAVOLO;

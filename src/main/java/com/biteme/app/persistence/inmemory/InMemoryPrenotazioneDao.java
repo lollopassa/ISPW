@@ -8,52 +8,42 @@ import java.util.Optional;
 
 public class InMemoryPrenotazioneDao implements PrenotazioneDao {
 
-    private final List<Prenotazione> prenotazioni = Storage.getInstance().getPrenotazioni(); // Usa lo storage condiviso
-    private int currentId = 1;
+    private final List<Prenotazione> prenotazioni = Storage.getInstance().getPrenotazioni();     private int currentId = 1;
 
     @Override
     public Optional<Prenotazione> load(Integer key) {
-        // Ritorna una prenotazione dato un ID
-        return prenotazioni.stream().filter(p -> p.getId() == key).findFirst();
+                return prenotazioni.stream().filter(p -> p.getId() == key).findFirst();
     }
 
     @Override
     public void store(Prenotazione prenotazione) {
-        // Se l'entità ha già un ID, effettua un aggiornamento.
-        if (prenotazione.getId() > 0) {
+                if (prenotazione.getId() > 0) {
             delete(prenotazione.getId());
         } else {
-            // Altrimenti assegna un ID univoco.
-            prenotazione.setId(currentId++);
+                        prenotazione.setId(currentId++);
         }
         prenotazioni.add(prenotazione);
     }
 
     @Override
     public void delete(Integer key) {
-        // Rimuove la prenotazione con un ID specifico
-        prenotazioni.removeIf(p -> p.getId() == key);
+                prenotazioni.removeIf(p -> p.getId() == key);
     }
 
     @Override
     public boolean exists(Integer key) {
-        // Verifica se esiste una prenotazione con un ID specifico
-        return prenotazioni.stream().anyMatch(p -> p.getId() == key);
+                return prenotazioni.stream().anyMatch(p -> p.getId() == key);
     }
 
     @Override
     public List<Prenotazione> getByData(LocalDate data) {
-        // Filtra le prenotazioni dalla data
-        return prenotazioni.stream()
+                return prenotazioni.stream()
                 .filter(p -> p.getData().equals(data))
-                .toList(); // Sostituito "collect(Collectors.toList())" con "toList()"
-    }
+                .toList();     }
 
     @Override
     public void update(Prenotazione prenotazione) {
-        // Trova la prenotazione con l'ID specificato e rimuovila
-        delete(prenotazione.getId());
-        // Aggiungi la versione aggiornata
-        prenotazioni.add(prenotazione);
+                delete(prenotazione.getId());
+                prenotazioni.add(prenotazione);
     }
 }

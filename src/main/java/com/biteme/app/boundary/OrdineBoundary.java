@@ -25,17 +25,17 @@ import java.util.logging.Logger;
 
 public class OrdineBoundary {
 
-    // Constants for error messages
+    
     private static final String ERROR_TITLE = "Errore";
     private static final String ERROR_ORDINE_NOT_FOUND = "Ordine non trovato per l'ID: ";
     private static final String ERROR_NO_ORDINE_SELECTED = "Nessuna ordinazione selezionata.";
     private static final String ASPORTO = "Asporto";
 
-    // Controllers
+    
     private final OrdineController controller = new OrdineController();
     private final OrdinazioneController ordinazioneController = new OrdinazioneController();
 
-    // FXML elements
+    
     @FXML
     private FlowPane flowPaneProdotti;
 
@@ -48,7 +48,7 @@ public class OrdineBoundary {
     @FXML
     private Label totaleOrdine;
 
-    // Handle saving an order
+    
     @FXML
     private void handleSalva() {
         try {
@@ -63,7 +63,7 @@ public class OrdineBoundary {
         }
     }
 
-    // Handle completing the checkout
+    
     @FXML
     public void handleCheckout(ActionEvent actionEvent) {
         try {
@@ -78,13 +78,13 @@ public class OrdineBoundary {
         }
     }
 
-    // Handle back button
+    
     @FXML
     private void handleIndietro() {
         SceneLoader.getInstance().loadScene("/com/biteme/app/ordinazione.fxml", "Torna a Ordinazione");
     }
 
-    // Initialize method that runs when the screen is loaded
+    
     @FXML
     public void initialize() {
         try {
@@ -115,7 +115,7 @@ public class OrdineBoundary {
     }
 
 
-    // Helper method to log errors and show alerts
+    
     private void logAndShowAlert(String message) {
         Logger.getLogger(OrdineBoundary.class.getName())
                 .log(Level.SEVERE, message);
@@ -126,7 +126,7 @@ public class OrdineBoundary {
         riepilogoContenuto.getChildren().clear();
         List<String> prodotti = ordineBean.getProdotti();
         List<Integer> quantita = ordineBean.getQuantita();
-        List<ProdottoBean> prodottiDisponibili = controller.getTuttiProdotti(); // Ottieni tutti i prodotti disponibili
+        List<ProdottoBean> prodottiDisponibili = controller.getTuttiProdotti(); 
 
         for (int i = 0; i < prodotti.size(); i++) {
             String nomeProdotto = prodotti.get(i);
@@ -168,7 +168,7 @@ public class OrdineBoundary {
         }
     }
 
-    // I metodi per la gestione delle categorie e dei controlli sul riepilogo rimangono invariati
+    
     @FXML
     private void handleCategoriaBevande() {
         caricaProdotti("Bevande");
@@ -231,7 +231,7 @@ public class OrdineBoundary {
         Label labelQuantitaText = new Label("Quantità:");
         labelQuantitaText.setStyle("-fx-font-size: 14px; -fx-text-fill: black; -fx-font-weight: bold;");
         HBox controlliQuantita = creaControlliQuantita(prodotto);
-        Label quantitaLabel = (Label) controlliQuantita.getChildren().get(1); // La Label del contatore
+        Label quantitaLabel = (Label) controlliQuantita.getChildren().get(1); 
         quantitaLabel.setText(String.valueOf(quantitaDalRiepilogo));
 
         boxProdotto.getChildren().addAll(labelNome, labelQuantitaText, controlliQuantita);

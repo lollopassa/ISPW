@@ -30,8 +30,7 @@ public class PrenotazioneController {
         LocalTime orario = parseOrario(bean.getOrarioStr());
         int coperti = parseCoperti(bean.getCopertiStr());
 
-        // Imposto i valori convertiti nella bean
-        bean.setOrario(orario);
+                bean.setOrario(orario);
         bean.setCoperti(coperti);
 
         Prenotazione entity = convertToEntity(bean);

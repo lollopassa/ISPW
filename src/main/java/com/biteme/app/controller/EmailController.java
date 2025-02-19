@@ -16,10 +16,8 @@ public class EmailController {
         String fromEmail = null;
 
         try {
-            // Ottieni l'access token tramite GoogleAuthUtility
             accessToken = GoogleAuthUtility.authenticate();
 
-            // Ottieni i dati dell'utente autenticato utilizzando il token
             GoogleAuthUtility.GoogleUserData userData = GoogleAuthUtility.getGoogleUserData(accessToken);
             if (userData != null) {
                 fromEmail = userData.getEmail();
@@ -31,8 +29,7 @@ public class EmailController {
             throw new IllegalStateException("Il processo di autenticazione è stato interrotto", e);
         }
 
-        // Esegui i controlli sui valori recuperati
-        if (accessToken == null) {
+                if (accessToken == null) {
             throw new IllegalStateException("Access token non disponibile. Controlla l'autenticazione con Google.");
         }
 
@@ -40,7 +37,6 @@ public class EmailController {
             throw new IllegalStateException("Indirizzo email del mittente non disponibile.");
         }
 
-        // Invia l'email utilizzando l'access token e l'indirizzo email del mittente
         try {
             GmailEmailSender.sendEmail(accessToken, fromEmail,
                     emailBean.getDestinatario(),

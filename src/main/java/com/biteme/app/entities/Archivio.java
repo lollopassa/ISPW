@@ -14,8 +14,7 @@ public class Archivio {
 
     public Archivio() {}
 
-    // Costruttore completo per inizializzazione rapida
-    public Archivio(int idOrdine, List<String> prodotti, List<Integer> quantita, BigDecimal totale, LocalDateTime dataArchiviazione) {
+        public Archivio(int idOrdine, List<String> prodotti, List<Integer> quantita, BigDecimal totale, LocalDateTime dataArchiviazione) {
         this.idOrdine = idOrdine;
         this.prodotti = prodotti;
         this.quantita = quantita;

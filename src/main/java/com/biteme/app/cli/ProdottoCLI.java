@@ -9,7 +9,7 @@ import com.biteme.app.util.CLIUtils;
 
 public class ProdottoCLI {
 
-    // Costruttore privato per evitare istanziazioni
+    
     private ProdottoCLI() {
     }
 
@@ -76,9 +76,9 @@ public class ProdottoCLI {
             System.out.print("Nome Prodotto: ");
             String nome = scanner.nextLine();
             System.out.print("Categoria (PIZZE, PRIMI, ANTIPASTI, BEVANDE, CONTORNI, DOLCI): ");
-            String categoria = scanner.nextLine(); // Inserito dall'utente come stringa
+            String categoria = scanner.nextLine(); 
             System.out.print("Prezzo: ");
-            BigDecimal prezzo = new BigDecimal(scanner.nextLine()); // Gestione numerica
+            BigDecimal prezzo = new BigDecimal(scanner.nextLine()); 
 
             ProdottoBean bean = new ProdottoBean();
             bean.setNome(nome);
@@ -89,7 +89,7 @@ public class ProdottoCLI {
             prodottoController.aggiungiProdotto(bean);
             System.out.println("Prodotto aggiunto correttamente.");
         } catch (ProdottoException e) {
-            // Stampe di errore sul terminale
+            
             System.out.println(ERROR_MESSAGE + e.getMessage());
         } catch (NumberFormatException e) {
             System.out.println("Errore: Il prezzo deve essere un valore numerico.");

@@ -9,8 +9,7 @@ import java.util.Base64;
 
 public class GoogleAuthService {
 
-    // Modifichiamo il metodo per restituire l'access token
-    public String authenticateWithGoogle() throws GoogleAuthException {
+        public String authenticateWithGoogle() throws GoogleAuthException {
         try {
             return GoogleAuthUtility.authenticate();
         } catch (InterruptedException e) {
@@ -21,7 +20,6 @@ public class GoogleAuthService {
         }
     }
 
-    // Aggiungiamo un nuovo metodo per ottenere i dati utente
     public GoogleAuthUtility.GoogleUserData getGoogleUserData(String accessToken) throws GoogleAuthException {
         return GoogleAuthUtility.getGoogleUserData(accessToken);
     }

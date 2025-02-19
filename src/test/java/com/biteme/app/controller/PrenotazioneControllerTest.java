@@ -4,7 +4,7 @@ import com.biteme.app.bean.PrenotazioneBean;
 import com.biteme.app.exception.PrenotationValidationException;
 import com.biteme.app.entities.Prenotazione;
 import com.biteme.app.persistence.PrenotazioneDao;
-import com.biteme.app.persistence.inmemory.Storage; // Utilizzato solo se la persistenza è in memory
+import com.biteme.app.persistence.inmemory.Storage;
 import com.biteme.app.persistence.Configuration;
 import org.junit.jupiter.api.*;
 
@@ -26,13 +26,13 @@ class PrenotazioneControllerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        // Inizializza il controller
+
         controller = new PrenotazioneController();
 
-        // Recupera il DAO generico per le prenotazioni tramite la configurazione
+
         prenotazioneDao = Configuration.getPersistenceProvider().getDaoFactory().getPrenotazioneDao();
 
-        // Usa reflection per iniettare il DAO nella classe PrenotazioneController
+
         Field daoField = PrenotazioneController.class.getDeclaredField("prenotazioneDao");
         daoField.setAccessible(true);
         daoField.set(controller, prenotazioneDao);
@@ -60,7 +60,7 @@ class PrenotazioneControllerTest {
                 .filter(p -> nome.equals(p.getNomeCliente()) && p.getOrario().equals(time))
                 .forEach(p -> {
                     prenotazioneDao.delete(p.getId());
-                    // Rimuovo anche dall'elenco degli ID creati (se presente)
+
                     createdPrenotazioniIds.remove(Integer.valueOf(p.getId()));
                 });
     }
@@ -69,7 +69,7 @@ class PrenotazioneControllerTest {
     void testCreaPrenotazione() {
         removeExistingPrenotazione("Mario Rossi", LocalDate.of(2025, 4, 15), "20:00");
 
-        // Creazione della bean con i parametri raw
+
         PrenotazioneBean bean = new PrenotazioneBean();
         bean.setNomeCliente("Mario Rossi");
         bean.setOrarioStr("20:00");
@@ -100,7 +100,7 @@ class PrenotazioneControllerTest {
 
     @Test
     void testModificaPrenotazione() {
-        // Creazione di una prenotazione iniziale
+
         Prenotazione initPrenotazione = new Prenotazione(
                 0,
                 "Anna Verdi",
@@ -114,7 +114,7 @@ class PrenotazioneControllerTest {
         int storedId = initPrenotazione.getId();
         createdPrenotazioniIds.add(storedId);
 
-        // Creazione della bean per la modifica
+
         PrenotazioneBean modBean = new PrenotazioneBean();
         modBean.setId(storedId);
         modBean.setNomeCliente("Anna Verdi Modificata");
@@ -154,7 +154,7 @@ class PrenotazioneControllerTest {
         controller.eliminaPrenotazione(storedId);
 
         assertFalse(prenotazioneDao.exists(storedId));
-        // Rimuovo l'ID dalla lista perché è già stato eliminato
+
         createdPrenotazioniIds.remove(Integer.valueOf(storedId));
     }
 
@@ -231,7 +231,7 @@ class PrenotazioneControllerTest {
         assertEquals("La prenotazione con ID 999 non esiste.", ex.getMessage());
     }
 
-    // Metodo helper per creare una bean e invocare creaPrenotazione
+
     private void createPrenotazioneWithParams(String nome, String orario, LocalDate data, String email, String note, String coperti) {
         PrenotazioneBean bean = new PrenotazioneBean();
         bean.setNomeCliente(nome);
@@ -243,7 +243,7 @@ class PrenotazioneControllerTest {
         controller.creaPrenotazione(bean);
     }
 
-    // Metodo helper per centralizzare la gestione delle eccezioni di validazione
+
     private void assertThrowsValidationException(String expectedMessage, String nome, String orario, LocalDate data, String email, String note, String coperti) {
         Exception ex = assertThrows(PrenotationValidationException.class, () -> {
             createPrenotazioneWithParams(nome, orario, data, email, note, coperti);

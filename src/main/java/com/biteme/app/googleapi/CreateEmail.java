@@ -10,8 +10,7 @@ import javax.mail.internet.MimeMessage;
 public class CreateEmail {
 
     private CreateEmail() {
-        //costruttore privato
-    }
+            }
 
     public static MimeMessage createEmail(String toEmailAddress,
                                           String fromEmailAddress,

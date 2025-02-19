@@ -14,28 +14,23 @@ public class SignupController {
         this.userDao = Configuration.getPersistenceProvider().getDaoFactory().getUserDao();
     }
 
-    // Metodo per registrare un utente con validazione interna
-    public void registerUser(SignupBean signupBean) {
-        // Esegui la validazione; se fallisce, lancia un'eccezione
-        validate(signupBean);
+        public void registerUser(SignupBean signupBean) {
+                validate(signupBean);
 
-        // Controllo aggiuntivo: se l'utente o l'email esistono già
-        if (userDao.load(signupBean.getEmail()).isPresent()) {
+                if (userDao.load(signupBean.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email già registrata");
         }
         if (userDao.load(signupBean.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username già registrato");
         }
 
-        // Se tutti i controlli sono superati, crea e registra l'utente
-        User user = new User(signupBean.getUsername());
+                User user = new User(signupBean.getUsername());
         user.setEmail(signupBean.getEmail());
         user.setPassword(signupBean.getPassword());
         userDao.store(user);
     }
 
-    // Metodo di validazione: se qualcosa non va, lancia un'eccezione
-    private void validate(SignupBean signupBean) {
+        private void validate(SignupBean signupBean) {
         String email = signupBean.getEmail();
         String username = signupBean.getUsername();
         String password = signupBean.getPassword();
@@ -58,8 +53,7 @@ public class SignupController {
         }
     }
 
-    // Metodo per navigare al login
-    public void navigateToLogin() {
+        public void navigateToLogin() {
         SceneLoader.getInstance().loadScene("/com/biteme/app/login.fxml", "Login - BiteMe");
     }
 }

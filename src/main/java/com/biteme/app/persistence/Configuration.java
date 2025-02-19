@@ -9,8 +9,7 @@ import java.util.logging.Logger;
 public class Configuration {
     private static final Logger logger = Logger.getLogger(Configuration.class.getName());
     private static final Properties properties = new Properties();
-    private static String persistenceMode = "in memory"; // Default: "in memory" oppure "database" oppure "txt"
-
+    private static String persistenceMode = "in memory"; 
     static {
         try (InputStream input = Configuration.class.getClassLoader().getResourceAsStream("config.properties")) {
             if (input != null) {
@@ -28,15 +27,13 @@ public class Configuration {
     }
 
     private Configuration() {
-        // Costruttore privato per disabilitare l'istanziazione
-    }
+            }
 
     public static PersistenceProvider getPersistenceProvider() {
         return PersistenceProvider.getProviderByName(persistenceMode);
     }
 
-    // Altri metodi per ottenere configurazioni aggiuntive
-    public static String getGoogleClientId() {
+        public static String getGoogleClientId() {
         return properties.getProperty("google.client.id");
     }
 
@@ -49,6 +46,5 @@ public class Configuration {
     }
 
     public static String getUiMode() {
-        return properties.getProperty("ui.mode", "fx").toLowerCase(); // Default: "fx" oppure "cli"
-    }
+        return properties.getProperty("ui.mode", "fx").toLowerCase();     }
 }
