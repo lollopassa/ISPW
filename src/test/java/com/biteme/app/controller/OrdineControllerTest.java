@@ -8,6 +8,7 @@ import com.biteme.app.entities.Prodotto;
 import com.biteme.app.entities.Categoria;
 import com.biteme.app.entities.StatoOrdinazione;
 import com.biteme.app.entities.TipoOrdinazione;
+import com.biteme.app.exception.OrdineException;
 import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.persistence.OrdinazioneDao;
@@ -105,7 +106,7 @@ class OrdineControllerTest {
 
 
     @Test
-    void testSalvaOrdine() {
+    void testSalvaOrdine() throws OrdineException {
         // Crea un OrdineBean con i dati da salvare
         OrdineBean ordineBean = new OrdineBean();
         ordineBean.setProdotti(List.of("Pizza Margherita", "Coca Cola"));
@@ -123,7 +124,7 @@ class OrdineControllerTest {
     }
 
     @Test
-    void testGetOrdini() {
+    void testGetOrdini() throws OrdineException {
         // Crea un ordine utilizzando il parentId generato nel setUp(), che esiste nella tabella 'ordinazione'
         Ordine ordineDaSalvare = new Ordine(parentId, List.of("Pizza Margherita"), List.of(2));
         ordineDao.store(ordineDaSalvare);
@@ -135,17 +136,6 @@ class OrdineControllerTest {
         assertEquals(storedId, bean.getId());
         assertEquals("Pizza Margherita", bean.getProdotti().get(0));
         assertEquals(2, bean.getQuantita().get(0));
-    }
-
-
-
-    @Test
-    void testGetOrdineByIdNonEsistente() {
-        Exception ex = assertThrows(
-                IllegalArgumentException.class,
-                () -> controller.getOrdineById(999)
-        );
-        assertEquals("Ordine con ID 999 non trovato", ex.getMessage());
     }
 
     @Test
@@ -183,4 +173,14 @@ class OrdineControllerTest {
                 .toList();
         assertEquals(2, filtered.size(), "Dovrebbero essere presenti 2 prodotti corrispondenti.");
     }
+
+    @Test
+    void testGetOrdineByIdNonEsistente() {
+        Exception ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> controller.getOrdineById(999)
+        );
+        assertEquals("Ordine con ID 999 non trovato", ex.getMessage());
+    }
+
 }

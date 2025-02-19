@@ -5,6 +5,7 @@ import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.controller.OrdinazioneController;
 import com.biteme.app.controller.OrdineController;
 import com.biteme.app.exception.OrdinazioneException;
+import com.biteme.app.exception.OrdineException;
 import com.biteme.app.util.SceneLoader;
 import com.biteme.app.bean.OrdineBean;
 import javafx.event.ActionEvent;
@@ -86,25 +87,33 @@ public class OrdineBoundary {
     // Initialize method that runs when the screen is loaded
     @FXML
     public void initialize() {
-        controller.setRiepilogoContenuto(this.riepilogoContenuto);
-        OrdinazioneBean ordinazioneBean = OrdinazioneBoundary.getOrdineSelezionato();
+        try {
+            controller.setRiepilogoContenuto(this.riepilogoContenuto);
+            OrdinazioneBean ordinazioneBean = OrdinazioneBoundary.getOrdineSelezionato();
 
-        if (ordinazioneBean != null) {
-            int ordineId = ordinazioneBean.getId();
-            OrdineBean ordineBean = controller.load(ordineId);
-            if (ordineBean != null) {
-                String infoTavolo = ordinazioneBean.getInfoTavolo();
-                nomeTavolo.setText(infoTavolo == null || infoTavolo.trim().isEmpty() || ASPORTO.equalsIgnoreCase(infoTavolo) ?
-                        ASPORTO : "Tavolo: " + infoTavolo);
-                caricaProdottiAssociati();
-                caricaProdottiNelRiepilogo(ordineBean);
+            if (ordinazioneBean != null) {
+                int ordineId = ordinazioneBean.getId();
+                OrdineBean ordineBean = controller.load(ordineId);
+                if (ordineBean != null) {
+                    String infoTavolo = ordinazioneBean.getInfoTavolo();
+                    nomeTavolo.setText(
+                            (infoTavolo == null || infoTavolo.trim().isEmpty() || ASPORTO.equalsIgnoreCase(infoTavolo))
+                                    ? ASPORTO
+                                    : "Tavolo: " + infoTavolo
+                    );
+                    caricaProdottiAssociati();
+                    caricaProdottiNelRiepilogo(ordineBean);
+                } else {
+                    logAndShowAlert(ERROR_ORDINE_NOT_FOUND + ordineId);
+                }
             } else {
-                logAndShowAlert(ERROR_ORDINE_NOT_FOUND + ordineId);
+                logAndShowAlert(ERROR_NO_ORDINE_SELECTED);
             }
-        } else {
-            logAndShowAlert(ERROR_NO_ORDINE_SELECTED);
+        } catch (OrdineException e) {
+            logAndShowAlert("Errore nel caricamento dell'ordine: " + e.getMessage());
         }
     }
+
 
     // Helper method to log errors and show alerts
     private void logAndShowAlert(String message) {

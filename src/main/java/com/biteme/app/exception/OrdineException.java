@@ -1,6 +1,6 @@
 package com.biteme.app.exception;
 
-public class OrdineException extends RuntimeException {
+public class OrdineException extends Exception {
 
     public OrdineException(String message) {
         super(message);

@@ -69,8 +69,12 @@ public class OrdineCLI {
                     break;
                 case "4":
                     // Salva le modifiche chiamando il metodo del controller
-                    ordineController.salvaOrdine(ordineBean, orderId);
-                    System.out.println("Modifiche salvate.");
+                    try {
+                        ordineController.salvaOrdine(ordineBean, orderId);
+                        System.out.println("Modifiche salvate.");
+                    } catch (com.biteme.app.exception.OrdineException e) {
+                        System.out.println("Errore nel salvataggio dell'ordine: " + e.getMessage());
+                    }
                     modificando = false;
                     break;
                 case "5":
@@ -83,6 +87,7 @@ public class OrdineCLI {
             }
         }
     }
+
 
 
     private static void mostraOrdine(OrdineBean ordineBean) {

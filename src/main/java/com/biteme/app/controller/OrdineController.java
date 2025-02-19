@@ -42,7 +42,7 @@ public class OrdineController {
         return ordineBean;
     }
 
-    public void salvaOrdineEStato(int ordineId, String statoStr) {
+    public void salvaOrdineEStato(int ordineId, String statoStr) throws OrdineException {
         try {
             StatoOrdinazione stato = convertStringToStatoOrdine(statoStr);
             List<String> prodotti = recuperaProdottiDalRiepilogo();
@@ -56,11 +56,12 @@ public class OrdineController {
             OrdinazioneController ordinazioneController = new OrdinazioneController();
             ordinazioneController.aggiornaStatoOrdinazione(ordineId, stato);
         } catch (Exception e) {
-            throw new OrdineException("Errore nel salvataggio dell'ordine e nell'aggiornamento dello stato: " + e.getMessage(), e);
+            throw new OrdineException("Errore nel salvataggio dell'ordine e nell'aggiornamento dello stato: "
+                    + e.getMessage(), e);
         }
     }
 
-    public void salvaOrdine(OrdineBean ordineBean, int id) {
+    public void salvaOrdine(OrdineBean ordineBean, int id) throws OrdineException {
         try {
             Ordine nuovoOrdine = new Ordine(
                     id,
@@ -78,7 +79,7 @@ public class OrdineController {
         List<String> prodotti = new ArrayList<>();
         for (Node nodo : riepilogoContenuto.getChildren()) {
             if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
-                String testo = nomeEQuantitaLabel.getText(); // ad esempio: "Pizza Margherita x 2"
+                String testo = nomeEQuantitaLabel.getText(); // es. "Pizza Margherita x 2"
                 String[] parti = testo.split(" x ");
                 if (parti.length > 1) {
                     String nomeProdotto = parti[0].trim();
@@ -122,11 +123,11 @@ public class OrdineController {
                 .toList();
     }
 
-    public OrdineBean getOrdineById(int id) {
+    public OrdineBean getOrdineById(int id) throws OrdineException {
         return load(id);
     }
 
-    public OrdineBean load(int idOrdine) {
+    public OrdineBean load(int idOrdine) throws OrdineException {
         Ordine ordine = ordineDao.getById(idOrdine);
         if (ordine == null) {
             throw new OrdineException("L'ordine con ID " + idOrdine + " non esiste.");
