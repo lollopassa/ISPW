@@ -7,7 +7,6 @@ public class SignupBean {
     private String password;
     private String confirmPassword;
 
-
     public String getEmail() {
         return email;
     }
@@ -40,4 +39,21 @@ public class SignupBean {
         this.confirmPassword = confirmPassword;
     }
 
+    public void validate() {
+        if (email == null ||  email.isEmpty() || !email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,7}$")) {
+            throw new IllegalArgumentException("Email non valida");
+        }
+
+        if (username == null || username.isEmpty()) {
+            throw new IllegalArgumentException("Username mancante");
+        }
+
+        if (password == null || password.isEmpty() || confirmPassword == null  || confirmPassword.isEmpty()) {
+            throw new IllegalArgumentException("Le password sono obbligatorie");
+        }
+
+        if (!password.equals(confirmPassword)) {
+            throw new IllegalArgumentException("Le password non corrispondono");
+        }
+    }
 }

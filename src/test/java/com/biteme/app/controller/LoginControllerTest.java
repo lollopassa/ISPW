@@ -58,27 +58,17 @@ class LoginControllerTest {
 
         userDao.store(user);
 
-        LoginBean loginBean = createLoginBean("test@example.com", password);
+    LoginBean loginBean = createLoginBean("test@example.com", password);
 
-        assertDoesNotThrow(() -> controller.authenticateUser(loginBean));
+    assertDoesNotThrow(() -> controller.authenticateUser(loginBean));
 
-        User actualUser = UserSession.getCurrentUser();
-        assertNotNull(actualUser, "L'utente corrente non dovrebbe essere nullo");
-        assertEquals(user.getUsername(), actualUser.getUsername(), "Username non corrispondente");
-        assertEquals(user.getEmail(), actualUser.getEmail(), "Email non corrispondente");
-        assertEquals(user.getRuolo(), actualUser.getRuolo(), "Ruolo utente non corrispondente");
-        assertEquals(user.isGoogleUser(), actualUser.isGoogleUser(), "Flag Google non corrispondente");
-    }
-
-    @Test
-    void testAuthenticateUserInvalidEmailFormat() {
-        LoginBean loginBean = createLoginBean("invalid@format", "password123");
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> controller.authenticateUser(loginBean)
-        );
-        assertEquals("Il formato dell'email non è valido.", exception.getMessage());
-    }
+    User actualUser = UserSession.getCurrentUser();
+    assertNotNull(actualUser, "L'utente corrente non dovrebbe essere nullo");
+    assertEquals(user.getUsername(), actualUser.getUsername(), "Username non corrispondente");
+    assertEquals(user.getEmail(), actualUser.getEmail(), "Email non corrispondente");
+    assertEquals(user.getRuolo(), actualUser.getRuolo(), "Ruolo utente non corrispondente");
+    assertEquals(user.isGoogleUser(), actualUser.isGoogleUser(), "Flag Google non corrispondente");
+}
 
     @Test
     void testNavigateToHomeAsAdmin() {

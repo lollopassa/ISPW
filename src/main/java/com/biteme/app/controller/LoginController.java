@@ -13,7 +13,6 @@ import com.biteme.app.util.UserSession;
 import com.biteme.app.persistence.UserDao;
 
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 public class LoginController {
 
@@ -26,15 +25,6 @@ public class LoginController {
     }
 
     public void authenticateUser(LoginBean loginBean) {
-                if (loginBean.getEmailOrUsername() == null || loginBean.getEmailOrUsername().trim().isEmpty() ||
-                loginBean.getPassword() == null || loginBean.getPassword().trim().isEmpty()) {
-            throw new IllegalArgumentException("Email/Username e password sono obbligatori.");
-        }
-
-                if (loginBean.getEmailOrUsername().contains("@") && !isValidEmail(loginBean.getEmailOrUsername())) {
-            throw new IllegalArgumentException("Il formato dell'email non è valido.");
-        }
-
                 Optional<User> optionalUser = userDao.load(loginBean.getEmailOrUsername());
         if (!optionalUser.isPresent()) {
             throw new IllegalArgumentException("Utente non trovato.");
@@ -98,11 +88,6 @@ public class LoginController {
 
     public void navigateToSignup() {
         SceneLoader.getInstance().loadScene("/com/biteme/app/signup.fxml", "Registrati - BiteMe");
-    }
-
-    private boolean isValidEmail(String email) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,7}$";
-        return Pattern.compile(emailRegex).matcher(email).matches();
     }
 
     public String getCurrentUsername() {

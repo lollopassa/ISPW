@@ -94,6 +94,16 @@ public class TxtPrenotazioneDao implements PrenotazioneDao {
     }
 
     @Override
+    public boolean existsDuplicate(Prenotazione p) {
+        return prenotazioni.stream().anyMatch(x ->
+                x.getNomeCliente().equalsIgnoreCase(p.getNomeCliente()) &&
+                        x.getOrario().equals(p.getOrario()) &&
+                        x.getData().equals(p.getData()) &&
+                        x.getCoperti() == p.getCoperti()
+        );
+    }
+
+    @Override
     public List<Prenotazione> getByData(LocalDate data) {
         return prenotazioni.stream()
                 .filter(p -> p.getData().equals(data))

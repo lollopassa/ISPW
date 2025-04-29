@@ -19,15 +19,6 @@ public class ProdottoController {
     }
 
     public void aggiungiProdotto(ProdottoBean prodottoBean) {
-        if (prodottoBean.getNome() == null || prodottoBean.getNome().isBlank()) {
-            throw new ProdottoException("Il nome del prodotto non può essere vuoto.");
-        }
-        if (prodottoBean.getCategoria() == null || prodottoBean.getCategoria().isBlank()) {
-            throw new ProdottoException("Seleziona una categoria valida.");
-        }
-        if (prodottoBean.getPrezzo() == null || prodottoBean.getPrezzo().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ProdottoException("Inserisci un valore numerico valido per il prezzo maggiore di zero.");
-        }
 
         Prodotto prodotto = new Prodotto(
                 prodottoBean.getId() != null ? prodottoBean.getId() : 0,
@@ -37,20 +28,12 @@ public class ProdottoController {
                 prodottoBean.getDisponibile() != null && prodottoBean.getDisponibile()
         );
         prodottoDao.store(prodotto);
-            }
+    }
 
     public void modificaProdotto(ProdottoBean prodottoBean) {
+        // Controllo specifico per la modifica: l'ID deve essere presente e valido
         if (prodottoBean.getId() == null || prodottoBean.getId() <= 0) {
             throw new ProdottoException("L'ID del prodotto non è valido.");
-        }
-        if (prodottoBean.getNome() == null || prodottoBean.getNome().isBlank()) {
-            throw new ProdottoException("Il nome del prodotto non può essere vuoto.");
-        }
-        if (prodottoBean.getCategoria() == null || prodottoBean.getCategoria().isBlank()) {
-            throw new ProdottoException("Seleziona una categoria valida.");
-        }
-        if (prodottoBean.getPrezzo() == null || prodottoBean.getPrezzo().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ProdottoException("Inserisci un valore numerico valido per il prezzo maggiore di zero.");
         }
 
         Prodotto prodottoAggiornato = new Prodotto(

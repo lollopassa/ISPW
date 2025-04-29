@@ -33,4 +33,6 @@ module demo {
     exports com.biteme.app.googleapi;
     opens com.biteme.app.googleapi to javafx.fxml;
     exports com.biteme.app.exception;
+    exports com.biteme.app.ui;
+    opens com.biteme.app.ui to javafx.fxml;
 }

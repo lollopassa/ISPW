@@ -24,58 +24,16 @@ public class OrdinazioneController {
                 .getOrdinazioneDao();
         this.ordineController = new OrdineController();
     }
-
-
     public OrdinazioneBean processOrdineCreation(String nome, String tipoOrdine, String orario, String coperti, String tavolo) throws OrdinazioneException {
-        if (nome == null || nome.trim().isEmpty()) {
-            throw new OrdinazioneException("Il campo Nome Cliente deve essere compilato.");
-        }
-        if (tipoOrdine == null || tipoOrdine.trim().isEmpty()) {
-            throw new OrdinazioneException("Seleziona un tipo di ordine: 'Al Tavolo' o 'Asporto'.");
-        }
-
-        if ("Al Tavolo".equals(tipoOrdine)) {
-            validateAlTavolo(coperti, tavolo);
-                        orario = LocalTime.now().toString().substring(0, 5);
-        } else if ("Asporto".equals(tipoOrdine)) {
-            validateAsporto(orario);
-                        coperti = "";
-            tavolo = "";
-        } else {
-            throw new OrdinazioneException("Tipo di ordine non valido: " + tipoOrdine);
-        }
-
         OrdinazioneBean bean = new OrdinazioneBean();
         bean.setNome(nome);
         bean.setTipoOrdine(tipoOrdine);
         bean.setOrarioCreazione(orario);
         bean.setNumeroClienti(coperti);
         bean.setInfoTavolo(tavolo);
+
         return bean;
     }
-
-    private void validateAlTavolo(String coperti, String tavolo) throws OrdinazioneException {
-        if (coperti == null || coperti.trim().isEmpty()) {
-            throw new OrdinazioneException("Il numero di coperti è obbligatorio per gli ordini 'Al Tavolo'.");
-        }
-        if (!coperti.matches("\\d+")) {
-            throw new OrdinazioneException("Il campo 'Numero di Coperti' deve contenere solo numeri interi.");
-        }
-        if (tavolo == null || tavolo.trim().isEmpty()) {
-            throw new OrdinazioneException("Il numero del tavolo è obbligatorio per gli ordini 'Al Tavolo'.");
-        }
-    }
-
-    private void validateAsporto(String orario) throws OrdinazioneException {
-        if (orario == null || orario.trim().isEmpty()) {
-            throw new OrdinazioneException("Il campo Orario deve essere compilato per Asporto.");
-        }
-        if (!isValidTime(orario)) {
-            throw new OrdinazioneException("Il campo 'Orario' deve essere nel formato HH:mm (es. '12:20').");
-        }
-    }
-
-
 
     public void creaOrdine(OrdinazioneBean ordinazioneBean) throws OrdinazioneException {
         try {
