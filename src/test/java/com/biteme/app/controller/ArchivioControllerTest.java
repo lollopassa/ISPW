@@ -210,7 +210,7 @@ class ArchivioControllerTest {
 
     @Test
     void testGuadagniPerGiorno() {
-        LocalDateTime monday = LocalDateTime.of(2025, 1, 6, 12, 0);           LocalDateTime tuesday = LocalDateTime.of(2025, 1, 7, 12, 0);          int id1 = 5000, id2 = 5001, id3 = 5002;
+        LocalDateTime monday = LocalDateTime.of(2025, 5, 5, 12, 0);           LocalDateTime tuesday = LocalDateTime.of(2025, 5,6, 7, 12, 0);          int id1 = 5000, id2 = 5001, id3 = 5002;
 
         Archivio archivio1 = new Archivio();
         archivio1.setIdOrdine(id1);

@@ -8,8 +8,6 @@ import com.biteme.app.entities.StatoOrdinazione;
 import com.biteme.app.entities.TipoOrdinazione;
 import com.biteme.app.persistence.OrdinazioneDao;
 import com.biteme.app.persistence.Configuration;
-import com.biteme.app.util.SceneLoader;
-import com.biteme.app.boundary.OrdinazioneBoundary;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,22 +16,15 @@ public class OrdinazioneController {
 
     private final OrdinazioneDao ordinazioneDao;
     private final OrdineController ordineController;
+
     public OrdinazioneController() {
         this.ordinazioneDao = Configuration.getPersistenceProvider()
                 .getDaoFactory()
                 .getOrdinazioneDao();
         this.ordineController = new OrdineController();
     }
-    public OrdinazioneBean processOrdineCreation(String nome, String tipoOrdine, String orario, String coperti, String tavolo) throws OrdinazioneException {
-        OrdinazioneBean bean = new OrdinazioneBean();
-        bean.setNome(nome);
-        bean.setTipoOrdine(tipoOrdine);
-        bean.setOrarioCreazione(orario);
-        bean.setNumeroClienti(coperti);
-        bean.setInfoTavolo(tavolo);
 
-        return bean;
-    }
+
 
     public void creaOrdine(OrdinazioneBean ordinazioneBean) throws OrdinazioneException {
         try {
@@ -46,12 +37,16 @@ public class OrdinazioneController {
             ordineBean.setId(ordinazione.getId());
             ordineBean.setProdotti(new ArrayList<>());
             ordineBean.setQuantita(new ArrayList<>());
+            ordineBean.setPrezzi(new ArrayList<>());   // ← qui inizializzo prezzi
 
             ordineController.salvaOrdine(ordineBean, ordinazione.getId());
         } catch (Exception e) {
-            throw new OrdinazioneException("Errore nella creazione dell'ordinazione: " + e.getMessage(), e);
+            throw new OrdinazioneException(
+                    "Errore nella creazione dell'ordinazione: " + e.getMessage(), e
+            );
         }
     }
+
 
 
     public List<OrdinazioneBean> getOrdini() {
@@ -72,13 +67,6 @@ public class OrdinazioneController {
         }
     }
 
-    public int getIdOrdineSelezionato() throws OrdinazioneException {
-        OrdinazioneBean ordinazioneBean = OrdinazioneBoundary.getOrdineSelezionato();
-        if (ordinazioneBean == null) {
-            throw new OrdinazioneException("Nessuna ordinazione selezionata.");
-        }
-        return ordinazioneBean.getId();
-    }
 
     public void aggiornaStatoOrdinazione(int ordineId, StatoOrdinazione nuovoStato) throws OrdinazioneException {
         try {
@@ -86,10 +74,6 @@ public class OrdinazioneController {
         } catch (Exception e) {
             throw new OrdinazioneException("Errore nell'aggiornamento dello stato dell'ordinazione: " + e.getMessage(), e);
         }
-    }
-
-    public void cambiaASchermataOrdinazione() {
-        SceneLoader.getInstance().loadScene("/com/biteme/app/ordinazione.fxml", "Torna a Ordinazione");
     }
 
     public boolean isValidTime(String time) {
@@ -105,7 +89,7 @@ public class OrdinazioneController {
         }
     }
 
-        private Ordinazione convertToModel(OrdinazioneBean bean) {
+    private Ordinazione convertToModel(OrdinazioneBean bean) {
         TipoOrdinazione tipoOrdine;
         if ("Al Tavolo".equals(bean.getTipoOrdine())) {
             tipoOrdine = TipoOrdinazione.AL_TAVOLO;
@@ -114,14 +98,13 @@ public class OrdinazioneController {
         } else {
             throw new IllegalArgumentException("Tipo Ordine non valido: " + bean.getTipoOrdine());
         }
-        StatoOrdinazione statoOrdine = StatoOrdinazione.NUOVO;
         return new Ordinazione(
                 bean.getId(),
                 bean.getNome(),
                 bean.getNumeroClienti(),
                 tipoOrdine,
                 bean.getInfoTavolo(),
-                statoOrdine,
+                StatoOrdinazione.NUOVO,
                 bean.getOrarioCreazione()
         );
     }
@@ -131,10 +114,11 @@ public class OrdinazioneController {
         bean.setId(model.getId());
         bean.setNome(model.getNomeCliente());
         bean.setNumeroClienti(model.getNumeroClienti());
-        bean.setTipoOrdine(model.getTipoOrdine().toString());
-        bean.setInfoTavolo(model.getInfoTavolo());
-        bean.setStatoOrdine(model.getStatoOrdine().toString());
+        bean.setTipoOrdine  (model.getTipoOrdine().toString());
+        bean.setInfoTavolo   (model.getInfoTavolo());
+        bean.setStatoOrdine  (model.getStatoOrdine().toString());
         bean.setOrarioCreazione(model.getOrarioCreazione());
         return bean;
     }
+
 }

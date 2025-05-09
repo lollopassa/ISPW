@@ -5,14 +5,12 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
-<BorderPane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.OrdineBoundary">
+<BorderPane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.ui.OrdineUI">
 
     <top>
         <StackPane>
-            <!-- Rettangolo superiore -->
             <Rectangle fill="#303d68" height="120" width="1440" />
 
-            <!-- Pulsante Indietro -->
             <Button onAction="#handleIndietro" prefHeight="40" prefWidth="100" style="-fx-font-size: 16px; -fx-background-color: #e02189; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5px; -fx-cursor: hand;" text="Indietro" StackPane.alignment="CENTER_LEFT">
                 <StackPane.margin>
                     <Insets left="15" />
@@ -23,27 +21,16 @@
 
     <bottom>
         <AnchorPane>
-            <!-- Rettangolo inferiore -->
-            <Rectangle height="120" width="1440" fill="#303d68" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
+            <Rectangle fill="#303d68" height="120" layoutX="14.0" width="1440" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="-14.0" AnchorPane.topAnchor="0.0" />
 
-            <!-- Pulsante Salva -->
-            <Button text="Salva" onAction="#handleSalva"
-                    style="-fx-font-size: 16px; -fx-background-color: #e02189; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5px; -fx-cursor: hand;"
-                    prefHeight="40" prefWidth="100"
-                    AnchorPane.rightAnchor="150" AnchorPane.bottomAnchor="40" />
+            <Button onAction="#handleSalva" prefHeight="40" prefWidth="100" style="-fx-font-size: 16px; -fx-background-color: #e02189; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5px; -fx-cursor: hand;" text="Salva" AnchorPane.bottomAnchor="40" AnchorPane.rightAnchor="150" />
 
-            <!-- Pulsante Checkout -->
-            <Button text="Checkout" onAction="#handleCheckout"
-                    style="-fx-font-size: 16px; -fx-background-color: #e02189; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5px; -fx-cursor: hand;"
-                    prefHeight="40" prefWidth="100"
-                    AnchorPane.rightAnchor="25" AnchorPane.bottomAnchor="40" />
+            <Button onAction="#handleCheckout" prefHeight="40" prefWidth="100" style="-fx-font-size: 16px; -fx-background-color: #e02189; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5px; -fx-cursor: hand;" text="Checkout" AnchorPane.bottomAnchor="40" AnchorPane.rightAnchor="25" />
         </AnchorPane>
     </bottom>
 
-    <!-- Colonna Sinistra con i Pulsanti delle Categorie -->
     <left>
         <VBox alignment="CENTER" prefWidth="200" spacing="10" style="-fx-background-color: #f4f4f4;">
-            <!-- Pulsanti delle categorie con azioni associate -->
             <Button onAction="#handleCategoriaBevande" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white; -fx-cursor: hand;" text="Bevande" />
             <Button onAction="#handleCategoriaAntipasti" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white; -fx-cursor: hand;" text="Antipasti" />
             <Button onAction="#handleCategoriaPizze" prefHeight="60" prefWidth="180" style="-fx-background-color: #303d68; -fx-font-size: 16px; -fx-text-fill: white; -fx-cursor: hand;" text="Pizze" />
@@ -54,46 +41,82 @@
         </VBox>
     </left>
 
-    <!-- Parte Centrale con i Prodotti -->
-    <center>
-        <!-- Uso ScrollPane per rendere la sezione scorrevole -->
-        <ScrollPane fitToHeight="true" fitToWidth="true">
-            <!-- Contenitore HBox per spostare gli elementi verso destra -->
-            <HBox>
-                <!-- Spaziatura verso destra tramite un Region -->
-                <Region prefWidth="20" /> <!-- Spostamento verso destra -->
-                <VBox>
-                    <!-- Spaziatura in alto tramite un altro Region -->
-                    <Region prefHeight="20" /> <!-- Spostamento verso il basso -->
-                    <FlowPane fx:id="flowPaneProdotti" hgap="20" vgap="20">
-                        <!-- Esempio di prodotto -->
-                        <VBox alignment="CENTER" prefHeight="150" prefWidth="150" spacing="10" style="-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, lightgray, 10, 0, 3, 3);">
-                            <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Prodotto 1" />
-                            <Label style="-fx-font-size: 14px; -fx-text-fill: gray;" text="Quantità" />
-                            <HBox alignment="CENTER" spacing="10">
-                                <Button prefHeight="30" prefWidth="30" style="-fx-cursor: hand;" text="-" />
-                                <Label fx:id="quantitaProdotto1" style="-fx-font-size: 14px;" text="0" />
-                                <Button prefHeight="30" prefWidth="30" style="-fx-cursor: hand;" text="+" />
-                            </HBox>
-                        </VBox>
 
-                        <!-- Esempio di prodotto aggiuntivo -->
-                        <VBox alignment="CENTER" prefHeight="150" prefWidth="150" spacing="10" style="-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, lightgray, 10, 0, 3, 3);">
-                            <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Prodotto 2" />
-                            <Label style="-fx-font-size: 14px; -fx-text-fill: gray;" text="Quantità" />
-                            <HBox alignment="CENTER" spacing="10">
-                                <Button prefHeight="30" prefWidth="30" style="-fx-cursor: hand;" text="-" />
-                                <Label fx:id="quantitaProdotto2" style="-fx-font-size: 14px;" text="0" />
-                                <Button prefHeight="30" prefWidth="30" style="-fx-cursor: hand;" text="+" />
-                            </HBox>
-                        </VBox>
-                    </FlowPane>
-                </VBox>
-            </HBox>
-        </ScrollPane>
+    <center>
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <ScrollPane fitToHeight="true" fitToWidth="true" HBox.hgrow="ALWAYS">
+                <FlowPane fx:id="flowPaneProdotti"
+                          hgap="20" vgap="20"
+                          style="-fx-padding:20;" />
+            </ScrollPane>
+
+            <VBox alignment="CENTER_RIGHT"
+                  prefWidth="320" minWidth="320" maxWidth="320"
+                  prefHeight="200" minHeight="200" maxHeight="200">
+
+                <AnchorPane prefWidth="320" prefHeight="200"
+                            style="
+                            -fx-border-color: #888;
+                            -fx-border-width: 2;
+                            -fx-background-color: #f9f9f9;
+                            -fx-background-radius: 8;
+                            -fx-border-radius: 8;
+                            -fx-padding: 15;
+                        "
+                            xmlns="http://javafx.com/javafx/8"
+                            xmlns:fx="http://javafx.com/fxml/1">
+
+                    <GridPane hgap="12" vgap="12"
+                              AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0"
+                              AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
+
+                        <Label text="Prodotto:"
+                               GridPane.rowIndex="0" GridPane.columnIndex="0"
+                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+                        <TextField fx:id="txtProdotto"
+                                   promptText="Nome prodotto"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                   style="-fx-font-size:14px;"/>
+
+                        <Label text="Prezzo (€):"
+                               GridPane.rowIndex="1" GridPane.columnIndex="0"
+                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+                        <TextField fx:id="txtPrezzo"
+                                   promptText="0.00"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                   style="-fx-font-size:14px;"/>
+
+                        <Label text="Quantità:"
+                               GridPane.rowIndex="2" GridPane.columnIndex="0"
+                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+                        <TextField fx:id="txtQuantita"
+                                   promptText="0"
+                                   GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                   style="-fx-font-size:14px;"/>
+
+                        <HBox spacing="12" alignment="CENTER_RIGHT"
+                              GridPane.rowIndex="3" GridPane.columnIndex="1">
+                            <Button text="Pulisci"
+                                    onAction="#onPulisci"
+                                    prefWidth="80"
+                                    style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+                            <Button text="Aggiungi"
+                                    onAction="#onAggiungi"
+                                    prefWidth="80"
+                                    style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+                        </HBox>
+                    </GridPane>
+                </AnchorPane>
+            </VBox>
+        </HBox>
     </center>
 
-    <!-- Colonna Destra per il Riepilogo -->
+
+
+
+
+
+
     <right>
         <VBox alignment="TOP_CENTER" prefWidth="400" spacing="10" style="-fx-background-color: #e8e8e8; -fx-padding: 5;">
             <Label fx:id="nomeTavolo" style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Tavolo 1" />
@@ -104,7 +127,7 @@
             </HBox>
             <Separator />
             <ScrollPane fitToHeight="true" fitToWidth="true">
-                <VBox fx:id="riepilogoContenuto" spacing="10"></VBox>
+                <VBox fx:id="riepilogoContenuto" spacing="10" />
             </ScrollPane>
             <Separator />
             <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 5;">

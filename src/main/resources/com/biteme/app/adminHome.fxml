@@ -7,13 +7,11 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.boundary.AdminHomeBoundary">
+<Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.ui.AdminHomeUI">
     <children>
 
-        <!-- Inclusione del menu laterale -->
         <fx:include source="menuLaterale.fxml" />
 
-        <!-- Etichetta Header -->
         <Label layoutX="349.0" layoutY="24.0" text="Admin Home" textAlignment="CENTER" textFill="BLACK" wrapText="true">
             <font>
                 <Font size="32.0" />
@@ -31,13 +29,10 @@
             </items>
         </ComboBox>
 
-        <!-- Pulsante per aggiornare i dati -->
         <Button fx:id="aggiornaButton" layoutX="699.0" layoutY="709.0" onAction="#aggiornaDati" style="-fx-font-weight: bold; -fx-padding: 10px; -fx-background-color: #303d68; -fx-text-fill: white; -fx-cursor: hand;" text="Aggiorna Dati" />
 
-        <!-- Pulsante per switchare viste -->
         <Button fx:id="switchButton" layoutX="699.0" layoutY="750.0" onAction="#switchView" prefHeight="37.0" prefWidth="99.0" style="-fx-font-weight: bold; -fx-padding: 10px; -fx-background-color: #E0218A; -fx-text-fill: white; -fx-cursor: hand;" text="Guadagni" />
 
-        <!-- Tabella per la classifica (abbassata di 20 unità) -->
         <TableView fx:id="statisticheTable" layoutX="350.0" layoutY="120.0" prefHeight="580.0" prefWidth="450.0">
             <columns>
                 <TableColumn fx:id="colonnaPiatto" prefWidth="300.0" text="Piatto" />
@@ -45,7 +40,6 @@
             </columns>
         </TableView>
 
-        <!-- BarChart allineato con il fondo della tabella -->
         <BarChart fx:id="barChart" layoutX="818.0" layoutY="165.0" prefHeight="580.0" prefWidth="612.0">
             <xAxis>
                 <CategoryAxis label="Piatto" fx:id="xAxis" />

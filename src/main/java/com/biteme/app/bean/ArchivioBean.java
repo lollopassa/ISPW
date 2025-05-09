@@ -11,6 +11,22 @@ public class ArchivioBean {
     private BigDecimal totale;
     private LocalDateTime dataArchiviazione;
 
+
+    public void validate() {
+        if (prodotti == null || quantita == null ||
+                prodotti.size() != quantita.size()) {
+            throw new IllegalArgumentException(
+                    "Prodotti e quantitÃ  devono essere non null e di uguale lunghezza.");
+        }
+        if (totale == null || totale.signum() < 0) {
+            throw new IllegalArgumentException("Totale non valido.");
+        }
+        if (dataArchiviazione == null) {
+            throw new IllegalArgumentException("Data archiviazione mancante.");
+        }
+    }
+
+
     public int getIdOrdine() {
         return idOrdine;
     }
@@ -49,22 +65,5 @@ public class ArchivioBean {
 
     public void setDataArchiviazione(LocalDateTime dataArchiviazione) {
         this.dataArchiviazione = dataArchiviazione;
-    }
-
-    public void validate() {
-        if (prodotti == null || quantita == null) {
-            throw new IllegalArgumentException("Prodotti e quantità non possono essere nulli.");
-        }
-        if (prodotti.isEmpty()) {
-            throw new IllegalArgumentException("Nessun prodotto da archiviare.");
-        }
-        if (prodotti.size() != quantita.size()) {
-            throw new IllegalArgumentException("Il numero di prodotti non corrisponde alle quantità.");
-        }
-        for (Integer q : quantita) {
-            if (q == null || q <= 0) {
-                throw new IllegalArgumentException("Quantità non valide: " + q);
-            }
-        }
     }
 }

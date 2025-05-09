@@ -7,17 +7,14 @@
 <Pane prefHeight="800" prefWidth="1440" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.biteme.app.ui.OrdinazioneUI">
    <children>
 
-      <!-- Inclusione del Menu Laterale -->
       <fx:include source="menuLaterale.fxml" />
 
-      <!-- Etichetta "Ordinazione" -->
       <Label fx:id="ordinazioneLabelG" layoutX="349.0" layoutY="24.0" text="Ordinazione" textAlignment="CENTER" textFill="BLACK">
          <font>
             <Font size="32.0" />
          </font>
       </Label>
 
-      <!-- Tabella delle ordinazioni -->
       <TableView fx:id="ordinazioniTableView" layoutX="376.0" layoutY="138.0" prefHeight="250.0" prefWidth="652.0">
          <columns>
             <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
@@ -30,35 +27,26 @@
          </columns>
       </TableView>
 
-      <!-- Pulsanti fuori dalla tabella -->
       <HBox alignment="CENTER" layoutX="800.0" layoutY="410.0" spacing="20">
          <Button fx:id="archiviaButton" onAction="#archiviaOrdine" style="-fx-font-weight: bold; -fx-padding: 8px; -fx-background-color: #303d68; -fx-text-fill: white; -fx-cursor: hand;" text="Archivia" />
          <Button fx:id="modificaButton" onAction="#modificaOrdine" style="-fx-font-weight: bold; -fx-padding: 8px; -fx-background-color: #303d68; -fx-text-fill: white; -fx-cursor: hand;" text="Modifica" />
          <Button fx:id="eliminaButton" onAction="#eliminaOrdine" style="-fx-font-weight: bold; -fx-padding: 8px;-fx-background-color: #E0218A; -fx-text-fill: white; -fx-cursor: hand; " text="Elimina" />
       </HBox>
 
-      <!-- Modulo per Aggiungere Ordinazione -->
       <VBox alignment="TOP_CENTER" layoutX="370.0" layoutY="414.0" spacing="15.0" style="-fx-padding: 15px; -fx-border-color: lightgray; -fx-border-width: 1.5px; -fx-background-color: #f9f9f9; -fx-border-radius: 8px;">
-         <!-- Titolo della sezione -->
          <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Nuova Ordinazione" />
 
-         <!-- Campo Nome Cliente -->
          <TextField fx:id="nomeClienteField" prefHeight="35.0" prefWidth="300.0" promptText="Nome Cliente" style="-fx-font-size: 14px;" />
 
-         <!-- Campo Tipo Ordine -->
          <ComboBox fx:id="tipoOrdineComboBox" prefHeight="35.0" prefWidth="300.0" promptText="Asporto o Al Tavolo?" style="-fx-font-size: 14px;">
          </ComboBox>
 
-         <!-- Campo Orario Ordinazione -->
          <TextField fx:id="orarioField" prefHeight="35.0" prefWidth="300.0" promptText="Orario (hh:mm)" style="-fx-font-size: 14px;" />
 
-         <!-- Campo Numero Coperti -->
          <TextField fx:id="copertiField" prefHeight="35.0" prefWidth="300.0" promptText="Numero Coperti" style="-fx-font-size: 14px;" />
 
-         <!-- Campo Info Tavolo -->
          <TextField fx:id="tavoloField" prefHeight="35.0" prefWidth="300.0" promptText="Tavolo" style="-fx-font-size: 14px;" />
 
-         <!-- Pulsante per aggiungere un'ordinazione -->
          <Button onAction="#createOrdine" prefHeight="40.0" prefWidth="300.0" style="-fx-background-color: #303d68; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;" text="Aggiungi Ordinazione" />
       </VBox>
 
