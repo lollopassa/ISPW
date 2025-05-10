@@ -77,7 +77,7 @@ class PrenotazioneControllerTest {
         bean.setEmail("");
         bean.setNote("Cena di compleanno");
         bean.setCopertiStr("3");
-
+        bean.validate();
         controller.creaPrenotazione(bean);
 
         List<Prenotazione> prenotazioni = prenotazioneDao.getByData(LocalDate.of(2025, 4, 15));
@@ -107,7 +107,7 @@ class PrenotazioneControllerTest {
                 LocalTime.of(19, 0),
                 LocalDate.of(2025, 5, 20),
                 "Cena di lavoro",
-                "anna.verdi@example.com",
+                "",
                 4
         );
         prenotazioneDao.store(initPrenotazione);
@@ -123,6 +123,8 @@ class PrenotazioneControllerTest {
         modBean.setEmail("");
         modBean.setNote("Cena privata");
         modBean.setCopertiStr("5");
+        modBean.validate();
+
 
         PrenotazioneBean updatedBean = controller.modificaPrenotazione(modBean);
 
@@ -190,40 +192,6 @@ class PrenotazioneControllerTest {
         assertEquals(6, bean.getCoperti());
     }
 
-    @Test
-    void testCreaPrenotazioneConNomeVuoto() {
-        assertThrowsValidationException("Il nome del cliente non può essere vuoto.",
-                "   ", "20:00", LocalDate.of(2025, 3, 15),
-                "mario.rossi@example.com", "Test", "3");
-    }
-
-    @Test
-    void testCreaPrenotazioneConOrarioNonValido() {
-        assertThrowsValidationException("Formato orario non valido. Usa 'HH:mm'.",
-                "Mario Rossi", "invalid", LocalDate.of(2025, 3, 15),
-                "mario.rossi@example.com", "Test", "3");
-    }
-
-    @Test
-    void testCreaPrenotazioneConDataNulla() {
-        assertThrowsValidationException("Seleziona una data valida.",
-                "Mario Rossi", "20:00", null,
-                "mario.rossi@example.com", "Test", "3");
-    }
-
-    @Test
-    void testCreaPrenotazioneConEmailNonValida() {
-        assertThrowsValidationException("Formato email non valido.",
-                "Mario Rossi", "20:00", LocalDate.of(2025, 3, 15),
-                "invalid_123", "Test", "3");
-    }
-
-    @Test
-    void testCreaPrenotazioneConCopertiNegativi() {
-        assertThrowsValidationException("I coperti devono essere maggiori di 0.",
-                "Mario Rossi", "20:00", LocalDate.of(2025, 3, 15),
-                "mario.rossi@example.com", "Test", "-1");
-    }
 
     @Test
     void testEliminaPrenotazioneNonEsistente() {

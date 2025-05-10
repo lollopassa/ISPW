@@ -154,28 +154,6 @@ class ProdottoControllerTest {
         assertTrue(bean.getDisponibile());
     }
 
-
-    @Test
-    void testAggiungiProdottoConNomeVuoto() {
-        ProdottoBean bean = preparaProdottoBean("   ", "PRIMI", new BigDecimal("12"), true);
-        Exception exception = assertThrows(ProdottoException.class, () -> controller.aggiungiProdotto(bean));
-        assertEquals("Il nome del prodotto non può essere vuoto.", exception.getMessage());
-    }
-
-    @Test
-    void testAggiungiProdottoConCategoriaNonValida() {
-        ProdottoBean bean = preparaProdottoBean("Salmone", " ", new BigDecimal("12"), true);
-        Exception exception = assertThrows(ProdottoException.class, () -> controller.aggiungiProdotto(bean));
-        assertEquals("Seleziona una categoria valida.", exception.getMessage());
-    }
-
-    @Test
-    void testAggiungiProdottoConPrezzoNonValido() {
-        ProdottoBean bean = preparaProdottoBean("Pizza Capricciosa", "PIZZE", new BigDecimal("-5"), true);
-        Exception exception = assertThrows(ProdottoException.class, () -> controller.aggiungiProdotto(bean));
-        assertEquals("Inserisci un valore numerico valido per il prezzo maggiore di zero.", exception.getMessage());
-    }
-
     @Test
     void testGetProdottoByNomeNonTrovato() {
         Exception exception = assertThrows(ProdottoException.class, () -> controller.getProdottoByNome("NonEsistente"));

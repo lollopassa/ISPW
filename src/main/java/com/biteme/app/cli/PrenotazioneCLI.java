@@ -4,21 +4,18 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
-import com.biteme.app.bean.EmailBean;
 import com.biteme.app.bean.PrenotazioneBean;
-import com.biteme.app.controller.EmailController;
-import com.biteme.app.controller.PrenotazioneController;
+import com.biteme.app.boundary.PrenotazioneBoundary;
+import com.biteme.app.exception.EmailSendingException;
 import com.biteme.app.exception.PrenotationValidationException;
 import com.biteme.app.util.CLIUtils;
 
 public class PrenotazioneCLI {
 
-    
     private PrenotazioneCLI() {
     }
 
-    private static final PrenotazioneController prenotazioneController = new PrenotazioneController();
-    private static final EmailController emailController = new EmailController();
+    private static final PrenotazioneBoundary boundary = new PrenotazioneBoundary();
     private static final String PRENOTAZIONI_PER_DATA = "Prenotazioni per il ";
 
     public static void start() {
@@ -43,7 +40,7 @@ public class PrenotazioneCLI {
                     eliminaPrenotazione(scanner);
                     break;
                 case "6":
-                    return; 
+                    return;
                 default:
                     System.out.println("Opzione non valida.");
             }
@@ -75,7 +72,6 @@ public class PrenotazioneCLI {
         System.out.print("Note: ");
         String note = scanner.nextLine().trim();
 
-        
         PrenotazioneBean bean = new PrenotazioneBean();
         bean.setNomeCliente(nomeCliente);
         bean.setData(data);
@@ -85,9 +81,9 @@ public class PrenotazioneCLI {
         bean.setNote(note);
 
         try {
-            prenotazioneController.creaPrenotazione(bean);
+            boundary.creaPrenotazione(bean);
             System.out.println("Prenotazione creata con successo.");
-        } catch (Exception e) {
+        } catch (PrenotationValidationException e) {
             System.out.println("Errore nella creazione della prenotazione: " + e.getMessage());
         }
     }
@@ -96,9 +92,9 @@ public class PrenotazioneCLI {
         System.out.print("Inserisci l'ID della prenotazione da eliminare: ");
         int id = Integer.parseInt(scanner.nextLine());
         try {
-            prenotazioneController.eliminaPrenotazione(id);
+            boundary.eliminaPrenotazione(id);
             System.out.println("Prenotazione eliminata.");
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             System.out.println("Errore nell'eliminazione della prenotazione: " + e.getMessage());
         }
     }
@@ -106,7 +102,7 @@ public class PrenotazioneCLI {
     private static void listaPrenotazioniPerData(Scanner scanner) {
         System.out.print("Inserisci la data (YYYY-MM-DD): ");
         LocalDate data = LocalDate.parse(scanner.nextLine().trim());
-        List<PrenotazioneBean> prenotazioni = prenotazioneController.getPrenotazioniByData(data);
+        List<PrenotazioneBean> prenotazioni = boundary.getPrenotazioniByData(data);
         if (prenotazioni.isEmpty()) {
             System.out.println("Nessuna prenotazione per la data specificata.");
         } else {
@@ -119,43 +115,37 @@ public class PrenotazioneCLI {
     private static void inviaEmail(Scanner scanner) {
         System.out.print("Inserisci la data (YYYY-MM-DD) della prenotazione: ");
         LocalDate data = LocalDate.parse(scanner.nextLine().trim());
-        List<PrenotazioneBean> prenotazioni = prenotazioneController.getPrenotazioniByData(data);
+        List<PrenotazioneBean> prenotazioni = boundary.getPrenotazioniByData(data);
         if (prenotazioni.isEmpty()) {
             System.out.println("Nessuna prenotazione trovata per la data specificata.");
             return;
         }
         System.out.println(PRENOTAZIONI_PER_DATA + data + ":");
-        for (PrenotazioneBean p : prenotazioni) {
-            System.out.println(p.getId() + " - " + p.getNomeCliente() + " alle " + p.getOrario());
-        }
-        
+        prenotazioni.forEach(p ->
+                System.out.println(p.getId() + " - " + p.getNomeCliente() + " alle " + p.getOrario()));
+
         System.out.print("Inserisci l'ID della prenotazione per inviare l'email: ");
         int id = Integer.parseInt(scanner.nextLine());
-        PrenotazioneBean selected = null;
-        for (PrenotazioneBean p : prenotazioni) {
-            if (p.getId() == id) {
-                selected = p;
-                break;
-            }
-        }
+        PrenotazioneBean selected = prenotazioni.stream()
+                .filter(p -> p.getId() == id)
+                .findFirst()
+                .orElse(null);
         if (selected == null) {
             System.out.println("Prenotazione non trovata.");
             return;
         }
-        
+
         System.out.print("Inserisci l'indirizzo email del cliente: ");
         String email = scanner.nextLine().trim();
         if (email.isEmpty()) {
             System.out.println("L'indirizzo email non può essere vuoto.");
             return;
         }
-        
-        EmailBean emailBean = emailController.composeEmailFromPrenotazione(selected);
-        emailBean.setDestinatario(email);
+
         try {
-            emailController.sendEmail(emailBean);
+            boundary.inviaEmail(selected, email);
             System.out.println("Email inviata correttamente a " + email);
-        } catch (Exception e) {
+        } catch (EmailSendingException e) {
             System.out.println("Errore durante l'invio dell'email: " + e.getMessage());
         }
     }
@@ -170,24 +160,20 @@ public class PrenotazioneCLI {
             System.out.println("Formato data non valido. Assicurati di utilizzare il formato YYYY-MM-DD.");
             return;
         }
-        List<PrenotazioneBean> prenotazioni = prenotazioneController.getPrenotazioniByData(data);
+        List<PrenotazioneBean> prenotazioni = boundary.getPrenotazioniByData(data);
         if (prenotazioni.isEmpty()) {
             System.out.println("Nessuna prenotazione trovata per la data specificata.");
             return;
         }
         System.out.println(PRENOTAZIONI_PER_DATA + data + ":");
-        for (PrenotazioneBean p : prenotazioni) {
-            System.out.println(p.getId() + " - " + p.getNomeCliente());
-        }
+        prenotazioni.forEach(p -> System.out.println(p.getId() + " - " + p.getNomeCliente()));
+
         System.out.print("Inserisci l'ID della prenotazione da modificare: ");
         int id = Integer.parseInt(scanner.nextLine());
-        PrenotazioneBean prenotazioneEsistente = null;
-        for (PrenotazioneBean p : prenotazioni) {
-            if (p.getId() == id) {
-                prenotazioneEsistente = p;
-                break;
-            }
-        }
+        PrenotazioneBean prenotazioneEsistente = prenotazioni.stream()
+                .filter(p -> p.getId() == id)
+                .findFirst()
+                .orElse(null);
         if (prenotazioneEsistente == null) {
             System.out.println("Prenotazione non trovata.");
             return;
@@ -197,38 +183,31 @@ public class PrenotazioneCLI {
 
         System.out.print("Nuovo Nome Cliente (attuale: " + prenotazioneEsistente.getNomeCliente() + "): ");
         String nomeCliente = scanner.nextLine().trim();
-        if (nomeCliente.isEmpty())
-            nomeCliente = prenotazioneEsistente.getNomeCliente();
+        if (nomeCliente.isEmpty()) nomeCliente = prenotazioneEsistente.getNomeCliente();
 
         System.out.print("Nuova Data (YYYY-MM-DD) (attuale: " + prenotazioneEsistente.getData() + "): ");
         String dataStr = scanner.nextLine().trim();
-        if (dataStr.isEmpty())
-            dataStr = prenotazioneEsistente.getData().toString();
+        if (dataStr.isEmpty()) dataStr = prenotazioneEsistente.getData().toString();
         LocalDate nuovaData = LocalDate.parse(dataStr);
 
         System.out.print("Nuovo Orario (HH:mm) (attuale: " + prenotazioneEsistente.getOrario() + "): ");
         String orarioStr = scanner.nextLine().trim();
-        if (orarioStr.isEmpty())
-            orarioStr = prenotazioneEsistente.getOrario().toString();
+        if (orarioStr.isEmpty()) orarioStr = prenotazioneEsistente.getOrario().toString();
 
         System.out.print("Nuovo Numero di Coperti (attuale: " + prenotazioneEsistente.getCoperti() + "): ");
         String copertiStr = scanner.nextLine().trim();
-        if (copertiStr.isEmpty())
-            copertiStr = String.valueOf(prenotazioneEsistente.getCoperti());
+        if (copertiStr.isEmpty()) copertiStr = String.valueOf(prenotazioneEsistente.getCoperti());
 
         System.out.print("Nuova Email (attuale: " + prenotazioneEsistente.getEmail() + "): ");
         String email = scanner.nextLine().trim();
-        if (email.isEmpty())
-            email = prenotazioneEsistente.getEmail();
+        if (email.isEmpty()) email = prenotazioneEsistente.getEmail();
 
         System.out.print("Nuove Note (attuale: " + prenotazioneEsistente.getNote() + "): ");
         String note = scanner.nextLine().trim();
-        if (note.isEmpty())
-            note = prenotazioneEsistente.getNote();
+        if (note.isEmpty()) note = prenotazioneEsistente.getNote();
 
-        
         PrenotazioneBean bean = new PrenotazioneBean();
-        bean.setId(prenotazioneEsistente.getId());
+        bean.setId(id);
         bean.setNomeCliente(nomeCliente);
         bean.setData(nuovaData);
         bean.setOrarioStr(orarioStr);
@@ -237,7 +216,7 @@ public class PrenotazioneCLI {
         bean.setNote(note);
 
         try {
-            PrenotazioneBean updated = prenotazioneController.modificaPrenotazione(bean);
+            PrenotazioneBean updated = boundary.modificaPrenotazione(bean);
             System.out.println("Prenotazione modificata con successo.");
             System.out.println("Dettagli aggiornati: ");
             System.out.println("ID: " + updated.getId());

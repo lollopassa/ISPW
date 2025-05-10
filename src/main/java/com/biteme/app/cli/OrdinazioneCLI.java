@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.biteme.app.bean.OrdinazioneBean;
-import com.biteme.app.controller.ArchivioController;
-import com.biteme.app.controller.OrdinazioneController;
+import com.biteme.app.boundary.OrdinazioneBoundary;
+import com.biteme.app.exception.ArchiviazioneException;
 import com.biteme.app.exception.OrdinazioneException;
+import com.biteme.app.exception.OrdineException;
 import com.biteme.app.util.CLIUtils;
 
 public class OrdinazioneCLI {
-    private static final OrdinazioneController ORDINAZIONE_CONTROLLER = new OrdinazioneController();
-    private static final ArchivioController ARCHIVIO_CONTROLLER = new ArchivioController();
+    private static final OrdinazioneBoundary boundary = new OrdinazioneBoundary();
     private static final Scanner SCANNER = CLIUtils.getScanner();
 
     private static final String INVALID_ID_MESSAGE = "ID non valido.";
@@ -26,11 +26,10 @@ public class OrdinazioneCLI {
             "6. Torna al Menu"
     };
 
-    
     private OrdinazioneCLI() {
     }
 
-    public static void start() {
+    public static void start() throws OrdineException {
         boolean exit = false;
         while (!exit) {
             printMenu();
@@ -58,22 +57,12 @@ public class OrdinazioneCLI {
 
     private static void handleCreateOrder() {
         OrdinazioneBean bean = new OrdinazioneBean();
-
         try {
             System.out.print("Nome Cliente: ");
             bean.setNome(SCANNER.nextLine());
 
             System.out.print("Tipo Ordine (Al Tavolo/Asporto): ");
-            String inputTipo = SCANNER.nextLine().trim();
-            
-            if (inputTipo.equalsIgnoreCase("AL_TAVOLO") || inputTipo.equalsIgnoreCase("Al Tavolo")) {
-                bean.setTipoOrdine("Al Tavolo");
-            } else if (inputTipo.equalsIgnoreCase("ASPORTO") || inputTipo.equalsIgnoreCase("Asporto")) {
-                bean.setTipoOrdine("Asporto");
-            } else {
-                System.out.println("Tipo Ordine non valido. Operazione annullata.");
-                return;
-            }
+            bean.setTipoOrdine(SCANNER.nextLine().trim());
 
             System.out.print("Orario (HH:mm): ");
             bean.setOrarioCreazione(SCANNER.nextLine());
@@ -84,61 +73,66 @@ public class OrdinazioneCLI {
             System.out.print("Info Tavolo (se applicabile): ");
             bean.setInfoTavolo(SCANNER.nextLine());
 
-            ORDINAZIONE_CONTROLLER.creaOrdine(bean);
+            boundary.createOrdinazione(bean);
             System.out.println("Ordine creato con successo.");
         } catch (OrdinazioneException e) {
-            
             System.err.println("Errore durante la creazione dell'ordine: " + e.getMessage());
         } catch (Exception e) {
-            
             System.err.println("Si è verificato un errore imprevisto: " + e.getMessage());
         }
     }
 
-
-    private static void handleModifyOrder() {
-        List<OrdinazioneBean> orders = ORDINAZIONE_CONTROLLER.getOrdini();
+    private static void handleModifyOrder() throws OrdineException {
+        List<OrdinazioneBean> orders = boundary.getAll();
         if (showOrderList(orders)) return;
 
         int id = promptForOrderId();
         if (id != -1) {
-            
-            OrdineCLI.start(id);
-        }
-    }
-
-    private static void handleDeleteOrder() {
-        List<OrdinazioneBean> orders = ORDINAZIONE_CONTROLLER.getOrdini();
-        if (showOrderList(orders)) return;
-
-        int id = promptForOrderId();
-        if (id != -1) {
-            try {
-                ORDINAZIONE_CONTROLLER.eliminaOrdinazione(id);
-                System.out.println("Ordine eliminato.");
-            } catch (OrdinazioneException e) {
-                
-                System.err.println("Errore durante l'eliminazione dell'ordine: " + e.getMessage());
-            } catch (Exception e) {
-                
-                System.err.println("Si è verificato un errore imprevisto durante l'eliminazione: " + e.getMessage());
+            OrdinazioneBean selected = orders.stream()
+                    .filter(o -> o.getId() == id)
+                    .findFirst()
+                    .orElse(null);
+            if (selected != null) {
+                OrdineCLI.start(id);
+            } else {
+                System.out.println("Ordine non trovato.");
             }
         }
     }
 
-
-    private static void handleArchiveOrder() {
-        List<OrdinazioneBean> orders = ORDINAZIONE_CONTROLLER.getOrdini();
+    private static void handleDeleteOrder() {
+        List<OrdinazioneBean> orders = boundary.getAll();
         if (showOrderList(orders)) return;
 
         int id = promptForOrderId();
         if (id != -1) {
             try {
-                
-                ARCHIVIO_CONTROLLER.archiviaOrdine(new com.biteme.app.bean.ArchivioBean());
-                ORDINAZIONE_CONTROLLER.eliminaOrdinazione(id);
+                boundary.delete(id);
+                System.out.println("Ordine eliminato.");
+            } catch (OrdinazioneException e) {
+                System.err.println("Errore durante l'eliminazione dell'ordine: " + e.getMessage());
+            }
+        }
+    }
+
+    private static void handleArchiveOrder() {
+        List<OrdinazioneBean> orders = boundary.getAll();
+        if (showOrderList(orders)) return;
+
+        int id = promptForOrderId();
+        if (id != -1) {
+            OrdinazioneBean selected = orders.stream()
+                    .filter(o -> o.getId() == id)
+                    .findFirst()
+                    .orElse(null);
+            if (selected == null) {
+                System.out.println("Ordine non trovato.");
+                return;
+            }
+            try {
+                boundary.archive(selected);
                 System.out.println("Ordine archiviato con successo.");
-            } catch (Exception e) {
+            } catch (ArchiviazioneException e) {
                 System.out.println("Errore durante l'archiviazione: " + e.getMessage());
             }
         }
@@ -165,7 +159,7 @@ public class OrdinazioneCLI {
     }
 
     private static void listOrders() {
-        List<OrdinazioneBean> orders = ORDINAZIONE_CONTROLLER.getOrdini();
+        List<OrdinazioneBean> orders = boundary.getAll();
         if (orders.isEmpty()) {
             System.out.println(NO_ORDERS_MESSAGE);
             return;

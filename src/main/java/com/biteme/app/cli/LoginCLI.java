@@ -2,12 +2,13 @@ package com.biteme.app.cli;
 
 import java.util.Scanner;
 import com.biteme.app.bean.LoginBean;
+import com.biteme.app.boundary.LoginBoundary;
 import com.biteme.app.controller.LoginController;
+import com.biteme.app.exception.OrdineException;
 import com.biteme.app.util.CLIUtils;
 
 public class LoginCLI {
 
-    
     private LoginCLI() {
     }
 
@@ -21,61 +22,47 @@ public class LoginCLI {
         System.out.print("Scegli un'opzione: ");
         String scelta = scanner.nextLine();
 
+        LoginController controller = new LoginController();
+        LoginBoundary boundary = new LoginBoundary(controller);
+
         if (scelta.equals("1")) {
-            
             System.out.println("========== Login CLI ==========");
             System.out.print("Inserisci Email o Username: ");
             String emailOrUsername = scanner.nextLine();
             System.out.print("Inserisci Password: ");
             String password = scanner.nextLine();
 
-            
             LoginBean loginBean = new LoginBean();
             loginBean.setEmailOrUsername(emailOrUsername);
             loginBean.setPassword(password);
 
-            
-            LoginController loginController = new LoginController();
-
             try {
-                
-                loginController.authenticateUser(loginBean);
-
-                
+                boundary.login(loginBean);
                 System.out.println("Login effettuato con successo! Benvenuto " + emailOrUsername);
 
-                
-                if (loginController.isUserAdmin()) {
+                if (controller.isUserAdmin()) {
                     System.out.println("Benvenuto, amministratore!");
                 }
 
-                
                 MenuCLI.start();
-            } catch (IllegalArgumentException ex) {
-                
+            } catch (IllegalArgumentException | OrdineException ex) {
                 System.out.println("Errore: " + ex.getMessage());
                 System.out.println("Credenziali non valide! Riprova.");
-                login(); 
+                login();
             }
         } else if (scelta.equals("2")) {
-            
             SignupCLI.start();
         } else if (scelta.equals("3")) {
-            
             System.out.println("========== Login con Google ==========");
-            LoginController loginController = new LoginController();
             try {
-                
-                loginController.authenticateWithGoogle();
-                String username = loginController.getCurrentUsername();
+                boundary.loginWithGoogle();
+                String username = controller.getCurrentUsername();
                 System.out.println("Login con Google effettuato con successo! Benvenuto " + username);
 
-                
-                if (loginController.isUserAdmin()) {
+                if (controller.isUserAdmin()) {
                     System.out.println("Benvenuto, amministratore!");
                 }
 
-                
                 MenuCLI.start();
             } catch (Exception ex) {
                 System.out.println("Errore durante il login con Google: " + ex.getMessage());

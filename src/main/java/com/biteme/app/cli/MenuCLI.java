@@ -1,6 +1,7 @@
 package com.biteme.app.cli;
 
 import com.biteme.app.controller.LoginController;
+import com.biteme.app.exception.OrdineException;
 import com.biteme.app.util.CLIUtils;
 
 public class MenuCLI {
@@ -9,7 +10,7 @@ public class MenuCLI {
     private MenuCLI() {
     }
 
-    public static void start() {
+    public static void start() throws OrdineException {
 
         LoginController loginController = new LoginController();
 

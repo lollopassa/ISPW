@@ -1,9 +1,9 @@
-package com.biteme.app.boundary;
+package com.biteme.app.ui;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-public class HomeBoundary {
+public class HomeUI {
 
     @FXML
     private Label welcomeMessageLabel; 

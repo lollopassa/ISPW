@@ -2,11 +2,9 @@ package com.biteme.app.controller;
 
 import com.biteme.app.bean.OrdineBean;
 import com.biteme.app.bean.ProdottoBean;
-import com.biteme.app.exception.OrdinazioneException;
 import com.biteme.app.exception.OrdineException;
 import com.biteme.app.entities.Ordine;
 import com.biteme.app.entities.Prodotto;
-import com.biteme.app.entities.StatoOrdinazione;
 import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.persistence.Configuration;
@@ -55,57 +53,7 @@ public class OrdineController {
         return ordineBean;
     }
 
-    public void salvaOrdineEStato(int ordineId, String statoStr) throws OrdineException {
-        try {
-            StatoOrdinazione stato = convertStringToStatoOrdine(statoStr);
-            List<String> prodotti = recuperaProdottiDalRiepilogo();
 
-            validateProdottiNonVuoti(prodotti);
-
-            List<Integer> quantita = recuperaQuantita(prodotti);
-            OrdineBean ordineBean = preparaEValidaOrdine(prodotti, quantita);
-
-            salvaOrdine(ordineBean, ordineId);
-            aggiornaStatoOrdinazioneSafely(ordineId, stato);
-
-        } catch (IllegalStateException e) {
-            throw new OrdineException("Errore di stato interno: " + e.getMessage(), e);
-        }
-    }
-
-
-    private void aggiornaStatoOrdinazioneSafely(int ordineId, StatoOrdinazione stato) throws OrdineException {
-        try {
-            OrdinazioneController ordinazioneController = new OrdinazioneController();
-            ordinazioneController.aggiornaStatoOrdinazione(ordineId, stato);
-        } catch (OrdinazioneException e) {
-            throw new OrdineException("Errore durante l'aggiornamento dello stato: " + e.getMessage(), e);
-        }
-    }
-
-    private void validateProdottiNonVuoti(List<String> prodotti) throws OrdineException {
-        if(prodotti.isEmpty()) {
-            throw new OrdineException("Impossibile creare un ordine senza prodotti");
-        }
-    }
-
-    private List<Integer> recuperaQuantita(List<String> prodotti) {
-        List<Integer> quantita = new ArrayList<>();
-        for (String prodotto : prodotti) {
-            quantita.add(recuperaQuantitaDalRiepilogo(prodotto));
-        }
-        return quantita;
-    }
-
-    private OrdineBean preparaEValidaOrdine(List<String> prodotti, List<Integer> quantita) throws OrdineException {
-        OrdineBean ordineBean = preparaOrdineBean(prodotti, quantita);
-
-        if(ordineBean.getPrezzi() == null || ordineBean.getPrezzi().size() != prodotti.size()) {
-            throw new OrdineException("Errore di inizializzazione prezzi");
-        }
-
-        return ordineBean;
-    }
 
     public void salvaOrdine(OrdineBean ordineBean, int id) throws OrdineException {
         try {
@@ -230,17 +178,4 @@ public class OrdineController {
                 .toList();
     }
 
-    private StatoOrdinazione convertStringToStatoOrdine(String statoStr) {
-        if (statoStr == null) {
-            throw new IllegalArgumentException("Stato ordine non puÃ² essere null");
-        }
-        switch (statoStr.toUpperCase()) {
-            case "IN_CORSO":
-                return StatoOrdinazione.IN_CORSO;
-            case "COMPLETATO":
-                return StatoOrdinazione.COMPLETATO;
-            default:
-                throw new IllegalArgumentException("Stato ordine non valido: " + statoStr);
-        }
-    }
 }

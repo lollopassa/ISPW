@@ -90,6 +90,13 @@ class OrdineControllerTest {
         OrdineBean ordineBean = new OrdineBean();
         ordineBean.setProdotti(List.of("Pizza Margherita", "Coca Cola"));
         ordineBean.setQuantita(List.of(2, 1));
+
+
+        ordineBean.setPrezzi(List.of(
+                new BigDecimal("8.50"),
+                new BigDecimal("3.00")
+        ));
+
         controller.salvaOrdine(ordineBean, parentId);
 
         Ordine ordine = ordineDao.getById(parentId);
@@ -100,7 +107,11 @@ class OrdineControllerTest {
                 ordine.getProdotti(),  "I prodotti non coincidono");
         assertEquals(List.of(2, 1),
                 ordine.getQuantita(),  "Le quantitÃ  non coincidono");
+
+        assertEquals(List.of(new BigDecimal("8.50"), new BigDecimal("3.00")),
+                ordine.getPrezzi(), "I prezzi non coincidono");
     }
+
 
     @Test
     void testGetOrdineByIdEsistente() throws OrdineException {

@@ -1,39 +1,37 @@
 package com.biteme.app.cli;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Scanner;
+
 import com.biteme.app.bean.ProdottoBean;
-import com.biteme.app.controller.LoginController;
-import com.biteme.app.controller.ProdottoController;
+import com.biteme.app.boundary.ProdottoBoundary;
 import com.biteme.app.exception.ProdottoException;
 import com.biteme.app.util.CLIUtils;
 
 public class ProdottoCLI {
 
-    
-    private ProdottoCLI() {
-    }
+    private ProdottoCLI() {}
 
-    private static final ProdottoController prodottoController = new ProdottoController();
-    private static final LoginController loginController = new LoginController();
-    private static final String ERROR_MESSAGE = "errore";
+    private static final ProdottoBoundary boundary = new ProdottoBoundary();
+    private static final Scanner scanner = CLIUtils.getScanner();
+    private static final String ERROR_PREFIX = "Errore: ";
 
     public static void start() {
-        var scanner = CLIUtils.getScanner();
-        boolean isAdmin = loginController.isUserAdmin();
+        boolean isAdmin = boundary.isUserAdmin();
         boolean running = true;
 
         while (running) {
             System.out.println("========== Prodotto CLI ==========");
-
             if (isAdmin) {
-                running = handleAdminOptions(scanner);
+                running = handleAdminOptions();
             } else {
-                running = handleUserOptions(scanner);
+                running = handleUserOptions();
             }
         }
     }
 
-    private static boolean handleAdminOptions(java.util.Scanner scanner) {
+    private static boolean handleAdminOptions() {
         System.out.println("1. Aggiungi Prodotto");
         System.out.println("2. Modifica Prodotto");
         System.out.println("3. Elimina Prodotto");
@@ -43,9 +41,9 @@ public class ProdottoCLI {
         String scelta = scanner.nextLine();
 
         switch (scelta) {
-            case "1" -> aggiungiProdotto(scanner);
-            case "2" -> modificaProdotto(scanner);
-            case "3" -> eliminaProdotto(scanner);
+            case "1" -> aggiungiProdotto();
+            case "2" -> modificaProdotto();
+            case "3" -> eliminaProdotto();
             case "4" -> listaProdotti();
             case "5" -> {
                 return false;
@@ -55,7 +53,7 @@ public class ProdottoCLI {
         return true;
     }
 
-    private static boolean handleUserOptions(java.util.Scanner scanner) {
+    private static boolean handleUserOptions() {
         System.out.println("1. Lista Prodotti");
         System.out.println("2. Torna al Menu");
         System.out.print("Scegli un'opzione: ");
@@ -71,80 +69,82 @@ public class ProdottoCLI {
         return true;
     }
 
-    private static void aggiungiProdotto(java.util.Scanner scanner) {
+    private static void aggiungiProdotto() {
         try {
             System.out.print("Nome Prodotto: ");
             String nome = scanner.nextLine();
             System.out.print("Categoria (PIZZE, PRIMI, ANTIPASTI, BEVANDE, CONTORNI, DOLCI): ");
-            String categoria = scanner.nextLine(); 
+            String categoria = scanner.nextLine().toUpperCase();
             System.out.print("Prezzo: ");
-            BigDecimal prezzo = new BigDecimal(scanner.nextLine()); 
+            BigDecimal prezzo = new BigDecimal(scanner.nextLine());
 
             ProdottoBean bean = new ProdottoBean();
             bean.setNome(nome);
-            bean.setCategoria(categoria.toUpperCase());
+            bean.setCategoria(categoria);
             bean.setPrezzo(prezzo);
             bean.setDisponibile(true);
 
-            prodottoController.aggiungiProdotto(bean);
+            boundary.aggiungiProdotto(bean);
             System.out.println("Prodotto aggiunto correttamente.");
         } catch (ProdottoException e) {
-            
-            System.out.println(ERROR_MESSAGE + e.getMessage());
+            System.out.println(ERROR_PREFIX + e.getMessage());
         } catch (NumberFormatException e) {
-            System.out.println("Errore: Il prezzo deve essere un valore numerico.");
+            System.out.println(ERROR_PREFIX + "Prezzo non valido.");
         }
     }
 
-    private static void modificaProdotto(java.util.Scanner scanner) {
+    private static void modificaProdotto() {
         try {
-            System.out.print("Inserisci l'ID del prodotto da modificare: ");
+            System.out.print("ID Prodotto: ");
             int id = Integer.parseInt(scanner.nextLine());
             System.out.print("Nuovo Nome: ");
             String nome = scanner.nextLine();
-            System.out.print("Nuova Categoria (PIZZE, PRIMI, ANTIPASTI, BEVANDE, CONTORNI, DOLCI): ");
-            String categoria = scanner.nextLine();
+            System.out.print("Nuova Categoria: ");
+            String categoria = scanner.nextLine().toUpperCase();
             System.out.print("Nuovo Prezzo: ");
             BigDecimal prezzo = new BigDecimal(scanner.nextLine());
 
-            ProdottoBean beanAggiornato = new ProdottoBean();
-            beanAggiornato.setId(id);
-            beanAggiornato.setNome(nome);
-            beanAggiornato.setCategoria(categoria.toUpperCase());
-            beanAggiornato.setPrezzo(prezzo);
-            beanAggiornato.setDisponibile(true);
+            ProdottoBean bean = new ProdottoBean();
+            bean.setId(id);
+            bean.setNome(nome);
+            bean.setCategoria(categoria);
+            bean.setPrezzo(prezzo);
+            bean.setDisponibile(true);
 
-            prodottoController.modificaProdotto(beanAggiornato);
+            boundary.modificaProdotto(bean);
             System.out.println("Prodotto aggiornato con successo.");
         } catch (ProdottoException e) {
-            System.out.println("Errore: " + e.getMessage());
+            System.out.println(ERROR_PREFIX + e.getMessage());
         } catch (NumberFormatException e) {
-            System.out.println("Errore: Il prezzo deve essere un valore numerico.");
+            System.out.println(ERROR_PREFIX + "ID o prezzo non validi.");
         }
     }
 
-    private static void eliminaProdotto(java.util.Scanner scanner) {
+    private static void eliminaProdotto() {
         try {
-            System.out.print("Inserisci l'ID del prodotto da eliminare: ");
+            System.out.print("ID Prodotto: ");
             int id = Integer.parseInt(scanner.nextLine());
-            System.out.print("Confermi l'eliminazione? (s/n): ");
-            String conferma = scanner.nextLine();
-
-            if (conferma.equalsIgnoreCase("s")) {
-                prodottoController.eliminaProdotto(id);
+            System.out.print("Confermi eliminazione? (s/n): ");
+            if (scanner.nextLine().equalsIgnoreCase("s")) {
+                boundary.eliminaProdotto(id);
                 System.out.println("Prodotto eliminato con successo.");
             }
         } catch (ProdottoException e) {
-            System.out.println("Errore: " + e.getMessage());
+            System.out.println(ERROR_PREFIX + e.getMessage());
         } catch (NumberFormatException e) {
-            System.out.println("Errore: L'ID del prodotto deve essere un valore numerico.");
+            System.out.println(ERROR_PREFIX + "ID non valido.");
         }
     }
 
     private static void listaProdotti() {
-        System.out.println("Lista Prodotti:");
-        for (ProdottoBean bean : prodottoController.getProdotti()) {
-            System.out.println(bean.getId() + " - " + bean.getNome() + " - " + bean.getCategoria() + " - " + bean.getPrezzo());
+        List<ProdottoBean> prodotti = boundary.getProdotti();
+        if (prodotti.isEmpty()) {
+            System.out.println("Nessun prodotto disponibile.");
+        } else {
+            System.out.println("Lista Prodotti:");
+            prodotti.forEach(p -> System.out.println(
+                    p.getId() + " - " + p.getNome() + " (" + p.getCategoria() + ") " + p.getPrezzo() + "€"
+            ));
         }
     }
 }
