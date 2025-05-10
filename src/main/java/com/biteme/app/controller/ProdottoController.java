@@ -7,7 +7,6 @@ import com.biteme.app.entities.Categoria;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.persistence.Configuration;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public class ProdottoController {
@@ -31,7 +30,6 @@ public class ProdottoController {
     }
 
     public void modificaProdotto(ProdottoBean prodottoBean) {
-        // Controllo specifico per la modifica: l'ID deve essere presente e valido
         if (prodottoBean.getId() == null || prodottoBean.getId() <= 0) {
             throw new ProdottoException("L'ID del prodotto non è valido.");
         }

@@ -1,7 +1,6 @@
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.PrenotazioneBean;
-import com.biteme.app.exception.PrenotationValidationException;
 import com.biteme.app.entities.Prenotazione;
 import com.biteme.app.persistence.PrenotazioneDao;
 import com.biteme.app.persistence.inmemory.Storage;
@@ -199,23 +198,4 @@ class PrenotazioneControllerTest {
         assertEquals("La prenotazione con ID 999 non esiste.", ex.getMessage());
     }
 
-
-    private void createPrenotazioneWithParams(String nome, String orario, LocalDate data, String email, String note, String coperti) {
-        PrenotazioneBean bean = new PrenotazioneBean();
-        bean.setNomeCliente(nome);
-        bean.setOrarioStr(orario);
-        bean.setData(data);
-        bean.setEmail(email);
-        bean.setNote(note);
-        bean.setCopertiStr(coperti);
-        controller.creaPrenotazione(bean);
-    }
-
-
-    private void assertThrowsValidationException(String expectedMessage, String nome, String orario, LocalDate data, String email, String note, String coperti) {
-        Exception ex = assertThrows(PrenotationValidationException.class, () -> {
-            createPrenotazioneWithParams(nome, orario, data, email, note, coperti);
-        });
-        assertEquals(expectedMessage, ex.getMessage());
-    }
 }

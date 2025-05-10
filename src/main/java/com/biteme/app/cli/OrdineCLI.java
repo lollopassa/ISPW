@@ -85,7 +85,7 @@ public class OrdineCLI {
         }
     }
 
-    private static void aggiungiProdotto(OrdineBean ordineBean) throws OrdineException {
+    private static void aggiungiProdotto(OrdineBean ordineBean) {
         System.out.print("Nome prodotto: ");
         String nome = scanner.nextLine().trim();
         System.out.print("Quantità: ");
