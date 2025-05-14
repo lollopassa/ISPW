@@ -84,7 +84,7 @@ public class OrdinazioneController {
         try {
             LocalTime.parse(time);
             return true;
-        } catch (Exception e) {
+        } catch (Exception _) {
             return false;
         }
     }

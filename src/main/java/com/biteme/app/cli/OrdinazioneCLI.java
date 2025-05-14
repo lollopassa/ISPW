@@ -152,7 +152,7 @@ public class OrdinazioneCLI {
         System.out.print("Inserisci l'ID dell'ordine: ");
         try {
             return Integer.parseInt(SCANNER.nextLine());
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             System.out.println(INVALID_ID_MESSAGE);
             return -1;
         }

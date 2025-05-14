@@ -156,7 +156,7 @@ public class PrenotazioneCLI {
         LocalDate data;
         try {
             data = LocalDate.parse(dataInput);
-        } catch (Exception e) {
+        } catch (Exception _) {
             System.out.println("Formato data non valido. Assicurati di utilizzare il formato YYYY-MM-DD.");
             return;
         }

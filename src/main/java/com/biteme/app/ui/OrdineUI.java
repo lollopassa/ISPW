@@ -58,7 +58,7 @@ public class OrdineUI {
         try {
             OrdineBean ordine = boundary.loadOrdine(currentOrdineId);
             caricaProdottiNelRiepilogo(ordine);
-        } catch (OrdineException e) {
+        } catch (OrdineException _) {
             creaNuovoOrdineVuoto(currentOrdineId);
             showAlert(Alert.AlertType.INFORMATION, "Nuovo ordine creato per questa ordinazione");
         }
@@ -369,7 +369,7 @@ public class OrdineUI {
         double prezzo;
         try {
             prezzo = Double.parseDouble(txtPrezzo.getText().trim().replace(",", "."));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             showAlert(Alert.AlertType.WARNING, "Prezzo non valido");
             return;
         }
@@ -381,7 +381,7 @@ public class OrdineUI {
                 showAlert(Alert.AlertType.WARNING, "La quantità non può essere negativa");
                 return;
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             showAlert(Alert.AlertType.WARNING, "Quantità non valida");
             return;
         }

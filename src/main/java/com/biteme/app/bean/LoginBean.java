@@ -6,7 +6,6 @@ public class LoginBean {
     private String emailOrUsername;
     private String password;
 
-    // Validazione centralizzata nel Bean
     public void validate() {
         validateNotEmpty();
         validateEmailFormatIfPresent();
@@ -32,7 +31,6 @@ public class LoginBean {
         return Pattern.matches(emailRegex, emailOrUsername);
     }
 
-    // Getters e Setters
     public String getEmailOrUsername() {
         return emailOrUsername;
     }

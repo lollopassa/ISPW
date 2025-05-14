@@ -107,7 +107,7 @@ public class OrdineController {
                     try {
                         String[] parti = testo.split(" x ");
                         return Integer.parseInt(parti[1].trim());
-                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
+                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException _) {
                         return 0;
                     }
                 }

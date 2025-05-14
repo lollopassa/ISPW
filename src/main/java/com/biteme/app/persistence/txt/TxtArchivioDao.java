@@ -135,7 +135,7 @@ public class TxtArchivioDao implements ArchivioDao {
             BigDecimal totale = new BigDecimal(parts[3]);
             LocalDateTime dataArchiviazione = LocalDateTime.parse(parts[4], DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             return new Archivio(idOrdine, prodotti, quantita, totale, dataArchiviazione);
-        } catch (Exception e) {
+        } catch (Exception _) {
             LOGGER.log(Level.WARNING, "Errore nella deserializzazione della riga: {0}", line);
             return null;
         }

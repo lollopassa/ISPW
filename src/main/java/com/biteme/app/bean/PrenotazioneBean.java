@@ -17,8 +17,6 @@ public class PrenotazioneBean {
     private int coperti;
     private String copertiStr;
 
-    // Getter e setter esistenti
-
     public int getId() {
         return id;
     }
@@ -97,7 +95,7 @@ public class PrenotazioneBean {
         }
         try {
             this.orario = LocalTime.parse(orarioStr.trim());
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeParseException _) {
             throw new PrenotationValidationException("Formato orario non valido. Usa 'HH:mm'.");
         }
     }
@@ -112,7 +110,7 @@ public class PrenotazioneBean {
                 throw new PrenotationValidationException("I coperti devono essere maggiori di 0.");
             }
             this.coperti = parsedCoperti;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             throw new PrenotationValidationException("Numero coperti non valido.");
         }
     }

@@ -142,7 +142,7 @@ public class TxtPrenotazioneDao implements PrenotazioneDao {
             String email = parts[5];
             int coperti = Integer.parseInt(parts[6]);
             return new Prenotazione(id, nomeCliente, orario, data, note, email, coperti);
-        } catch (Exception e) {
+        } catch (Exception _) {
             LOGGER.log(Level.WARNING, "Errore nella deserializzazione della riga: {0}", line);
             return null;
         }

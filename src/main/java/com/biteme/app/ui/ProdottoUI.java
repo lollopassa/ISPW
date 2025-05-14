@@ -152,8 +152,10 @@ public class ProdottoUI {
                 boundary.modificaProdotto(bean);
                 showAlert(Alert.AlertType.INFORMATION, ALERT_INFORMATION, "Prodotto aggiornato correttamente!");
                 refreshTable();
-            } catch (ProdottoException e) {
-                showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Errore nella modifica del prodotto: " + e.getMessage());
+            } catch (ProdottoException error) {
+                showAlert(Alert.AlertType.ERROR,
+                        ALERT_ERROR,
+                        "Errore nella modifica del prodotto: " + error.getMessage());
             }
         });
     }
@@ -177,7 +179,7 @@ public class ProdottoUI {
     private BigDecimal parsePrezzo(String prezzo) {
         try {
             return new BigDecimal(prezzo);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return BigDecimal.ZERO;
         }
     }

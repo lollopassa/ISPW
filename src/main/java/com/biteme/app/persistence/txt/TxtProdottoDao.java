@@ -150,7 +150,7 @@ public class TxtProdottoDao implements ProdottoDao {
             Categoria categoria = Categoria.valueOf(parts[3].toUpperCase());
             boolean disponibile = Boolean.parseBoolean(parts[4]);
             return new Prodotto(id, nome, prezzo, categoria, disponibile);
-        } catch (Exception e) {
+        } catch (Exception _) {
             LOGGER.log(Level.WARNING, "Errore nella deserializzazione della riga: {0}", line);
             return null;
         }

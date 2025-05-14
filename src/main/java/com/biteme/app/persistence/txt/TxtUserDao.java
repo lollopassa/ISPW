@@ -124,7 +124,7 @@ public class TxtUserDao implements UserDao {
             u.setRuolo(ruolo);
             u.setGoogleUser(isGoogleUser);
             return u;
-        } catch (Exception e) {
+        } catch (Exception _) {
             LOGGER.log(Level.WARNING, "Errore nella deserializzazione della riga: {0}", line);
             return null;
         }

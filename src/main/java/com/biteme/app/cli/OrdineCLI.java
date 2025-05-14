@@ -96,7 +96,7 @@ public class OrdineCLI {
                 System.out.println("La quantità deve essere >0.");
                 return;
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             System.out.println("Quantità non valida.");
             return;
         }
@@ -120,7 +120,7 @@ public class OrdineCLI {
             String removed = ordineBean.getProdotti().remove(idx);
             ordineBean.getQuantita().remove(idx);
             System.out.println("Rimosso: " + removed);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             System.out.println("Input non valido.");
         }
     }
@@ -141,7 +141,7 @@ public class OrdineCLI {
             }
             ordineBean.getQuantita().set(idx, newQty);
             System.out.println("Quantità aggiornata.");
-        } catch (Exception e) {
+        } catch (Exception _) {
             System.out.println("Input non valido.");
         }
     }

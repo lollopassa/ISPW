@@ -134,7 +134,7 @@ public class TxtOrdinazioneDao implements OrdinazioneDao {
             StatoOrdinazione statoOrdinazione = StatoOrdinazione.valueOf(parts[5].toUpperCase());
             String orarioCreazione = parts[6];
             return new Ordinazione(id, nomeCliente, numeroClienti, tipoOrdinazione, infoTavolo, statoOrdinazione, orarioCreazione);
-        } catch (Exception e) {
+        } catch (Exception _) {
             LOGGER.log(Level.WARNING, "Errore nella deserializzazione della riga: {0}", line);
             return null;
         }
