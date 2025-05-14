@@ -175,15 +175,12 @@ public class PrenotazioneUI {
                     bean.setEmail(emailInput.getText().trim());
                     bean.setNote(noteInput.getText().trim());
                     return prenotazioneBoundary.modificaPrenotazione(bean);
-                } catch (PrenotationValidationException validationError) {
-                    String m = validationError.getMessage();
-                    if (m.toLowerCase().contains("identica")) {
-                        showAlert(ERROR_TITLE,
-                                m + " Per favore modifica il nome.",
-                                Alert.AlertType.ERROR);
-                    } else {
-                        showAlert(ERROR_TITLE, m, Alert.AlertType.ERROR);
-                    }
+                } catch (PrenotationValidationException _) {
+                    showAlert(
+                            ERROR_TITLE,
+                            "Dati di prenotazione non validi. Per favore controlla i campi e riprova.",
+                            Alert.AlertType.ERROR
+                    );
                 }
             }
             return null;

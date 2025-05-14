@@ -156,7 +156,7 @@ public class ProdottoUI {
                         "Prodotto aggiornato correttamente!"
                 );
                 refreshTable();
-            } catch (ProdottoException ignored) {
+            } catch (ProdottoException _) {
                 showAlert(
                         Alert.AlertType.ERROR,
                         ALERT_ERROR,
