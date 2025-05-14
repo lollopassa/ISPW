@@ -175,8 +175,8 @@ public class PrenotazioneUI {
                     bean.setEmail(emailInput.getText().trim());
                     bean.setNote(noteInput.getText().trim());
                     return prenotazioneBoundary.modificaPrenotazione(bean);
-                } catch (PrenotationValidationException ex) {
-                    String m = ex.getMessage();
+                } catch (PrenotationValidationException validationError) {
+                    String m = validationError.getMessage();
                     if (m.toLowerCase().contains("identica")) {
                         showAlert(ERROR_TITLE,
                                 m + " Per favore modifica il nome.",
@@ -227,7 +227,7 @@ public class PrenotazioneUI {
             try {
                 prenotazioneBoundary.inviaEmail(sel, email);
                 showAlert(SUCCESS_TITLE, "Email inviata correttamente a " + email, Alert.AlertType.INFORMATION);
-            } catch (EmailSendingException ignoredError) {
+            } catch (EmailSendingException _) {
                 showAlert(
                         ERROR_TITLE,
                         "Errore durante l'invio dell'email.",

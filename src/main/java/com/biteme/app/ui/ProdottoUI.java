@@ -150,12 +150,18 @@ public class ProdottoUI {
         dialog.showAndWait().ifPresent(bean -> {
             try {
                 boundary.modificaProdotto(bean);
-                showAlert(Alert.AlertType.INFORMATION, ALERT_INFORMATION, "Prodotto aggiornato correttamente!");
+                showAlert(
+                        Alert.AlertType.INFORMATION,
+                        ALERT_INFORMATION,
+                        "Prodotto aggiornato correttamente!"
+                );
                 refreshTable();
-            } catch (ProdottoException error) {
-                showAlert(Alert.AlertType.ERROR,
+            } catch (ProdottoException ignored) {
+                showAlert(
+                        Alert.AlertType.ERROR,
                         ALERT_ERROR,
-                        "Errore nella modifica del prodotto: " + error.getMessage());
+                        "Errore nella modifica del prodotto."
+                );
             }
         });
     }
