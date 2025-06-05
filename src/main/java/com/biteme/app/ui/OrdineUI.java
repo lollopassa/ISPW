@@ -59,22 +59,8 @@ public class OrdineUI {
             OrdineBean ordine = boundary.loadOrdine(currentOrdineId);
             caricaProdottiNelRiepilogo(ordine);
         } catch (OrdineException _) {
-            creaNuovoOrdineVuoto(currentOrdineId);
+            boundary.creaNuovoOrdineVuoto(currentOrdineId);
             showAlert(Alert.AlertType.INFORMATION, "Nuovo ordine creato per questa ordinazione");
-        }
-    }
-
-    private void creaNuovoOrdineVuoto(int ordineId) {
-        OrdineBean nuovoOrdine = new OrdineBean();
-        nuovoOrdine.setId(ordineId);
-        nuovoOrdine.setProdotti(new ArrayList<>());
-        nuovoOrdine.setQuantita(new ArrayList<>());
-        nuovoOrdine.setPrezzi(new ArrayList<>());
-
-        try {
-            boundary.salvaOrdineCompleto(ordineId, nuovoOrdine);
-        } catch (OrdineException ex) {
-            showAlert(Alert.AlertType.ERROR, "Errore nella creazione del nuovo ordine: " + ex.getMessage());
         }
     }
 
@@ -416,6 +402,6 @@ public class OrdineUI {
     }
 
     private void showAlert(Alert.AlertType type, String msg) {
-        new Alert(type, msg, ButtonType.OK).showAndWait(); // Aggiungi l'import per ButtonType
+        new Alert(type, msg, ButtonType.OK).showAndWait();
     }
 }

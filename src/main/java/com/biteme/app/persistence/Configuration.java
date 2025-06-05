@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 public class Configuration {
     private static final Logger logger = Logger.getLogger(Configuration.class.getName());
     private static final Properties properties = new Properties();
-    private static String persistenceMode = "in memory"; 
+    private static String persistenceMode = "txt";
     static {
         try (InputStream input = Configuration.class.getClassLoader().getResourceAsStream("config.properties")) {
             if (input != null) {
