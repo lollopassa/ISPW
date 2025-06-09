@@ -48,7 +48,6 @@ public class OrdineUI {
                         ? "Asporto"
                         : "Tavolo: " + sel.getInfoTavolo()
         );
-
         try {
             OrdineBean ordine = boundary.loadOrdine(currentOrdineId);
             caricaProdottiNelRiepilogo(ordine);
