@@ -3,7 +3,6 @@ package com.biteme.app.cli;
 import java.util.Scanner;
 import com.biteme.app.boundary.LoginBoundary;
 import com.biteme.app.controller.LoginController;
-import com.biteme.app.exception.OrdineException;
 import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.util.CLIUtils;
 

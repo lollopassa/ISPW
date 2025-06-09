@@ -161,7 +161,7 @@ public class ProdottoUI {
     private BigDecimal parsePrezzo(String testo) {
         try {
             return new BigDecimal(testo);
-        } catch (NumberFormatException ex) {
+        } catch (NumberFormatException _) {
             return BigDecimal.ZERO;
         }
     }

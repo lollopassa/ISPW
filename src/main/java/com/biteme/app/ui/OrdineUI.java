@@ -16,8 +16,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -52,10 +50,9 @@ public class OrdineUI {
         );
 
         try {
-            // provo a caricare l'ordine esistente
             OrdineBean ordine = boundary.loadOrdine(currentOrdineId);
             caricaProdottiNelRiepilogo(ordine);
-        } catch (OrdineException e) {
+        } catch (OrdineException _) {
             try {
                 boundary.salvaOrdineCompleto(
                         currentOrdineId,
@@ -280,7 +277,7 @@ public class OrdineUI {
         double prezzo;
         try {
             prezzo = Double.parseDouble(txtPrezzo.getText().trim().replace(",", "."));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             showAlert(Alert.AlertType.WARNING, "Prezzo non valido");
             return;
         }
@@ -292,7 +289,7 @@ public class OrdineUI {
                 showAlert(Alert.AlertType.WARNING, "La quantità non può essere negativa");
                 return;
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             showAlert(Alert.AlertType.WARNING, "Quantità non valida");
             return;
         }

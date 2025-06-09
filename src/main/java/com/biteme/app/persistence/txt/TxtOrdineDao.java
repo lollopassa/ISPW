@@ -123,7 +123,7 @@ public class TxtOrdineDao implements OrdineDao {
                     .toList();
 
             return new Ordine(id, prod, qty, prez);
-        } catch (Exception e) {
+        } catch (Exception _) {
             if (LOGGER.isLoggable(Level.WARNING)) {
                 LOGGER.log(Level.WARNING, () -> "Errore deserializza ordine: " + line);
             }

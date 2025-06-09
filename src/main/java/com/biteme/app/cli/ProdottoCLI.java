@@ -81,7 +81,7 @@ public class ProdottoCLI {
             System.out.println("Prodotto aggiunto correttamente.");
         } catch (ProdottoException e) {
             System.out.println(ERROR_PREFIX + e.getMessage());
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             System.out.println(ERROR_PREFIX + "Prezzo non valido.");
         }
     }
@@ -102,7 +102,7 @@ public class ProdottoCLI {
             System.out.println("Prodotto aggiornato con successo.");
         } catch (ProdottoException e) {
             System.out.println(ERROR_PREFIX + e.getMessage());
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             System.out.println(ERROR_PREFIX + "ID o prezzo non validi.");
         }
     }
@@ -118,7 +118,7 @@ public class ProdottoCLI {
             }
         } catch (ProdottoException e) {
             System.out.println(ERROR_PREFIX + e.getMessage());
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             System.out.println(ERROR_PREFIX + "ID non valido.");
         }
     }

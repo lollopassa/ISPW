@@ -45,7 +45,7 @@ public class MenuCLI {
                 case "3":
                     try {
                         OrdinazioneCLI.start();
-                    } catch (OrdineException e) {
+                    } catch (OrdineException _) {
                         System.out.println("Errore.");
                     }
                     break;
