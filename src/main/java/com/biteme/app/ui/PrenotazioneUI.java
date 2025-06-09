@@ -181,8 +181,8 @@ public class PrenotazioneUI {
                             noteInput.getText().trim(),
                             copertiInput.getText().trim()
                     );
-                } catch (PrenotationValidationException e) {
-                    String m = e.getMessage();
+                } catch (PrenotationValidationException ex) {
+                    String m = ex.getMessage();
                     if (m.toLowerCase().contains("identica")) {
                         showAlert(ERROR_TITLE,
                                 m + " Per favore modifica il nome.",
@@ -233,8 +233,8 @@ public class PrenotazioneUI {
             try {
                 prenotazioneBoundary.inviaEmail(sel, email);
                 showAlert(SUCCESS_TITLE, "Email inviata correttamente a " + email, Alert.AlertType.INFORMATION);
-            } catch (EmailSendingException e) {
-                String detail = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+            } catch (EmailSendingException ex) {
+                String detail = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
                 showAlert(ERROR_TITLE, "Errore durante l'invio dell'email: " + detail, Alert.AlertType.ERROR);
             }
         });
