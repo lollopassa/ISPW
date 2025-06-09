@@ -85,7 +85,7 @@ public class PrenotazioneCLI {
         try {
             boundary.eliminaPrenotazione(id);
             System.out.println("Prenotazione eliminata.");
-        } catch (IllegalArgumentException _) {
+        } catch (IllegalArgumentException e) {
             System.out.println("Errore nell'eliminazione della prenotazione: " + e.getMessage());
         }
     }
