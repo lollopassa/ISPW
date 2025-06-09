@@ -12,8 +12,7 @@ import com.biteme.app.util.CLIUtils;
 
 public class PrenotazioneCLI {
 
-    private PrenotazioneCLI() {
-    }
+    private PrenotazioneCLI() {}
 
     private static final PrenotazioneBoundary boundary = new PrenotazioneBoundary();
     private static final String PRENOTAZIONI_PER_DATA = "Prenotazioni per il ";
@@ -72,16 +71,8 @@ public class PrenotazioneCLI {
         System.out.print("Note: ");
         String note = scanner.nextLine().trim();
 
-        PrenotazioneBean bean = new PrenotazioneBean();
-        bean.setNomeCliente(nomeCliente);
-        bean.setData(data);
-        bean.setOrarioStr(orarioStr);
-        bean.setCopertiStr(copertiStr);
-        bean.setEmail(email);
-        bean.setNote(note);
-
         try {
-            boundary.creaPrenotazione(bean);
+            boundary.creaPrenotazione(nomeCliente, orarioStr, data, email, note, copertiStr);
             System.out.println("Prenotazione creata con successo.");
         } catch (PrenotationValidationException e) {
             System.out.println("Errore nella creazione della prenotazione: " + e.getMessage());
@@ -108,7 +99,8 @@ public class PrenotazioneCLI {
         } else {
             System.out.println(PRENOTAZIONI_PER_DATA + data + ":");
             prenotazioni.forEach(p ->
-                    System.out.println(p.getId() + " - " + p.getNomeCliente() + " alle " + p.getOrario()));
+                    System.out.println(p.getId() + " - " + p.getNomeCliente() + " alle " + p.getOrario())
+            );
         }
     }
 
@@ -122,7 +114,8 @@ public class PrenotazioneCLI {
         }
         System.out.println(PRENOTAZIONI_PER_DATA + data + ":");
         prenotazioni.forEach(p ->
-                System.out.println(p.getId() + " - " + p.getNomeCliente() + " alle " + p.getOrario()));
+                System.out.println(p.getId() + " - " + p.getNomeCliente() + " alle " + p.getOrario())
+        );
 
         System.out.print("Inserisci l'ID della prenotazione per inviare l'email: ");
         int id = Integer.parseInt(scanner.nextLine());
@@ -170,55 +163,47 @@ public class PrenotazioneCLI {
 
         System.out.print("Inserisci l'ID della prenotazione da modificare: ");
         int id = Integer.parseInt(scanner.nextLine());
-        PrenotazioneBean prenotazioneEsistente = prenotazioni.stream()
+        PrenotazioneBean esistente = prenotazioni.stream()
                 .filter(p -> p.getId() == id)
                 .findFirst()
                 .orElse(null);
-        if (prenotazioneEsistente == null) {
+        if (esistente == null) {
             System.out.println("Prenotazione non trovata.");
             return;
         }
 
         System.out.println("Lascia vuoto il campo per mantenere il valore attuale.");
 
-        System.out.print("Nuovo Nome Cliente (attuale: " + prenotazioneEsistente.getNomeCliente() + "): ");
-        String nomeCliente = scanner.nextLine().trim();
-        if (nomeCliente.isEmpty()) nomeCliente = prenotazioneEsistente.getNomeCliente();
+        System.out.print("Nuovo Nome Cliente (attuale: " + esistente.getNomeCliente() + "): ");
+        String nome = scanner.nextLine().trim();
+        if (nome.isEmpty()) nome = esistente.getNomeCliente();
 
-        System.out.print("Nuova Data (YYYY-MM-DD) (attuale: " + prenotazioneEsistente.getData() + "): ");
+        System.out.print("Nuova Data (YYYY-MM-DD) (attuale: " + esistente.getData() + "): ");
         String dataStr = scanner.nextLine().trim();
-        if (dataStr.isEmpty()) dataStr = prenotazioneEsistente.getData().toString();
+        if (dataStr.isEmpty()) dataStr = esistente.getData().toString();
         LocalDate nuovaData = LocalDate.parse(dataStr);
 
-        System.out.print("Nuovo Orario (HH:mm) (attuale: " + prenotazioneEsistente.getOrario() + "): ");
-        String orarioStr = scanner.nextLine().trim();
-        if (orarioStr.isEmpty()) orarioStr = prenotazioneEsistente.getOrario().toString();
+        System.out.print("Nuovo Orario (HH:mm) (attuale: " + esistente.getOrario() + "): ");
+        String orario = scanner.nextLine().trim();
+        if (orario.isEmpty()) orario = esistente.getOrario().toString();
 
-        System.out.print("Nuovo Numero di Coperti (attuale: " + prenotazioneEsistente.getCoperti() + "): ");
-        String copertiStr = scanner.nextLine().trim();
-        if (copertiStr.isEmpty()) copertiStr = String.valueOf(prenotazioneEsistente.getCoperti());
+        System.out.print("Nuovo Numero di Coperti (attuale: " + esistente.getCoperti() + "): ");
+        String coperti = scanner.nextLine().trim();
+        if (coperti.isEmpty()) coperti = String.valueOf(esistente.getCoperti());
 
-        System.out.print("Nuova Email (attuale: " + prenotazioneEsistente.getEmail() + "): ");
+        System.out.print("Nuova Email (attuale: " + esistente.getEmail() + "): ");
         String email = scanner.nextLine().trim();
-        if (email.isEmpty()) email = prenotazioneEsistente.getEmail();
+        if (email.isEmpty()) email = esistente.getEmail();
 
-        System.out.print("Nuove Note (attuale: " + prenotazioneEsistente.getNote() + "): ");
+        System.out.print("Nuove Note (attuale: " + esistente.getNote() + "): ");
         String note = scanner.nextLine().trim();
-        if (note.isEmpty()) note = prenotazioneEsistente.getNote();
-
-        PrenotazioneBean bean = new PrenotazioneBean();
-        bean.setId(id);
-        bean.setNomeCliente(nomeCliente);
-        bean.setData(nuovaData);
-        bean.setOrarioStr(orarioStr);
-        bean.setCopertiStr(copertiStr);
-        bean.setEmail(email);
-        bean.setNote(note);
+        if (note.isEmpty()) note = esistente.getNote();
 
         try {
-            PrenotazioneBean updated = boundary.modificaPrenotazione(bean);
+            PrenotazioneBean updated = boundary.modificaPrenotazione(
+                    id, nome, orario, nuovaData, email, note, coperti
+            );
             System.out.println("Prenotazione modificata con successo.");
-            System.out.println("Dettagli aggiornati: ");
             System.out.println("ID: " + updated.getId());
             System.out.println("Nome Cliente: " + updated.getNomeCliente());
             System.out.println("Data: " + updated.getData());

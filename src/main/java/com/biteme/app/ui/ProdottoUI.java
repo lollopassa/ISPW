@@ -49,10 +49,6 @@ public class ProdottoUI {
             adminButtonsHBox.setManaged(false);
             prodottiTableView.setEditable(false);
         } else {
-            aggiungiProdottoVBox.setVisible(true);
-            aggiungiProdottoVBox.setManaged(true);
-            adminButtonsHBox.setVisible(true);
-            adminButtonsHBox.setManaged(true);
             modificaButton.setDisable(true);
             eliminaButton.setDisable(true);
             prodottiTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
@@ -64,22 +60,10 @@ public class ProdottoUI {
     }
 
     private void configureComboBox() {
-        categoriaComboBox.setItems(FXCollections.observableArrayList());
-        categoriaComboBox.getItems().add(null);
-        categoriaComboBox.getItems().addAll("ANTIPASTI","PIZZE", "PRIMI", "SECONDI", "CONTORNI", "BEVANDE", "DOLCI");
+        categoriaComboBox.setItems(FXCollections.observableArrayList(
+                "ANTIPASTI","PIZZE", "PRIMI", "SECONDI", "CONTORNI", "BEVANDE", "DOLCI"
+        ));
         categoriaComboBox.setPromptText("Seleziona una categoria");
-        categoriaComboBox.setValue(null);
-        categoriaComboBox.setCellFactory(lv -> createCategoryCell());
-        categoriaComboBox.setButtonCell(createCategoryCell());
-    }
-
-    private ListCell<String> createCategoryCell() {
-        return new ListCell<>() {
-            @Override protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                setText((empty || item == null) ? "Seleziona una categoria" : item);
-            }
-        };
     }
 
     private void configureTableColumns() {
@@ -94,90 +78,90 @@ public class ProdottoUI {
     @FXML
     private void aggiungiProdotto() {
         try {
-            ProdottoBean bean = new ProdottoBean();
-            bean.setNome(nomeProdottoField.getText());
-            bean.setCategoria(categoriaComboBox.getValue());
-            bean.setPrezzo(parsePrezzo(prezzoField.getText()));
-            bean.setDisponibile(true);
-            boundary.aggiungiProdotto(bean);
+            String nome      = nomeProdottoField.getText().trim();
+            String categoria = categoriaComboBox.getValue();
+            BigDecimal prezzo = parsePrezzo(prezzoField.getText().trim());
+
+            // Chiamata al boundary: UI non conosce ProdottoBean
+            boundary.aggiungiProdotto(nome, categoria, prezzo);
 
             showAlert(Alert.AlertType.INFORMATION, ALERT_INFORMATION, "Prodotto aggiunto correttamente!");
             clearFields();
             refreshTable();
         } catch (ProdottoException e) {
-            showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Errore nell'aggiunta del prodotto: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Errore nell'aggiunta: " + e.getMessage());
         }
     }
 
     @FXML
     private void modificaProdotto() {
-        ProdottoBean selected = prodottiTableView.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Seleziona un prodotto da modificare.");
+        ProdottoBean sel = prodottiTableView.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Seleziona un prodotto.");
             return;
         }
-        Dialog<ProdottoBean> dialog = new Dialog<>();
+
+        Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Modifica Prodotto");
-        dialog.setHeaderText("Modifica i dati del prodotto:");
-        dialog.setResizable(true);
+        dialog.setHeaderText("Aggiorna i campi e conferma");
 
-        TextField nomeField = new TextField(selected.getNome());
-        ComboBox<String> catMod = new ComboBox<>(FXCollections.observableArrayList(
+        TextField nomeField      = new TextField(sel.getNome());
+        ComboBox<String> catMod  = new ComboBox<>(FXCollections.observableArrayList(
                 "ANTIPASTI","PIZZE","PRIMI","SECONDI","CONTORNI","BEVANDE","DOLCI"
-        )); catMod.setValue(selected.getCategoria());
-        TextField prezzoFieldMod = new TextField(selected.getPrezzo().toString());
+        ));
+        catMod.setValue(sel.getCategoria());
+        TextField prezzoFieldMod = new TextField(sel.getPrezzo().toString());
+        CheckBox disponibileBox  = new CheckBox("Disponibile");
+        disponibileBox.setSelected(sel.getDisponibile());
 
-        VBox vbox = new VBox(10, new Label("Nome Prodotto:"), nomeField,
+        VBox vbox = new VBox(10,
+                new Label("Nome:"), nomeField,
                 new Label("Categoria:"), catMod,
-                new Label("Prezzo:"), prezzoFieldMod);
+                new Label("Prezzo:"), prezzoFieldMod,
+                disponibileBox
+        );
         dialog.getDialogPane().setContent(vbox);
-        ButtonType ok = new ButtonType("Modifica", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(ok, ButtonType.CANCEL);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        dialog.setResultConverter(btn -> {
-            if (btn == ok) {
-                ProdottoBean bean = new ProdottoBean();
-                bean.setId(selected.getId());
-                bean.setNome(nomeField.getText());
-                bean.setCategoria(catMod.getValue());
-                bean.setPrezzo(parsePrezzo(prezzoFieldMod.getText()));
-                bean.setDisponibile(selected.getDisponibile());
-                return bean;
-            }
-            return null;
-        });
-
-        dialog.showAndWait().ifPresent(bean -> {
-            try {
-                boundary.modificaProdotto(bean);
-                showAlert(Alert.AlertType.INFORMATION, ALERT_INFORMATION, "Prodotto aggiornato correttamente!");
-                refreshTable();
-            } catch (ProdottoException e) {
-                showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Errore nella modifica del prodotto: " + e.getMessage());
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    boundary.modificaProdotto(
+                            sel.getId(),
+                            nomeField.getText().trim(),
+                            catMod.getValue(),
+                            parsePrezzo(prezzoFieldMod.getText().trim()),
+                            disponibileBox.isSelected()
+                    );
+                    showAlert(Alert.AlertType.INFORMATION, ALERT_INFORMATION, "Prodotto aggiornato!");
+                    refreshTable();
+                } catch (ProdottoException e) {
+                    showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Errore nella modifica: " + e.getMessage());
+                }
             }
         });
     }
 
     @FXML
     private void eliminaProdotto() {
-        ProdottoBean selected = prodottiTableView.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Seleziona un prodotto da eliminare.");
+        ProdottoBean sel = prodottiTableView.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Seleziona un prodotto.");
             return;
         }
         try {
-            boundary.eliminaProdotto(selected.getId());
-            showAlert(Alert.AlertType.INFORMATION, ALERT_INFORMATION, "Prodotto eliminato correttamente!");
+            boundary.eliminaProdotto(sel.getId());
+            showAlert(Alert.AlertType.INFORMATION, ALERT_INFORMATION, "Prodotto eliminato!");
             refreshTable();
         } catch (ProdottoException e) {
-            showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Errore nell'eliminazione del prodotto: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Errore nell'eliminazione: " + e.getMessage());
         }
     }
 
-    private BigDecimal parsePrezzo(String prezzo) {
+    private BigDecimal parsePrezzo(String testo) {
         try {
-            return new BigDecimal(prezzo);
-        } catch (NumberFormatException e) {
+            return new BigDecimal(testo);
+        } catch (NumberFormatException ex) {
             return BigDecimal.ZERO;
         }
     }
@@ -190,7 +174,6 @@ public class ProdottoUI {
         nomeProdottoField.clear();
         prezzoField.clear();
         categoriaComboBox.getSelectionModel().clearSelection();
-        categoriaComboBox.setValue(null);
     }
 
     private void showAlert(Alert.AlertType type, String title, String msg) {

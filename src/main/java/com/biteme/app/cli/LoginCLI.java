@@ -1,18 +1,19 @@
 package com.biteme.app.cli;
 
 import java.util.Scanner;
-import com.biteme.app.bean.LoginBean;
 import com.biteme.app.boundary.LoginBoundary;
 import com.biteme.app.controller.LoginController;
 import com.biteme.app.exception.OrdineException;
+import com.biteme.app.exception.GoogleAuthException;
 import com.biteme.app.util.CLIUtils;
 
 public class LoginCLI {
 
-    private LoginCLI() {
-    }
+    private LoginCLI() {}
 
     private static final Scanner scanner = CLIUtils.getScanner();
+    private static final LoginController controller = new LoginController();
+    private static final LoginBoundary boundary = new LoginBoundary(controller);
 
     public static void login() {
         System.out.println("========== Benvenuto ==========");
@@ -22,9 +23,6 @@ public class LoginCLI {
         System.out.print("Scegli un'opzione: ");
         String scelta = scanner.nextLine();
 
-        LoginController controller = new LoginController();
-        LoginBoundary boundary = new LoginBoundary(controller);
-
         if (scelta.equals("1")) {
             System.out.println("========== Login CLI ==========");
             System.out.print("Inserisci Email o Username: ");
@@ -32,20 +30,14 @@ public class LoginCLI {
             System.out.print("Inserisci Password: ");
             String password = scanner.nextLine();
 
-            LoginBean loginBean = new LoginBean();
-            loginBean.setEmailOrUsername(emailOrUsername);
-            loginBean.setPassword(password);
-
             try {
-                boundary.login(loginBean);
+                boundary.login(emailOrUsername, password);
                 System.out.println("Login effettuato con successo! Benvenuto " + emailOrUsername);
-
                 if (controller.isUserAdmin()) {
                     System.out.println("Benvenuto, amministratore!");
                 }
-
                 MenuCLI.start();
-            } catch (IllegalArgumentException | OrdineException ex) {
+            } catch (IllegalArgumentException ex) {
                 System.out.println("Errore: " + ex.getMessage());
                 System.out.println("Credenziali non valide! Riprova.");
                 login();
@@ -58,13 +50,11 @@ public class LoginCLI {
                 boundary.loginWithGoogle();
                 String username = controller.getCurrentUsername();
                 System.out.println("Login con Google effettuato con successo! Benvenuto " + username);
-
                 if (controller.isUserAdmin()) {
                     System.out.println("Benvenuto, amministratore!");
                 }
-
                 MenuCLI.start();
-            } catch (Exception ex) {
+            } catch (GoogleAuthException ex) {
                 System.out.println("Errore durante il login con Google: " + ex.getMessage());
                 System.out.println("Riprova.");
                 login();

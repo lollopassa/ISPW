@@ -1,4 +1,4 @@
-package com.biteme.app.boundary;
+package com.biteme.app.ui;
 
 import com.biteme.app.controller.LoginController;
 import com.biteme.app.util.SceneLoader;
@@ -9,11 +9,11 @@ import javafx.scene.layout.StackPane;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MenuLateraleBoundary {
+public class MenuLateraleUI {
 
     private LoginController loginController;
 
-    private static final Logger LOGGER = Logger.getLogger(MenuLateraleBoundary.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MenuLateraleUI.class.getName());
 
     @FXML
     private Label usernameLabel; 

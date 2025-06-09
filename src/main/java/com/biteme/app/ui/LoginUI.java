@@ -19,12 +19,11 @@ public class LoginUI {
 
     @FXML
     private void onLoginButtonClick() {
-        LoginBean loginBean = new LoginBean();
-        loginBean.setEmailOrUsername(emailOrUsernameTextField.getText());
-        loginBean.setPassword(passwordTextField.getText());
+        String emailOrUsername = emailOrUsernameTextField.getText();
+        String password = passwordTextField.getText();
 
         try {
-            loginBoundary.login(loginBean);
+            loginBoundary.login(emailOrUsername, password);
             showAlert("Successo", "Login effettuato con successo!", AlertType.INFORMATION);
             loginController.navigateToHome();
         } catch (IllegalArgumentException ex) {

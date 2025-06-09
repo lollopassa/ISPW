@@ -4,17 +4,13 @@ import com.biteme.app.bean.OrdineBean;
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.controller.OrdineController;
 import com.biteme.app.exception.OrdineException;
-import javafx.scene.layout.VBox;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class OrdineBoundary {
 
     private final OrdineController controller = new OrdineController();
-
-    public void setRiepilogoContent(VBox vbox) {
-        controller.setRiepilogoContenuto(vbox);
-    }
 
     public OrdineBean loadOrdine(int ordineId) throws OrdineException {
         return controller.load(ordineId);
@@ -24,19 +20,16 @@ public class OrdineBoundary {
         return controller.getProdottiByCategoria(categoria);
     }
 
-    public void salvaOrdineCompleto(int ordineId, OrdineBean bean) throws OrdineException {
+    public void salvaOrdineCompleto(int ordineId,
+                            List<String> prodotti,
+                            List<Integer> quantita,
+                            List<BigDecimal> prezzi)
+            throws OrdineException {
+        OrdineBean bean = new OrdineBean();
+        bean.setId(ordineId);
+        bean.setProdotti(prodotti);
+        bean.setQuantita(quantita);
+        bean.setPrezzi(prezzi);
         controller.salvaOrdine(bean, ordineId);
-    }
-
-    public List<ProdottoBean> getTuttiProdotti() {
-        return controller.getTuttiProdotti();
-    }
-
-    public List<String> recuperaProdottiDalRiepilogo() {
-        return controller.recuperaProdottiDalRiepilogo();
-    }
-
-    public int recuperaQuantitaDalRiepilogo(String nomeProdotto) {
-        return controller.recuperaQuantitaDalRiepilogo(nomeProdotto);
     }
 }

@@ -14,7 +14,15 @@ public class SignupBoundary {
     }
 
 
-    public void register(SignupBean bean) {
+    public void register(String username,
+                         String email,
+                         String password,
+                         String confirmPassword) {
+        SignupBean bean = new SignupBean();
+        bean.setUsername(username);
+        bean.setEmail(email);
+        bean.setPassword(password);
+        bean.setConfirmPassword(confirmPassword);
         bean.validate();
         signupController.registerUser(bean);
     }

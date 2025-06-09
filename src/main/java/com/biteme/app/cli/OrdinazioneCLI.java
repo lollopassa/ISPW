@@ -56,32 +56,29 @@ public class OrdinazioneCLI {
     }
 
     private static void handleCreateOrder() {
-        OrdinazioneBean bean = new OrdinazioneBean();
         try {
             System.out.print("Nome Cliente: ");
-            bean.setNome(SCANNER.nextLine());
+            String nome = SCANNER.nextLine().trim();
 
             System.out.print("Tipo Ordine (Al Tavolo/Asporto): ");
-            bean.setTipoOrdine(SCANNER.nextLine().trim());
+            String tipo = SCANNER.nextLine().trim();
 
             System.out.print("Orario (HH:mm): ");
-            bean.setOrarioCreazione(SCANNER.nextLine());
+            String orario = SCANNER.nextLine().trim();
 
             System.out.print("Coperti: ");
-            bean.setNumeroClienti(SCANNER.nextLine());
+            String coperti = SCANNER.nextLine().trim();
 
             System.out.print("Info Tavolo (se applicabile): ");
-            bean.setInfoTavolo(SCANNER.nextLine());
-
-            boundary.createOrdinazione(bean);
-            System.out.println("Ordine creato con successo.");
+            String tavolo = SCANNER.nextLine().trim();
+            boundary.createOrdinazione(nome, tipo, orario, coperti, tavolo);
+            System.out.println("Ordine creato con successo per " + nome + ".");
         } catch (OrdinazioneException e) {
-            System.err.println("Errore durante la creazione dell'ordine: " + e.getMessage());
+            System.err.println("Errore: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("Si è verificato un errore imprevisto: " + e.getMessage());
+            System.err.println("Errore imprevisto: " + e.getMessage());
         }
     }
-
     private static void handleModifyOrder() throws OrdineException {
         List<OrdinazioneBean> orders = boundary.getAll();
         if (showOrderList(orders)) return;

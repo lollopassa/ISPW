@@ -21,28 +21,49 @@ public class PrenotazioneBoundary {
         this.emailController = new EmailController();
     }
 
-
-    public void creaPrenotazione(PrenotazioneBean bean) throws PrenotationValidationException {
+    public void creaPrenotazione(String nomeCliente,
+                                 String orarioStr,
+                                 LocalDate data,
+                                 String email,
+                                 String note,
+                                 String copertiStr) throws PrenotationValidationException {
+        PrenotazioneBean bean = new PrenotazioneBean();
+        bean.setNomeCliente(nomeCliente);
+        bean.setOrarioStr(orarioStr);
+        bean.setData(data);
+        bean.setEmail(email);
+        bean.setNote(note);
+        bean.setCopertiStr(copertiStr);
         bean.validate();
         prenotazioneController.creaPrenotazione(bean);
     }
 
-
-    public PrenotazioneBean modificaPrenotazione(PrenotazioneBean bean) throws PrenotationValidationException {
+    public PrenotazioneBean modificaPrenotazione(int id,
+                                                 String nomeCliente,
+                                                 String orarioStr,
+                                                 LocalDate data,
+                                                 String email,
+                                                 String note,
+                                                 String copertiStr) throws PrenotationValidationException {
+        PrenotazioneBean bean = new PrenotazioneBean();
+        bean.setId(id);
+        bean.setNomeCliente(nomeCliente);
+        bean.setOrarioStr(orarioStr);
+        bean.setData(data);
+        bean.setEmail(email);
+        bean.setNote(note);
+        bean.setCopertiStr(copertiStr);
         bean.validate();
         return prenotazioneController.modificaPrenotazione(bean);
     }
-
 
     public void eliminaPrenotazione(int id) {
         prenotazioneController.eliminaPrenotazione(id);
     }
 
-
     public List<PrenotazioneBean> getPrenotazioniByData(LocalDate data) {
         return prenotazioneController.getPrenotazioniByData(data);
     }
-
 
     public void inviaEmail(PrenotazioneBean bean, String destinatario) throws EmailSendingException {
         EmailBean email = emailController.composeEmailFromPrenotazione(bean);

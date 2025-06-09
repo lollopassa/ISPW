@@ -8,11 +8,6 @@ import com.biteme.app.entities.Prodotto;
 import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.persistence.Configuration;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +16,6 @@ public class OrdineController {
 
     private final ProdottoDao prodottoDao;
     private final OrdineDao ordineDao;
-    private VBox riepilogoContenuto;
     public OrdineController() {
         this.prodottoDao = Configuration.getPersistenceProvider()
                 .getDaoFactory()
@@ -31,9 +25,6 @@ public class OrdineController {
                 .getOrdineDao();
     }
 
-    public void setRiepilogoContenuto(VBox riepilogoContenuto) {
-        this.riepilogoContenuto = riepilogoContenuto;
-    }
 
     private OrdineBean preparaOrdineBean(List<String> prodotti, List<Integer> quantita) {
         OrdineBean ordineBean = new OrdineBean();
@@ -83,39 +74,6 @@ public class OrdineController {
     }
 
 
-
-    public List<String> recuperaProdottiDalRiepilogo() {
-        List<String> prodotti = new ArrayList<>();
-        for (Node nodo : riepilogoContenuto.getChildren()) {
-            if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
-                String testo = nomeEQuantitaLabel.getText();
-                String[] parti = testo.split(" x ");
-                if (parti.length > 1) {
-                    String nomeProdotto = parti[0].trim();
-                    prodotti.add(nomeProdotto);
-                }
-            }
-        }
-        return prodotti;
-    }
-
-    public int recuperaQuantitaDalRiepilogo(String nomeProdotto) {
-        for (Node nodo : riepilogoContenuto.getChildren()) {
-            if (nodo instanceof HBox hbox && hbox.getChildren().get(0) instanceof Label nomeEQuantitaLabel) {
-                String testo = nomeEQuantitaLabel.getText();
-                if (testo.startsWith(nomeProdotto + " x")) {
-                    try {
-                        String[] parti = testo.split(" x ");
-                        return Integer.parseInt(parti[1].trim());
-                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
-                        return 0;
-                    }
-                }
-            }
-        }
-        return 0;
-    }
-
     public List<ProdottoBean> getProdottiByCategoria(String categoria) {
         List<Prodotto> prodotti = prodottoDao.getByCategoria(categoria);
         return prodotti.stream()
@@ -159,23 +117,4 @@ public class OrdineController {
             );
         }
     }
-
-
-
-
-    public List<ProdottoBean> getTuttiProdotti() {
-        List<Prodotto> prodotti = prodottoDao.getAll();
-        return prodotti.stream()
-                .map(prodotto -> {
-                    ProdottoBean prodottoBean = new ProdottoBean();
-                    prodottoBean.setId(prodotto.getId());
-                    prodottoBean.setNome(prodotto.getNome());
-                    prodottoBean.setPrezzo(prodotto.getPrezzo());
-                    prodottoBean.setCategoria(prodotto.getCategoria().name());
-                    prodottoBean.setDisponibile(prodotto.isDisponibile());
-                    return prodottoBean;
-                })
-                .toList();
-    }
-
 }

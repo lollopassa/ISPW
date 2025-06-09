@@ -53,12 +53,11 @@ public class OrdineCLI {
                 case "2" -> rimuoviProdotto(ordineBean);
                 case "3" -> modificaQuantita(ordineBean);
                 case "4" -> {
-                    try {
-                        boundary.salvaOrdineCompleto(orderId, ordineBean);
-                        System.out.println("Modifiche salvate.");
-                    } catch (OrdineException e) {
-                        System.out.println("Errore nel salvataggio: " + e.getMessage());
-                    }
+                    boundary.salvaOrdineCompleto(orderId,
+                            ordineBean.getProdotti(),
+                            ordineBean.getQuantita(),
+                            ordineBean.getPrezzi());
+                    System.out.println("Modifiche salvate.");
                     editing = false;
                 }
                 case "5" -> {
