@@ -135,8 +135,8 @@ public class ProdottoUI {
                     );
                     showAlert(Alert.AlertType.INFORMATION, ALERT_INFORMATION, "Prodotto aggiornato!");
                     refreshTable();
-                } catch (ProdottoException ex) {
-                    showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Errore nella modifica: " + ex.getMessage());
+                } catch (ProdottoException validationException) {
+                    showAlert(Alert.AlertType.ERROR, ALERT_ERROR, "Errore nella modifica: " + validationException.getMessage());
                 }
             }
         });
