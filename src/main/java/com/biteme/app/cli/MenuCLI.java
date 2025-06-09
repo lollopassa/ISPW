@@ -10,7 +10,7 @@ public class MenuCLI {
     private MenuCLI() {
     }
 
-    public static void start() throws OrdineException {
+    public static void start() {
 
         LoginController loginController = new LoginController();
 
@@ -43,7 +43,11 @@ public class MenuCLI {
                     PrenotazioneCLI.start();
                     break;
                 case "3":
-                    OrdinazioneCLI.start();
+                    try {
+                        OrdinazioneCLI.start();
+                    } catch (OrdineException _) {
+                        System.out.println("Errore.");
+                    }
                     break;
                 case "4":
                     

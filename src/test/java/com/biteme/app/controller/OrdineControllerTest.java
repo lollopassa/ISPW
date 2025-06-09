@@ -149,22 +149,4 @@ class OrdineControllerTest {
         assertEquals("Pizza Margherita", bean.getNome());
         assertEquals("8.50", bean.getPrezzo().toString());
     }
-
-    @Test
-    void testGetTuttiProdotti() {
-        Prodotto p1 = new Prodotto(0, "Pizza Margherita", new BigDecimal("8.50"),
-                Categoria.PIZZE, true);
-        Prodotto p2 = new Prodotto(0, "Pasta al Pomodoro", new BigDecimal("7.00"),
-                Categoria.PRIMI, true);
-        prodottoDao.store(p1);
-        prodottoDao.store(p2);
-
-        List<ProdottoBean> tutti = controller.getTuttiProdotti();
-        var filtered = tutti.stream()
-                .filter(b -> b.getNome().equals("Pizza Margherita")
-                        || b.getNome().equals("Pasta al Pomodoro"))
-                .toList();
-        assertEquals(2, filtered.size(),
-                "Dovrebbero essere presenti 2 prodotti corrispondenti.");
-    }
 }

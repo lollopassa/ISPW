@@ -6,6 +6,7 @@ import com.biteme.app.exception.EmailSendingException;
 import com.biteme.app.exception.PrenotationValidationException;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -69,17 +70,23 @@ public class PrenotazioneUI {
         modificaButton.setDisable(true);
         eliminaButton.setDisable(true);
         emailButton.setDisable(true);
+        modificaButton.setCursor(Cursor.HAND);
+        eliminaButton.setCursor(Cursor.HAND);
+        emailButton.setCursor(Cursor.HAND);
+        frecciaIndietro.setCursor(Cursor.HAND);
+        frecciaAvanti.setCursor(Cursor.HAND);
+
 
         prenotazioniTableView.getSelectionModel().selectedItemProperty()
-                .addListener((obs, oldV, newV) -> {
+                .addListener((_, _, newV) -> {
                     boolean sel = newV != null;
                     modificaButton.setDisable(!sel);
                     eliminaButton.setDisable(!sel);
                     emailButton.setDisable(!sel);
                 });
 
-        frecciaIndietro.setOnMouseClicked(e -> mesePrecedente());
-        frecciaAvanti.setOnMouseClicked(e -> meseSuccessivo());
+        frecciaIndietro.setOnMouseClicked(_ -> mesePrecedente());
+        frecciaAvanti.setOnMouseClicked(_ -> meseSuccessivo());
     }
 
     private void configureTableColumns() {
@@ -95,15 +102,14 @@ public class PrenotazioneUI {
     @FXML
     private void creaPrenotazione() {
         try {
-            PrenotazioneBean bean = new PrenotazioneBean();
-            bean.setNomeCliente(nomeClienteField.getText().trim());
-            bean.setOrarioStr(orarioField.getText().trim());
-            bean.setData(giornoSelezionato);
-            bean.setEmail(emailField.getText().trim());
-            bean.setNote(noteField.getText().trim());
-            bean.setCopertiStr(copertiField.getText().trim());
-            prenotazioneBoundary.creaPrenotazione(bean);
-
+            prenotazioneBoundary.creaPrenotazione(
+                    nomeClienteField.getText().trim(),
+                    orarioField.getText().trim(),
+                    giornoSelezionato,
+                    emailField.getText().trim(),
+                    noteField.getText().trim(),
+                    copertiField.getText().trim()
+            );
             showAlert(SUCCESS_TITLE, "Prenotazione creata con successo!", Alert.AlertType.INFORMATION);
             resetForm();
             refreshTable(giornoSelezionato);
@@ -166,21 +172,24 @@ public class PrenotazioneUI {
         dialog.setResultConverter(btn -> {
             if (btn == salva) {
                 try {
-                    PrenotazioneBean bean = new PrenotazioneBean();
-                    bean.setId(pren.getId());
-                    bean.setNomeCliente(nomeField.getText().trim());
-                    bean.setData(dataPicker.getValue());
-                    bean.setOrarioStr(orarioInput.getText().trim());
-                    bean.setCopertiStr(copertiInput.getText().trim());
-                    bean.setEmail(emailInput.getText().trim());
-                    bean.setNote(noteInput.getText().trim());
-                    return prenotazioneBoundary.modificaPrenotazione(bean);
-                } catch (PrenotationValidationException _) {
-                    showAlert(
-                            ERROR_TITLE,
-                            "Dati di prenotazione non validi. Per favore controlla i campi e riprova.",
-                            Alert.AlertType.ERROR
+                    return prenotazioneBoundary.modificaPrenotazione(
+                            pren.getId(),
+                            nomeField.getText().trim(),
+                            orarioInput.getText().trim(),
+                            dataPicker.getValue(),
+                            emailInput.getText().trim(),
+                            noteInput.getText().trim(),
+                            copertiInput.getText().trim()
                     );
+                } catch (PrenotationValidationException e) {
+                    String m = e.getMessage();
+                    if (m.toLowerCase().contains("identica")) {
+                        showAlert(ERROR_TITLE,
+                                m + " Per favore modifica il nome.",
+                                Alert.AlertType.ERROR);
+                    } else {
+                        showAlert(ERROR_TITLE, m, Alert.AlertType.ERROR);
+                    }
                 }
             }
             return null;
@@ -224,12 +233,9 @@ public class PrenotazioneUI {
             try {
                 prenotazioneBoundary.inviaEmail(sel, email);
                 showAlert(SUCCESS_TITLE, "Email inviata correttamente a " + email, Alert.AlertType.INFORMATION);
-            } catch (EmailSendingException _) {
-                showAlert(
-                        ERROR_TITLE,
-                        "Errore durante l'invio dell'email.",
-                        Alert.AlertType.ERROR
-                );
+            } catch (EmailSendingException e) {
+                String detail = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+                showAlert(ERROR_TITLE, "Errore durante l'invio dell'email: " + detail, Alert.AlertType.ERROR);
             }
         });
     }

@@ -78,14 +78,11 @@ public class OrdinazioneUI {
         String coperti   = copertiField.getText().trim();
         String tavolo    = tavoloField.getText().trim();
 
-        OrdinazioneBean bean = new OrdinazioneBean();
-        bean.setNome(nome);
-        bean.setTipoOrdine(tipo);
-        bean.setOrarioCreazione(orario);
-        bean.setNumeroClienti(coperti);
-        bean.setInfoTavolo(tavolo);
         try {
-            bean.validate();
+            boundary.createOrdinazione(nome, tipo, orario, coperti, tavolo);
+            showInfo("Ordine creato per “" + nome + "”");
+            clearForm();
+            refreshTable();
         } catch (OrdinazioneException ex) {
             showWarning(ex.getMessage());
             return;
@@ -122,7 +119,7 @@ public class OrdinazioneUI {
         }
 
         try {
-            boundary.createOrdinazione(bean);
+            boundary.createOrdinazione(nome, tipo, orario, coperti, tavolo);
             showInfo("Ordine creato per " + nome);
             clearForm();
             refreshTable();

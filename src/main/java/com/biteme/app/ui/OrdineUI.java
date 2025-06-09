@@ -15,10 +15,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -34,14 +31,11 @@ public class OrdineUI {
     @FXML private TextField txtPrezzo;
     @FXML private TextField txtQuantita;
 
-
     private final OrdineBoundary boundary = new OrdineBoundary();
     private int currentOrdineId;
 
     @FXML
     public void initialize() {
-        boundary.setRiepilogoContent(riepilogoContenuto);
-
         OrdinazioneBean sel = OrdinazioneBoundary.getSelected();
         if (sel == null) {
             showAlert(Alert.AlertType.ERROR, "Nessuna ordinazione selezionata.");
@@ -59,11 +53,19 @@ public class OrdineUI {
             OrdineBean ordine = boundary.loadOrdine(currentOrdineId);
             caricaProdottiNelRiepilogo(ordine);
         } catch (OrdineException _) {
-            boundary.creaNuovoOrdineVuoto(currentOrdineId);
+            try {
+                boundary.salvaOrdineCompleto(
+                        currentOrdineId,
+                        java.util.Collections.emptyList(),
+                        java.util.Collections.emptyList(),
+                        java.util.Collections.emptyList()
+                );
+            } catch (OrdineException ex) {
+                showAlert(Alert.AlertType.ERROR, "Errore nella creazione del nuovo ordine: " + ex.getMessage());
+                return;
+            }
             showAlert(Alert.AlertType.INFORMATION, "Nuovo ordine creato per questa ordinazione");
-        }
-    }
-
+        }    }
 
     @FXML
     private void handleCategoriaBevande() {
@@ -103,89 +105,28 @@ public class OrdineUI {
     @FXML
     private void handleSalva() {
         try {
-            List<String> prodotti = boundary.recuperaProdottiDalRiepilogo();
-            List<Integer> quantita = prodotti.stream()
-                    .map(boundary::recuperaQuantitaDalRiepilogo)
-                    .toList();
-
-            List<BigDecimal> prezzi = new ArrayList<>();
-            for (String nome : prodotti) {
-                int q = boundary.recuperaQuantitaDalRiepilogo(nome);
-                BigDecimal unitPrice = getPrezzoUnitarioDaUI(nome, q);
-                prezzi.add(unitPrice);
-            }
-
-            OrdineBean bean = new OrdineBean();
-            bean.setProdotti(prodotti);
-            bean.setQuantita(quantita);
-            bean.setPrezzi(prezzi);
-
-            boundary.salvaOrdineCompleto(currentOrdineId, bean);
-
+            var triple = estraiListeDaRiepilogo();
+            boundary.salvaOrdineCompleto(currentOrdineId, triple.prodotti, triple.quantita, triple.prezzi);
             showAlert(Alert.AlertType.INFORMATION, "Ordine salvato con successo");
             SceneLoader.getInstance().loadScene(ORDINAZIONE_FXML, ORDINAZIONE_TITLE);
-
         } catch (OrdineException e) {
             showAlert(Alert.AlertType.WARNING, e.getMessage());
         }
     }
 
-
-    private BigDecimal getPrezzoUnitarioDaUI(String nomeProdotto, int quantita) {
-        for (Node nodo : riepilogoContenuto.getChildren()) {
-            if (nodo instanceof HBox hbox
-                    && ((Label)hbox.getChildren().get(0)).getText().startsWith(nomeProdotto + " x")) {
-                Label priceLabel = (Label) hbox.getChildren().get(2);
-                String text = priceLabel.getText()
-                        .replace("€", "")
-                        .replace(",", ".")
-                        .trim();
-                BigDecimal total = new BigDecimal(text);
-                return quantita > 0
-                        ? total.divide(BigDecimal.valueOf(quantita), 2, RoundingMode.HALF_UP)
-                        : BigDecimal.ZERO;
-            }
-        }
-        return BigDecimal.ZERO;
-    }
-
     @FXML
     private void handleCheckout() {
         try {
-            List<String> prodotti = boundary.recuperaProdottiDalRiepilogo();
-            List<Integer> quantita = prodotti.stream()
-                    .map(boundary::recuperaQuantitaDalRiepilogo)
-                    .toList();
-
-            List<BigDecimal> prezzi = new ArrayList<>();
-            for (int i = 0; i < prodotti.size(); i++) {
-                String nome = prodotti.get(i);
-                int q       = quantita.get(i);
-                prezzi.add(getPrezzoUnitarioDaUI(nome, q));
-            }
-
-            OrdineBean bean = new OrdineBean();
-            bean.setProdotti(prodotti);
-            bean.setQuantita(quantita);
-            bean.setPrezzi(prezzi);
-
-            boundary.salvaOrdineCompleto(currentOrdineId, bean);
-
+            var triple = estraiListeDaRiepilogo();
+            boundary.salvaOrdineCompleto(currentOrdineId, triple.prodotti, triple.quantita, triple.prezzi);
             new OrdinazioneBoundary()
                     .aggiornaStatoOrdinazione(currentOrdineId, StatoOrdinazione.COMPLETATO);
-
             showAlert(Alert.AlertType.INFORMATION, "Checkout completato");
-            SceneLoader.getInstance()
-                    .loadScene(ORDINAZIONE_FXML, ORDINAZIONE_TITLE);
-
+            SceneLoader.getInstance().loadScene(ORDINAZIONE_FXML, ORDINAZIONE_TITLE);
         } catch (OrdineException | OrdinazioneException e) {
             showAlert(Alert.AlertType.WARNING, e.getMessage());
         }
     }
-
-
-
-
 
     @FXML
     private void handleIndietro() {
@@ -259,26 +200,10 @@ public class OrdineUI {
         for (int i = 0; i < nomi.size(); i++) {
             String nome = nomi.get(i);
             int q       = qtys.get(i);
-
-            double pu;
-            if (!prezzi.isEmpty()) {
-                pu = prezzi.get(i).doubleValue();
-            } else {
-                pu = boundary.getTuttiProdotti().stream()
-                        .filter(p -> p.getNome().equals(nome))
-                        .findFirst()
-                        .map(ProdottoBean::getPrezzo)
-                        .map(BigDecimal::doubleValue)
-                        .orElse(0.0);
-            }
-
+            double pu   = prezzi.get(i).doubleValue();
             updateRiepilogo(nome, pu, q);
         }
     }
-
-
-
-
 
     private void updateRiepilogo(String nomeProdotto, double prezzoUnitario, int delta) {
         for (Node node : riepilogoContenuto.getChildren()) {
@@ -306,7 +231,6 @@ public class OrdineUI {
             nuovo.setAlignment(Pos.CENTER_LEFT);
             nuovo.setCursor(Cursor.HAND);
             nuovo.setOnMouseClicked(evt -> {
-
                 Label lbl = (Label) nuovo.getChildren().get(0);
                 String[] parts = lbl.getText().split(" x ");
                 String nome = parts[0].trim();
@@ -334,8 +258,6 @@ public class OrdineUI {
             aggiornaTotale();
         }
     }
-
-
 
     @FXML
     private void onPulisci() {
@@ -377,17 +299,12 @@ public class OrdineUI {
                         ((Label)h.getChildren().get(0)).getText().startsWith(nome + " x ")
         );
 
-        if (quantita == 0) {
-            aggiornaTotale();
-        } else {
+        if (quantita > 0) {
             updateRiepilogo(nome, prezzo, quantita);
         }
-
+        aggiornaTotale();
         onPulisci();
     }
-
-
-
 
     private void aggiornaTotale() {
         double tot = 0.0;
@@ -399,6 +316,41 @@ public class OrdineUI {
             }
         }
         totaleOrdine.setText(String.format("Totale: €%.2f", tot));
+    }
+
+    private static class Triple {
+        final List<String> prodotti;
+        final List<Integer> quantita;
+        final List<java.math.BigDecimal> prezzi;
+        Triple(List<String> p, List<Integer> q, List<java.math.BigDecimal> pr) {
+            this.prodotti = p; this.quantita = q; this.prezzi = pr;
+        }
+    }
+
+    private Triple estraiListeDaRiepilogo() {
+        var nomi        = new java.util.ArrayList<String>();
+        var quantita        = new java.util.ArrayList<Integer>();
+        var prezziTotal = new java.util.ArrayList<java.math.BigDecimal>();
+
+        for (javafx.scene.Node node : riepilogoContenuto.getChildren()) {
+            if (node instanceof javafx.scene.layout.HBox h) {
+                String label = ((Label)h.getChildren().get(0)).getText(); // "Nome x Q"
+                String[] parts = label.split(" x ");
+                String nome = parts[0].trim();
+                int q = Integer.parseInt(parts[1].trim());
+
+                String priceTxt = ((Label)h.getChildren().get(2))
+                        .getText().replace("€","").replace(",",".").trim();
+                java.math.BigDecimal total = new java.math.BigDecimal(priceTxt);
+                java.math.BigDecimal unitPrice = total.divide(
+                        java.math.BigDecimal.valueOf(q), 2, java.math.RoundingMode.HALF_UP);
+
+                nomi.add(nome);
+                quantita.add(q);
+                prezziTotal.add(unitPrice);
+            }
+        }
+        return new Triple(nomi, quantita, prezziTotal);
     }
 
     private void showAlert(Alert.AlertType type, String msg) {

@@ -14,7 +14,11 @@ public class LoginBoundary {
     }
 
 
-    public void login(LoginBean loginBean) {
+    public void login(String emailOrUsername, String password) {
+        LoginBean loginBean = new LoginBean();
+        loginBean.setEmailOrUsername(emailOrUsername);
+        loginBean.setPassword(password);
+
         loginBean.validate();
         loginController.authenticateUser(loginBean);
     }

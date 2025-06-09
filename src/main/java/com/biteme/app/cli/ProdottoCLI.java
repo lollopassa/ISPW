@@ -72,19 +72,12 @@ public class ProdottoCLI {
     private static void aggiungiProdotto() {
         try {
             System.out.print("Nome Prodotto: ");
-            String nome = scanner.nextLine();
-            System.out.print("Categoria (PIZZE, PRIMI, ANTIPASTI, BEVANDE, CONTORNI, DOLCI): ");
-            String categoria = scanner.nextLine().toUpperCase();
+            String nome = scanner.nextLine().trim();
+            System.out.print("Categoria (ANTIPASTI, PIZZE, PRIMI, SECONDI, CONTORNI, BEVANDE, DOLCI): ");
+            String categoria = scanner.nextLine().trim().toUpperCase();
             System.out.print("Prezzo: ");
-            BigDecimal prezzo = new BigDecimal(scanner.nextLine());
-
-            ProdottoBean bean = new ProdottoBean();
-            bean.setNome(nome);
-            bean.setCategoria(categoria);
-            bean.setPrezzo(prezzo);
-            bean.setDisponibile(true);
-
-            boundary.aggiungiProdotto(bean);
+            BigDecimal prezzo = new BigDecimal(scanner.nextLine().trim());
+            boundary.aggiungiProdotto(nome, categoria, prezzo);
             System.out.println("Prodotto aggiunto correttamente.");
         } catch (ProdottoException e) {
             System.out.println(ERROR_PREFIX + e.getMessage());
@@ -96,22 +89,16 @@ public class ProdottoCLI {
     private static void modificaProdotto() {
         try {
             System.out.print("ID Prodotto: ");
-            int id = Integer.parseInt(scanner.nextLine());
+            int id = Integer.parseInt(scanner.nextLine().trim());
             System.out.print("Nuovo Nome: ");
-            String nome = scanner.nextLine();
+            String nome = scanner.nextLine().trim();
             System.out.print("Nuova Categoria: ");
-            String categoria = scanner.nextLine().toUpperCase();
+            String categoria = scanner.nextLine().trim().toUpperCase();
             System.out.print("Nuovo Prezzo: ");
-            BigDecimal prezzo = new BigDecimal(scanner.nextLine());
-
-            ProdottoBean bean = new ProdottoBean();
-            bean.setId(id);
-            bean.setNome(nome);
-            bean.setCategoria(categoria);
-            bean.setPrezzo(prezzo);
-            bean.setDisponibile(true);
-
-            boundary.modificaProdotto(bean);
+            BigDecimal prezzo = new BigDecimal(scanner.nextLine().trim());
+            System.out.print("Disponibile? (s/n): ");
+            boolean disponibile = scanner.nextLine().trim().equalsIgnoreCase("s");
+            boundary.modificaProdotto(id, nome, categoria, prezzo, disponibile);
             System.out.println("Prodotto aggiornato con successo.");
         } catch (ProdottoException e) {
             System.out.println(ERROR_PREFIX + e.getMessage());

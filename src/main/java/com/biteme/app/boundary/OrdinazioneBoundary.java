@@ -27,9 +27,17 @@ public class OrdinazioneBoundary {
 
     private static OrdinazioneBean selected;
 
-    public void createOrdinazione(OrdinazioneBean bean) throws OrdinazioneException {
+    public OrdinazioneBean createOrdinazione(String nome, String tipoOrdine, String orarioCreazione,
+                                  String numeroClienti, String infoTavolo) throws OrdinazioneException {
+        OrdinazioneBean bean = new OrdinazioneBean();
+        bean.setNome(nome);
+        bean.setTipoOrdine(tipoOrdine);
+        bean.setOrarioCreazione(orarioCreazione);
+        bean.setNumeroClienti(numeroClienti);
+        bean.setInfoTavolo(infoTavolo);
         bean.validate();
         ordinazioneController.creaOrdine(bean);
+        return bean;
     }
 
     public List<OrdinazioneBean> getAll() {
@@ -101,6 +109,7 @@ public class OrdinazioneBoundary {
             }
             return totale;
         }
+
         throw new OrdineException("Dati ordine non validi per il calcolo del totale.");
     }
 

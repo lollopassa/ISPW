@@ -1,6 +1,5 @@
 package com.biteme.app.cli;
 
-import com.biteme.app.bean.SignupBean;
 import com.biteme.app.boundary.SignupBoundary;
 import com.biteme.app.controller.SignupController;
 import com.biteme.app.util.CLIUtils;
@@ -18,10 +17,10 @@ public class SignupCLI {
         System.out.println("========== Signup ==========");
 
         System.out.print("Username: ");
-        String username = scanner.nextLine();
+        String username = scanner.nextLine().trim();
 
         System.out.print("Email: ");
-        String email = scanner.nextLine();
+        String email = scanner.nextLine().trim();
 
         System.out.print("Password: ");
         String password = scanner.nextLine();
@@ -29,14 +28,9 @@ public class SignupCLI {
         System.out.print("Conferma Password: ");
         String confirmPassword = scanner.nextLine();
 
-        SignupBean signupBean = new SignupBean();
-        signupBean.setUsername(username);
-        signupBean.setEmail(email);
-        signupBean.setPassword(password);
-        signupBean.setConfirmPassword(confirmPassword);
-
         try {
-            boundary.register(signupBean);
+            // CLI non costruisce più la bean
+            boundary.register(username, email, password, confirmPassword);
             System.out.println("Registrazione completata con successo!");
             System.out.println("Prosegui con il login...");
             boundary.navigateToLogin();
