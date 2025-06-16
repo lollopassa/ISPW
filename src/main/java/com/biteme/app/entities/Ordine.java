@@ -8,7 +8,7 @@ public class Ordine {
     private int id;
     private List<String> prodotti;
     private List<Integer> quantita;
-    private List<BigDecimal> prezzi;
+    private final List<BigDecimal> prezzi;
 
 
     public Ordine(int id, List<String> prodotti, List<Integer> quantita, List<BigDecimal> prezzi) {
@@ -31,7 +31,6 @@ public class Ordine {
     }
 
     public List<BigDecimal> getPrezzi() { return prezzi; }
-    public void setPrezzi(List<BigDecimal> prezzi) { this.prezzi = prezzi; }
 
     public void setQuantita(List<Integer> quantita) {
         this.quantita = quantita;

@@ -20,16 +20,22 @@ public class OrdineBoundary {
         return controller.getProdottiByCategoria(categoria);
     }
 
-    public void salvaOrdineCompleto(int ordineId,
-                            List<String> prodotti,
-                            List<Integer> quantita,
-                            List<BigDecimal> prezzi)
+    public void salvaOrdineCompleto(
+            int ordineId,
+            List<String> prodotti,
+            List<Integer> quantita,
+            List<BigDecimal> prezzi)
             throws OrdineException {
+
         OrdineBean bean = new OrdineBean();
         bean.setId(ordineId);
         bean.setProdotti(prodotti);
         bean.setQuantita(quantita);
         bean.setPrezzi(prezzi);
+
+        bean.validate();
+
         controller.salvaOrdine(bean, ordineId);
     }
+
 }

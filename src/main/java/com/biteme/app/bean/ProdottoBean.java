@@ -1,6 +1,8 @@
 package com.biteme.app.bean;
 
 import java.math.BigDecimal;
+
+import com.biteme.app.entities.Prodotto;
 import com.biteme.app.exception.ProdottoException;
 
 public class ProdottoBean {
@@ -52,4 +54,15 @@ public class ProdottoBean {
             throw new ProdottoException("Inserisci un valore numerico valido per il prezzo maggiore di zero.");
         }
     }
+
+    public static ProdottoBean fromEntity(Prodotto p) {
+        ProdottoBean b = new ProdottoBean();
+        b.setId(p.getId());
+        b.setNome(p.getNome());
+        b.setPrezzo(p.getPrezzo());
+        b.setCategoria(p.getCategoria().name());
+        b.setDisponibile(p.isDisponibile());
+        return b;
+    }
+
 }

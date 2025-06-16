@@ -27,18 +27,23 @@ public class OrdinazioneBoundary {
 
     private static OrdinazioneBean selected;
 
-    public OrdinazioneBean createOrdinazione(String nome, String tipoOrdine, String orarioCreazione,
-                                  String numeroClienti, String infoTavolo) throws OrdinazioneException {
+    public void createOrdinazione(String nome,
+                                  String tipoOrdine,
+                                  String orarioCreazione,
+                                  String numeroClienti,
+                                  String infoTavolo) throws OrdinazioneException {
+
         OrdinazioneBean bean = new OrdinazioneBean();
         bean.setNome(nome);
         bean.setTipoOrdine(tipoOrdine);
         bean.setOrarioCreazione(orarioCreazione);
         bean.setNumeroClienti(numeroClienti);
         bean.setInfoTavolo(infoTavolo);
-        bean.validate();
-        ordinazioneController.creaOrdine(bean);
-        return bean;
+
+        bean.validate();                     // validazione lato DTO
+        ordinazioneController.creaOrdine(bean);  // persistenza lato controller
     }
+
 
     public List<OrdinazioneBean> getAll() {
         return ordinazioneController.getOrdini();

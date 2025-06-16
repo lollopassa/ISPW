@@ -12,109 +12,69 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrdineController {
+public class OrdineController {                   // logica applicativa sugli ordini
 
-    private final ProdottoDao prodottoDao;
-    private final OrdineDao ordineDao;
-    public OrdineController() {
+    private final ProdottoDao prodottoDao;        // DAO prodotti
+    private final OrdineDao   ordineDao;          // DAO ordini
+
+    public OrdineController() {                   // costruttore: ottiene DAO da factory
         this.prodottoDao = Configuration.getPersistenceProvider()
                 .getDaoFactory()
-                .getProdottoDao();
-        this.ordineDao = Configuration.getPersistenceProvider()
+                .getProdottoDao();                // implementazione ProdottoDao
+        this.ordineDao   = Configuration.getPersistenceProvider()
                 .getDaoFactory()
-                .getOrdineDao();
+                .getOrdineDao();                  // implementazione OrdineDao
     }
 
-
+    // Completa un OrdineBean calcolando i prezzi dal catalogo
     private OrdineBean preparaOrdineBean(List<String> prodotti, List<Integer> quantita) {
-        OrdineBean ordineBean = new OrdineBean();
-        ordineBean.setProdotti(prodotti);
-        ordineBean.setQuantita(quantita);
+        OrdineBean ob = new OrdineBean();         // nuovo bean vuoto
+        ob.setProdotti(prodotti);                 // imposta lista prodotti
+        ob.setQuantita(quantita);                 // imposta lista quantità
 
-        List<BigDecimal> prezzi = new ArrayList<>();
-        for (String nomeProdotto : prodotti) {
-            Prodotto prodotto = prodottoDao.findByNome(nomeProdotto.trim()); // Aggiungi .trim()
-            if (prodotto == null) {
-                throw new IllegalStateException("Prodotto '" + nomeProdotto + "' non trovato nel database");
-            }
-            prezzi.add(prodotto.getPrezzo());
+        List<BigDecimal> prezzi = new ArrayList<>(); // lista prezzi da riempire
+        for (String nome : prodotti) {            // loop su ogni prodotto
+            Prodotto p = prodottoDao.findByNome(nome.trim()); // lookup DB
+            if (p == null)
+                throw new IllegalStateException("Prodotto '" + nome + "' non trovato nel database");
+            prezzi.add(p.getPrezzo());            // aggiunge prezzo
         }
-        ordineBean.setPrezzi(prezzi);
-
-        return ordineBean;
+        ob.setPrezzi(prezzi);                     // imposta prezzi
+        return ob;                                // ritorna bean completo
     }
 
-
-
-    public void salvaOrdine(OrdineBean ordineBean, int id) throws OrdineException {
+    // Salva (o aggiorna) un ordine associato a un ID ordinazione
+    public void salvaOrdine(OrdineBean bean, int id) throws OrdineException {
         try {
-            if (ordineBean.getPrezzi() == null || ordineBean.getPrezzi().isEmpty()) {
-                OrdineBean tmp = preparaOrdineBean(ordineBean.getProdotti(), ordineBean.getQuantita());
-                ordineBean.setPrezzi(tmp.getPrezzi());
+            if (!bean.isPrezziPresenti()) {       // se mancano i prezzi calcolali da catalogo
+                OrdineBean tmp = preparaOrdineBean(bean.getProdotti(), bean.getQuantita());
+                bean.setPrezzi(tmp.getPrezzi());
             }
-
-            if (!ordineBean.getProdotti().isEmpty()
-                    && (ordineBean.getPrezzi() == null || ordineBean.getPrezzi().isEmpty())) {
-                throw new OrdineException("Prezzi non inizializzati correttamente");
-            }
-
-            Ordine nuovoOrdine = new Ordine(
-                    id,
-                    ordineBean.getProdotti(),
-                    ordineBean.getQuantita(),
-                    ordineBean.getPrezzi()
-            );
-            ordineDao.store(nuovoOrdine);
-
-        } catch (OrdineException oe) {
-            throw oe;
-        } catch (Exception e) {
+            Ordine entity = bean.toEntity(id);    // DTO → entity
+            ordineDao.store(entity);              // persiste tramite DAO
+        } catch (Exception e) {                   // qualunque errore
             throw new OrdineException("Errore nel salvataggio dell'ordine: " + e.getMessage(), e);
         }
     }
 
-
+    // Recupera prodotti filtrati per categoria
     public List<ProdottoBean> getProdottiByCategoria(String categoria) {
-        List<Prodotto> prodotti = prodottoDao.getByCategoria(categoria);
-        return prodotti.stream()
-                .map(prodotto -> {
-                    ProdottoBean prodottoBean = new ProdottoBean();
-                    prodottoBean.setId(prodotto.getId());
-                    prodottoBean.setNome(prodotto.getNome());
-                    prodottoBean.setPrezzo(prodotto.getPrezzo());
-                    prodottoBean.setCategoria(prodotto.getCategoria().name());
-                    prodottoBean.setDisponibile(prodotto.isDisponibile());
-                    return prodottoBean;
-                })
+        return prodottoDao.getByCategoria(categoria)
+                .stream()
+                .map(ProdottoBean::fromEntity)    // entity → DTO
                 .toList();
     }
 
-    public OrdineBean getOrdineById(int id) throws OrdineException {
-        return load(id);
-    }
+    // Facade rapido che delega a load()
+    public OrdineBean getOrdineById(int id) throws OrdineException { return load(id); }
 
+    // Carica un ordine dal DAO e lo converte in Bean
     public OrdineBean load(int idOrdine) throws OrdineException {
         try {
-            Ordine ordine = ordineDao.getById(idOrdine);
-
-            OrdineBean bean = new OrdineBean();
-            bean.setId(idOrdine);
-
-            if (ordine != null) {
-                bean.setProdotti(ordine.getProdotti());
-                bean.setQuantita(ordine.getQuantita());
-                bean.setPrezzi(ordine.getPrezzi());
-            } else {
-                bean.setProdotti(new ArrayList<>());
-                bean.setQuantita(new ArrayList<>());
-                bean.setPrezzi(new ArrayList<>());
-            }
-
-            return bean;
+            Ordine ord = ordineDao.getById(idOrdine); // fetch entity
+            return (ord != null) ? OrdineBean.fromEntity(ord) : new OrdineBean();
         } catch (Exception e) {
-            throw new OrdineException(
-                    "Errore caricando l'ordine con ID " + idOrdine + ": " + e.getMessage(), e
-            );
+            throw new OrdineException("Errore caricando l'ordine con ID " + idOrdine + ": " + e.getMessage(), e);
         }
     }
 }

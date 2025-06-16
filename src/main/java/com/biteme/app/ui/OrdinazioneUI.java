@@ -31,7 +31,6 @@ public class OrdinazioneUI {
     @FXML private TableColumn<OrdinazioneBean, String> infoTavoloColumn;
     @FXML private TableColumn<OrdinazioneBean, String> statoOrdineColumn;
 
-    @FXML private Button creaButton;
     @FXML private Button modificaButton;
     @FXML private Button eliminaButton;
     @FXML private Button archiviaButton;
@@ -72,21 +71,11 @@ public class OrdinazioneUI {
 
     @FXML
     private void createOrdine() {
-        String nome      = nomeClienteField.getText().trim();
-        String tipo      = tipoOrdineComboBox.getValue();
-        String orario    = orarioField.getText().trim();
-        String coperti   = copertiField.getText().trim();
-        String tavolo    = tavoloField.getText().trim();
-
-        try {
-            boundary.createOrdinazione(nome, tipo, orario, coperti, tavolo);
-            showInfo("Ordine creato per “" + nome + "”");
-            clearForm();
-            refreshTable();
-        } catch (OrdinazioneException ex) {
-            showWarning(ex.getMessage());
-            return;
-        }
+        String nome    = nomeClienteField.getText().trim();
+        String tipo    = tipoOrdineComboBox.getValue();
+        String orario  = orarioField.getText().trim();
+        String coperti = copertiField.getText().trim();
+        String tavolo  = tavoloField.getText().trim();
 
         List<OrdinazioneBean> esistenti = boundary.getAll();
 
@@ -119,8 +108,8 @@ public class OrdinazioneUI {
         }
 
         try {
-            boundary.createOrdinazione(nome, tipo, orario, coperti, tavolo);
-            showInfo("Ordine creato per " + nome);
+            boundary.createOrdinazione(nome, tipo, orario, coperti, tavolo); // i controlli di coerenza sono nel bean
+            showInfo("Ordine creato per “" + nome + "”");
             clearForm();
             refreshTable();
         } catch (OrdinazioneException ex) {

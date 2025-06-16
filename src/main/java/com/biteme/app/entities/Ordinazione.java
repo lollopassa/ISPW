@@ -32,32 +32,16 @@ public class Ordinazione {
         return nomeCliente;
     }
 
-    public void setNomeCliente(String nomeCliente) {
-        this.nomeCliente = nomeCliente;
-    }
-
     public String getNumeroClienti() {
         return numeroClienti;
-    }
-
-    public void setNumeroClienti(String numeroClienti) {
-        this.numeroClienti = numeroClienti;
     }
 
     public TipoOrdinazione getTipoOrdine() {
         return tipoOrdinazione;
     }
 
-    public void setTipoOrdine(TipoOrdinazione tipoOrdinazione) {
-        this.tipoOrdinazione = tipoOrdinazione;
-    }
-
     public String getInfoTavolo() {
         return infoTavolo;
-    }
-
-    public void setInfoTavolo(String infoTavolo) {
-        this.infoTavolo = infoTavolo;
     }
 
     public StatoOrdinazione getStatoOrdine() {
@@ -72,7 +56,4 @@ public class Ordinazione {
         return orarioCreazione;
     }
 
-    public void setOrarioCreazione(String orarioCreazione) {
-        this.orarioCreazione = orarioCreazione;
-    }
 }
