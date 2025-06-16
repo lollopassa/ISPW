@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 public class SceneLoader {
     private static SceneLoader instance;
-    private Stage primaryStage;
+    private final Stage primaryStage;
     private static final Logger logger = Logger.getLogger(SceneLoader.class.getName());
 
     private SceneLoader(Stage stage) {

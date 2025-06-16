@@ -11,48 +11,48 @@ import com.biteme.app.persistence.Configuration;
 
 import java.util.List;
 
-public class OrdinazioneController { // Controller che gestisce la logica di alto livello sulle ordinazioni
+public class OrdinazioneController {
 
     private final OrdinazioneDao ordinazioneDao;
 
-    public OrdinazioneController() {                    // costruttore
+    public OrdinazioneController() {
         this.ordinazioneDao = Configuration.getPersistenceProvider()
                 .getDaoFactory()
-                .getOrdinazioneDao();                   // ottiene DAO da factory
+                .getOrdinazioneDao();
     }
 
-    public void creaOrdine(OrdinazioneBean bean) throws OrdinazioneException { // salva nuova ordinazione
+    public void creaOrdine(OrdinazioneBean bean) throws OrdinazioneException {
         try {
-            Ordinazione ord = bean.toEntity();          // mapping DTO → entity
-            ordinazioneDao.store(ord);                  // persiste entity
-            bean.setId(ord.getId());                   // aggiorna id sul DTO
-        } catch (Exception e) {                         // gestisce errori
+            Ordinazione ord = bean.toEntity();
+            ordinazioneDao.store(ord);
+            bean.setId(ord.getId());
+        } catch (Exception e) {
             throw new OrdinazioneException(
                     "Errore nella creazione dell'ordinazione: " + e.getMessage(), e);
         }
     }
 
-    public List<OrdinazioneBean> getOrdini() {          // restituisce tutte le ordinazioni
+    public List<OrdinazioneBean> getOrdini() {
         return ordinazioneDao.getAll()
                 .stream()
-                .map(OrdinazioneBean::fromEntity)       // mapping entity → DTO
+                .map(OrdinazioneBean::fromEntity)
                 .toList();
     }
 
-    public void eliminaOrdinazione(int id) throws OrdinazioneException { // elimina per id
-        if (!ordinazioneDao.exists(id))                 // verifica esistenza
+    public void eliminaOrdinazione(int id) throws OrdinazioneException {
+        if (!ordinazioneDao.exists(id))
             throw new OrdinazioneException("L'ordinazione con ID " + id + " non esiste.");
         try {
-            ordinazioneDao.delete(id);                  // cancella dal DAO
-        } catch (Exception e) {                         // errori delete
+            ordinazioneDao.delete(id);
+        } catch (Exception e) {
             throw new OrdinazioneException("Errore nell'eliminazione dell'ordinazione: " + e.getMessage(), e);
         }
     }
 
-    public void aggiornaStatoOrdinazione(int ordineId, StatoOrdinazione nuovoStato) throws OrdinazioneException { // update stato
+    public void aggiornaStatoOrdinazione(int ordineId, StatoOrdinazione nuovoStato) throws OrdinazioneException {
         try {
-            ordinazioneDao.aggiornaStato(ordineId, nuovoStato); // delega al DAO
-        } catch (Exception e) {                                 // gestisce errori update
+            ordinazioneDao.aggiornaStato(ordineId, nuovoStato);
+        } catch (Exception e) {
             throw new OrdinazioneException("Errore nell'aggiornamento dello stato dell'ordinazione: " + e.getMessage(), e);
         }
     }
