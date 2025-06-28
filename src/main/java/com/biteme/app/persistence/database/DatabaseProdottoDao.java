@@ -26,7 +26,7 @@ public class DatabaseProdottoDao implements ProdottoDao {
     }
 
     @Override
-    public Optional<Prodotto> load(Integer id) {
+    public Optional<Prodotto> read(Integer id) {
         String query = "SELECT id, nome, prezzo, categoria, disponibile FROM prodotti WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
@@ -42,7 +42,7 @@ public class DatabaseProdottoDao implements ProdottoDao {
     }
 
     @Override
-    public void store(Prodotto entity) {
+    public void create(Prodotto entity) {
         String query = "INSERT INTO prodotti (nome, prezzo, categoria, disponibile) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, entity.getNome());

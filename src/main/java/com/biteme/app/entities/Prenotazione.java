@@ -23,7 +23,9 @@ public class Prenotazione {
         this.coperti = coperti;
     }
 
-        public int getId() {
+    public Prenotazione() {}
+
+    public int getId() {
         return id;
     }
 

@@ -25,7 +25,7 @@ public class LoginController {
     }
 
     public void authenticateUser(LoginBean loginBean) {
-                Optional<User> optionalUser = userDao.load(loginBean.getEmailOrUsername());
+                Optional<User> optionalUser = userDao.read(loginBean.getEmailOrUsername());
         if (!optionalUser.isPresent()) {
             throw new IllegalArgumentException("Utente non trovato.");
         }
@@ -47,11 +47,11 @@ public class LoginController {
             String accessToken = googleAuthService.authenticateWithGoogle();
             GoogleAuthUtility.GoogleUserData googleUser = googleAuthService.getGoogleUserData(accessToken);
 
-            User user = userDao.load(googleUser.getEmail())
+            User user = userDao.read(googleUser.getEmail())
                     .map(this::validateGoogleUser)
                     .orElseGet(() -> {
                         User newUser = googleAuthService.createGoogleUser(googleUser);
-                        userDao.store(newUser);
+                        userDao.create(newUser);
                         return newUser;
                     });
 

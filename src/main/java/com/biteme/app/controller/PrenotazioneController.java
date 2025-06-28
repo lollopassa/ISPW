@@ -6,6 +6,7 @@ import com.biteme.app.entities.Prenotazione;
 import com.biteme.app.exception.PrenotationValidationException;
 import com.biteme.app.persistence.Configuration;
 import com.biteme.app.persistence.PrenotazioneDao;
+import com.biteme.app.util.mapper.BeanEntityMapperFactory;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,6 +15,7 @@ public class PrenotazioneController {
 
     private final PrenotazioneDao prenotazioneDao;
     private final EmailController emailController;
+    private final BeanEntityMapperFactory mapperFactory = BeanEntityMapperFactory.getInstance();
 
     public PrenotazioneController() {
         this.prenotazioneDao = Configuration.getPersistenceProvider()
@@ -23,69 +25,65 @@ public class PrenotazioneController {
     }
 
     public void creaPrenotazione(PrenotazioneBean bean) {
-        Prenotazione entity = convertToEntity(bean);
-        if (prenotazioneDao.existsDuplicate(entity)) {
+        Prenotazione entity = mapperFactory.toEntity(bean, PrenotazioneBean.class);
+
+        if (existsDuplicate(entity)) {
             throw new PrenotationValidationException(
                     "Esiste già una prenotazione identica (stesso nome, data, orario e numero di coperti)."
             );
         }
-        prenotazioneDao.store(entity);
+
+        prenotazioneDao.create(entity);
         bean.setId(entity.getId());
+
         if (bean.getEmail() != null && !bean.getEmail().isEmpty()) {
             inviaEmailConferma(bean);
         }
+    }
+
+    private boolean existsDuplicate(Prenotazione newPrenotazione) {
+        List<Prenotazione> sameDateBookings = prenotazioneDao.getByData(newPrenotazione.getData());
+        return sameDateBookings.stream().anyMatch(existing ->
+                existing.getNomeCliente().equalsIgnoreCase(newPrenotazione.getNomeCliente()) &&
+                        existing.getOrario().equals(newPrenotazione.getOrario()) &&
+                        existing.getCoperti() == newPrenotazione.getCoperti() &&
+                        existing.getId() != newPrenotazione.getId()
+        );
     }
 
     public List<PrenotazioneBean> getPrenotazioniByData(LocalDate data) {
         return prenotazioneDao.getByData(data).stream()
-                .map(this::convertToBean)
+                .map(entity -> mapperFactory.toBean(entity, PrenotazioneBean.class))
                 .toList();
     }
 
     public PrenotazioneBean modificaPrenotazione(PrenotazioneBean bean) {
-        Prenotazione entity = convertToEntity(bean);
-        if (prenotazioneDao.existsDuplicate(entity)) {
+        Prenotazione entity = mapperFactory.toEntity(bean, PrenotazioneBean.class);
+
+        if (existsDuplicate(entity)) {
             throw new PrenotationValidationException(
                     "Modifica non consentita: esiste già una prenotazione identica."
             );
         }
+
         prenotazioneDao.update(entity);
+
         if (bean.getEmail() != null && !bean.getEmail().isEmpty()) {
             inviaEmailConferma(bean);
         }
-        return bean;
+
+        return mapperFactory.toBean(entity, PrenotazioneBean.class);
     }
 
     public void eliminaPrenotazione(int id) {
-        if (prenotazioneDao.exists(id)) {
-            prenotazioneDao.delete(id);
-        } else {
+        if (!prenotazioneExists(id)) {
             throw new IllegalArgumentException("La prenotazione con ID " + id + " non esiste.");
         }
+        prenotazioneDao.delete(id);
     }
 
-    private Prenotazione convertToEntity(PrenotazioneBean b) {
-        return new Prenotazione(
-                b.getId(),
-                b.getNomeCliente(),
-                b.getOrario(),
-                b.getData(),
-                b.getNote(),
-                b.getEmail(),
-                b.getCoperti()
-        );
-    }
-
-    private PrenotazioneBean convertToBean(Prenotazione e) {
-        PrenotazioneBean b = new PrenotazioneBean();
-        b.setId(e.getId());
-        b.setNomeCliente(e.getNomeCliente());
-        b.setData(e.getData());
-        b.setOrario(e.getOrario());
-        b.setNote(e.getNote());
-        b.setEmail(e.getEmail());
-        b.setCoperti(e.getCoperti());
-        return b;
+    private boolean prenotazioneExists(int id) {
+        return prenotazioneDao.read(id).isPresent();
     }
 
     private void inviaEmailConferma(PrenotazioneBean bean) {

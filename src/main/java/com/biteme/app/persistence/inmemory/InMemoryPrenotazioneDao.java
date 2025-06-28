@@ -12,12 +12,12 @@ public class InMemoryPrenotazioneDao implements PrenotazioneDao {
     private int currentId = 1;
 
     @Override
-    public Optional<Prenotazione> load(Integer key) {
+    public Optional<Prenotazione> read(Integer key) {
                 return prenotazioni.stream().filter(p -> p.getId() == key).findFirst();
     }
 
     @Override
-    public void store(Prenotazione prenotazione) {
+    public void create(Prenotazione prenotazione) {
                 if (prenotazione.getId() > 0) {
             delete(prenotazione.getId());
         } else {
@@ -34,16 +34,6 @@ public class InMemoryPrenotazioneDao implements PrenotazioneDao {
     @Override
     public boolean exists(Integer key) {
                 return prenotazioni.stream().anyMatch(p -> p.getId() == key);
-    }
-
-    @Override
-    public boolean existsDuplicate(Prenotazione p) {
-        return prenotazioni.stream().anyMatch(x ->
-                x.getNomeCliente().equalsIgnoreCase(p.getNomeCliente()) &&
-                        x.getOrario().equals(p.getOrario()) &&
-                        x.getData().equals(p.getData()) &&
-                        x.getCoperti() == p.getCoperti()
-        );
     }
 
     @Override

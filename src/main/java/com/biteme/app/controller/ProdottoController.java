@@ -3,45 +3,36 @@ package com.biteme.app.controller;
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.exception.ProdottoException;
 import com.biteme.app.entities.Prodotto;
-import com.biteme.app.entities.Categoria;
-import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.persistence.Configuration;
+import com.biteme.app.persistence.ProdottoDao;
+import com.biteme.app.util.mapper.BeanEntityMapperFactory;
 
 import java.util.List;
 
 public class ProdottoController {
 
     private final ProdottoDao prodottoDao;
+    private final BeanEntityMapperFactory mapperFactory = BeanEntityMapperFactory.getInstance();
 
     public ProdottoController() {
-        this.prodottoDao = Configuration.getPersistenceProvider().getDaoFactory().getProdottoDao();
+        this.prodottoDao = Configuration
+                .getPersistenceProvider()
+                .getDaoFactory()
+                .getProdottoDao();
     }
 
-    public void aggiungiProdotto(ProdottoBean prodottoBean) {
-
-        Prodotto prodotto = new Prodotto(
-                prodottoBean.getId() != null ? prodottoBean.getId() : 0,
-                prodottoBean.getNome(),
-                prodottoBean.getPrezzo(),
-                Categoria.valueOf(prodottoBean.getCategoria().toUpperCase()),
-                prodottoBean.getDisponibile() != null && prodottoBean.getDisponibile()
-        );
-        prodottoDao.store(prodotto);
+    public void aggiungiProdotto(ProdottoBean bean) {
+        Prodotto entity = mapperFactory.toEntity(bean, ProdottoBean.class);
+        prodottoDao.create(entity);
+        bean.setId(entity.getId());
     }
 
-    public void modificaProdotto(ProdottoBean prodottoBean) {
-        if (prodottoBean.getId() == null || prodottoBean.getId() <= 0) {
+    public void modificaProdotto(ProdottoBean bean) {
+        if (bean.getId() == null || bean.getId() <= 0) {
             throw new ProdottoException("L'ID del prodotto non è valido.");
         }
-
-        Prodotto prodottoAggiornato = new Prodotto(
-                prodottoBean.getId(),
-                prodottoBean.getNome(),
-                prodottoBean.getPrezzo(),
-                Categoria.valueOf(prodottoBean.getCategoria().toUpperCase()),
-                prodottoBean.getDisponibile() != null && prodottoBean.getDisponibile()
-        );
-        prodottoDao.update(prodottoAggiornato);
+        Prodotto entity = mapperFactory.toEntity(bean, ProdottoBean.class);
+        prodottoDao.update(entity);
     }
 
     public void eliminaProdotto(Integer id) {
@@ -52,9 +43,9 @@ public class ProdottoController {
     }
 
     public List<ProdottoBean> getProdotti() {
-        List<Prodotto> prodotti = prodottoDao.getByDisponibilita(true);
-        return prodotti.stream()
-                .map(this::mapProdottoToBean)
+        List<Prodotto> entities = prodottoDao.getByDisponibilita(true);
+        return entities.stream()
+                .map(e -> mapperFactory.toBean(e, ProdottoBean.class))
                 .toList();
     }
 
@@ -62,20 +53,10 @@ public class ProdottoController {
         if (nome == null || nome.isBlank()) {
             throw new ProdottoException("Il nome del prodotto non può essere vuoto o nullo.");
         }
-        Prodotto prodotto = prodottoDao.findByNome(nome);
-        if (prodotto == null) {
+        Prodotto entity = prodottoDao.findByNome(nome);
+        if (entity == null) {
             throw new ProdottoException("Prodotto con nome '" + nome + "' non trovato!");
         }
-        return mapProdottoToBean(prodotto);
-    }
-
-    private ProdottoBean mapProdottoToBean(Prodotto prodotto) {
-        ProdottoBean bean = new ProdottoBean();
-        bean.setId(prodotto.getId());
-        bean.setNome(prodotto.getNome());
-        bean.setPrezzo(prodotto.getPrezzo());
-        bean.setCategoria(prodotto.getCategoria().name());
-        bean.setDisponibile(prodotto.isDisponibile());
-        return bean;
+        return mapperFactory.toBean(entity, ProdottoBean.class);
     }
 }

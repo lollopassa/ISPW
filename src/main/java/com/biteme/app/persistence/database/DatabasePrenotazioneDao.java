@@ -39,25 +39,9 @@ public class DatabasePrenotazioneDao implements PrenotazioneDao {
         }
     }
 
-    @Override
-    public boolean existsDuplicate(Prenotazione p) {
-        String query = "SELECT COUNT(*) FROM prenotazione WHERE nomeCliente = ? AND orario = ? AND data = ? AND coperti = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, p.getNomeCliente());
-            stmt.setTime(2, Time.valueOf(p.getOrario()));
-            stmt.setDate(3, Date.valueOf(p.getData()));
-            stmt.setInt(4, p.getCoperti());
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() && rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il controllo di prenotazione duplicata: " + p);
-            return false;
-        }
-    }
 
     @Override
-    public Optional<Prenotazione> load(Integer id) {
+    public Optional<Prenotazione> read(Integer id) {
         String query = "SELECT id, nomeCliente, orario, data, note, email, coperti FROM prenotazione WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
@@ -131,7 +115,7 @@ public class DatabasePrenotazioneDao implements PrenotazioneDao {
     }
 
     @Override
-    public void store(Prenotazione entity) {
+    public void create(Prenotazione entity) {
         String query = "INSERT INTO prenotazione (nomeCliente, orario, data, note, email, coperti) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, entity.getNomeCliente());

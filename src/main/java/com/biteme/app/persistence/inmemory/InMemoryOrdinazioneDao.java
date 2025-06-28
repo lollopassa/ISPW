@@ -14,13 +14,13 @@ public class InMemoryOrdinazioneDao implements OrdinazioneDao {
     private int currentId = 1;
     private final List<Ordinazione> ordinazioni = Storage.getInstance().getOrdinazioni();
     @Override
-    public Optional<Ordinazione> load(Integer key) {
+    public Optional<Ordinazione> read(Integer key) {
         return ordinazioni.stream()
                 .filter(o -> o.getId() == key)                 .findFirst();
     }
 
     @Override
-    public void store(Ordinazione ordinazione) {
+    public void create(Ordinazione ordinazione) {
                 if (ordinazione.getId() > 0 && exists(ordinazione.getId())) {
             delete(ordinazione.getId());
         } else if (ordinazione.getId() <= 0) {

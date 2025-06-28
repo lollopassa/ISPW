@@ -14,14 +14,14 @@ public class InMemoryProdottoDao implements ProdottoDao {
     private int currentId = 1;
 
     @Override
-    public Optional<Prodotto> load(Integer key) {
+    public Optional<Prodotto> read(Integer key) {
                 return prodotti.stream()
                 .filter(p -> p.getId() == key)
                 .findFirst();
     }
 
     @Override
-    public void store(Prodotto prodotto) {
+    public void create(Prodotto prodotto) {
                 if (prodotto.getId() > 0) {
             delete(prodotto.getId());
         } else {

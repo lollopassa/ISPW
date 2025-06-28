@@ -24,7 +24,7 @@ public class OrdinazioneController {
     public void creaOrdine(OrdinazioneBean bean) throws OrdinazioneException {
         try {
             Ordinazione ord = bean.toEntity();
-            ordinazioneDao.store(ord);
+            ordinazioneDao.create(ord);
             bean.setId(ord.getId());
         } catch (Exception e) {
             throw new OrdinazioneException(

@@ -25,7 +25,7 @@ public class DatabaseArchivioDao implements ArchivioDao {
     }
 
     @Override
-    public Optional<Archivio> load(Integer id) {
+    public Optional<Archivio> read(Integer id) {
         String query = "SELECT id, id_ordine, prodotti, quantita, totale, data_archiviazione FROM archivio WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
@@ -41,7 +41,7 @@ public class DatabaseArchivioDao implements ArchivioDao {
     }
 
     @Override
-    public void store(Archivio archivio) {
+    public void create(Archivio archivio) {
         String query = "INSERT INTO archivio (id_ordine, prodotti, quantita, totale, data_archiviazione) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, archivio.getIdOrdine());

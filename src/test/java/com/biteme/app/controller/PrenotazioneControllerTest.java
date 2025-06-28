@@ -109,7 +109,7 @@ class PrenotazioneControllerTest {
                 "",
                 4
         );
-        prenotazioneDao.store(initPrenotazione);
+        prenotazioneDao.create(initPrenotazione);
         int storedId = initPrenotazione.getId();
         createdPrenotazioniIds.add(storedId);
 
@@ -148,7 +148,7 @@ class PrenotazioneControllerTest {
                 "mario.rossi@example.com",
                 4
         );
-        prenotazioneDao.store(prenotazione);
+        prenotazioneDao.create(prenotazione);
         int storedId = prenotazione.getId();
         createdPrenotazioniIds.add(storedId);
 
@@ -170,7 +170,7 @@ class PrenotazioneControllerTest {
                 "giovanna.bianchi@example.com",
                 6
         );
-        prenotazioneDao.store(p);
+        prenotazioneDao.create(p);
         int id = p.getId();
         createdPrenotazioniIds.add(id);
 

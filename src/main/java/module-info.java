@@ -35,4 +35,6 @@ module demo {
     exports com.biteme.app.exception;
     exports com.biteme.app.ui;
     opens com.biteme.app.ui to javafx.fxml;
+    exports com.biteme.app.util.mapper;
+    opens com.biteme.app.util.mapper to javafx.fxml;
 }

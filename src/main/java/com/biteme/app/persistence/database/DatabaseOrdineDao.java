@@ -28,7 +28,7 @@ public class DatabaseOrdineDao implements OrdineDao {
     }
 
     @Override
-    public Optional<Ordine> load(Integer id) {
+    public Optional<Ordine> read(Integer id) {
         String query = "SELECT id, prodotti, quantita, prezzi FROM ordine WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
@@ -44,7 +44,7 @@ public class DatabaseOrdineDao implements OrdineDao {
     }
 
     @Override
-    public void store(Ordine ordine) {
+    public void create(Ordine ordine) {
         String query;
         boolean exists = ordine.getId() > 0 && exists(ordine.getId());
         if (exists) {
@@ -118,7 +118,7 @@ public class DatabaseOrdineDao implements OrdineDao {
 
     @Override
     public Ordine getById(Integer id) {
-        return load(id).orElseThrow(
+        return read(id).orElseThrow(
                 () -> new IllegalArgumentException("Ordine con ID " + id + " non trovato")
         );
     }

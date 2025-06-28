@@ -4,9 +4,9 @@ import java.util.Optional;
 
 public interface Dao<K, V> {
 
-        Optional<V> load(K key);
+        void create(V entity);
 
-        void store(V entity);
+        Optional<V> read(K key);
 
         void delete(K key);
 

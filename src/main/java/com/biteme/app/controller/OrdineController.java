@@ -49,7 +49,7 @@ public class OrdineController {
                 bean.setPrezzi(tmp.getPrezzi());
             }
             Ordine entity = bean.toEntity(id);
-            ordineDao.store(entity);
+            ordineDao.create(entity);
         } catch (Exception e) {
             throw new OrdineException("Errore nel salvataggio dell'ordine: " + e.getMessage(), e);
         }

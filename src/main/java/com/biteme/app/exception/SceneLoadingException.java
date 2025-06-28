@@ -1,6 +1,6 @@
 package com.biteme.app.exception;
 
-public class SceneLoadingException extends Exception {
+public class SceneLoadingException extends RuntimeException {
   public SceneLoadingException(String message, Throwable cause) {
     super(message, cause);
   }

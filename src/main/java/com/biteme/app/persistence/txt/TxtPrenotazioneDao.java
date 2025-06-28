@@ -50,7 +50,7 @@ public class TxtPrenotazioneDao implements PrenotazioneDao {
     }
 
     @Override
-    public Optional<Prenotazione> load(Integer id) {
+    public Optional<Prenotazione> read(Integer id) {
         return prenotazioni.stream().filter(p -> p.getId() == id).findFirst();
     }
 
@@ -72,7 +72,7 @@ public class TxtPrenotazioneDao implements PrenotazioneDao {
     }
 
     @Override
-    public void store(Prenotazione prenotazione) {
+    public void create(Prenotazione prenotazione) {
         if (prenotazione.getId() > 0) {
             delete(prenotazione.getId());
         } else {
@@ -91,16 +91,6 @@ public class TxtPrenotazioneDao implements PrenotazioneDao {
     @Override
     public boolean exists(Integer id) {
         return prenotazioni.stream().anyMatch(p -> p.getId() == id);
-    }
-
-    @Override
-    public boolean existsDuplicate(Prenotazione p) {
-        return prenotazioni.stream().anyMatch(x ->
-                x.getNomeCliente().equalsIgnoreCase(p.getNomeCliente()) &&
-                        x.getOrario().equals(p.getOrario()) &&
-                        x.getData().equals(p.getData()) &&
-                        x.getCoperti() == p.getCoperti()
-        );
     }
 
     @Override

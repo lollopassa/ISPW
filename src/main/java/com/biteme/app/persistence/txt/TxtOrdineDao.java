@@ -58,12 +58,12 @@ public class TxtOrdineDao implements OrdineDao {
     }
 
     @Override
-    public Optional<Ordine> load(Integer id) {
+    public Optional<Ordine> read(Integer id) {
         return ordini.stream().filter(o -> o.getId() == id).findFirst();
     }
 
     @Override
-    public void store(Ordine ordine) {
+    public void create(Ordine ordine) {
         if (ordine.getId() > 0) delete(ordine.getId());
         else ordine.setId(currentId++);
         ordini.add(ordine);
@@ -83,7 +83,7 @@ public class TxtOrdineDao implements OrdineDao {
 
     @Override
     public Ordine getById(Integer id) {
-        return load(id).orElseThrow(() -> new IllegalArgumentException("Ordine con ID " + id + " non trovato"));
+        return read(id).orElseThrow(() -> new IllegalArgumentException("Ordine con ID " + id + " non trovato"));
     }
 
     private String serialize(Ordine o) {

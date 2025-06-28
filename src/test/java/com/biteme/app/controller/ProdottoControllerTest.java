@@ -83,7 +83,7 @@ class ProdottoControllerTest {
     void testModificaProdotto() {
 
         Prodotto prodotto = new Prodotto(0, "Fiorentina", new BigDecimal("75.00"), Categoria.SECONDI, true);
-        prodottoDao.store(prodotto);
+        prodottoDao.create(prodotto);
         int prodId = prodotto.getId();
         createdProdottoIds.add(prodId);
 
@@ -92,7 +92,7 @@ class ProdottoControllerTest {
         controller.modificaProdotto(bean);
 
 
-        Optional<Prodotto> updatedProdotto = prodottoDao.load(prodId);
+        Optional<Prodotto> updatedProdotto = prodottoDao.read(prodId);
         assertTrue(updatedProdotto.isPresent(), "Il prodotto aggiornato deve essere presente.");
         Prodotto p = updatedProdotto.get();
         assertEquals("Bistecca alla Fiorentina", p.getNome());
@@ -105,7 +105,7 @@ class ProdottoControllerTest {
     void testEliminaProdotto() {
 
         Prodotto prodotto = new Prodotto(0, "Brodo di Carne", new BigDecimal("18.30"), Categoria.PRIMI, true);
-        prodottoDao.store(prodotto);
+        prodottoDao.create(prodotto);
         int prodId = prodotto.getId();
         createdProdottoIds.add(prodId);
 
@@ -122,9 +122,9 @@ class ProdottoControllerTest {
         Prodotto p2 = new Prodotto(0, "Tiramisu", new BigDecimal("8.50"), Categoria.DOLCI, false);
         Prodotto p3 = new Prodotto(0, "Insalata Mista", new BigDecimal("6.00"), Categoria.ANTIPASTI, true);
 
-        prodottoDao.store(p1);
-        prodottoDao.store(p2);
-        prodottoDao.store(p3);
+        prodottoDao.create(p1);
+        prodottoDao.create(p2);
+        prodottoDao.create(p3);
         createdProdottoIds.add(p1.getId());
         createdProdottoIds.add(p2.getId());
         createdProdottoIds.add(p3.getId());
@@ -142,7 +142,7 @@ class ProdottoControllerTest {
     @Test
     void testGetProdottoByNome() {
                 Prodotto prodotto = new Prodotto(0, "Gattò", new BigDecimal("15.00"), Categoria.SECONDI, true);
-        prodottoDao.store(prodotto);
+        prodottoDao.create(prodotto);
         int prodId = prodotto.getId();
         createdProdottoIds.add(prodId);
 

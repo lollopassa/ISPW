@@ -58,14 +58,14 @@ public class TxtUserDao implements UserDao {
     }
 
     @Override
-    public Optional<User> load(String identifier) {
+    public Optional<User> read(String identifier) {
         return users.stream()
                 .filter(u -> u.getUsername().equals(identifier) || u.getEmail().equals(identifier))
                 .findFirst();
     }
 
     @Override
-    public void store(User user) {
+    public void create(User user) {
         if (existsEmail(user.getEmail())) {
             throw new SignupException("Email già registrata");
         }

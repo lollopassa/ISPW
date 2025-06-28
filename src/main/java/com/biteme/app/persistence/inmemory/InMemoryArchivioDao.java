@@ -14,14 +14,14 @@ public class InMemoryArchivioDao implements ArchivioDao {
     private int currentId = 1;
 
     @Override
-    public Optional<Archivio> load(Integer id) {
+    public Optional<Archivio> read(Integer id) {
         return archivi.stream()
                 .filter(a -> a.getIdOrdine() == id)
                 .findFirst();
     }
 
     @Override
-    public void store(Archivio archivio) {
+    public void create(Archivio archivio) {
         if (archivio.getIdOrdine() == 0) {
             archivio.setIdOrdine(currentId++);
         } else {

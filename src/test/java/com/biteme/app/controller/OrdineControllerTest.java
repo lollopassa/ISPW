@@ -54,7 +54,7 @@ class OrdineControllerTest {
                 StatoOrdinazione.NUOVO,
                 "12:00"
         );
-        ordinazioneDao.store(dummy);
+        ordinazioneDao.create(dummy);
         parentId = dummy.getId();
 
         removeProdottoIfExists("Pizza Margherita");
@@ -119,7 +119,7 @@ class OrdineControllerTest {
                 List.of("Pizza Margherita"),
                 List.of(2),
                 List.of(new BigDecimal("8.50")));
-        ordineDao.store(ordineDaSalvare);
+        ordineDao.create(ordineDaSalvare);
         int storedId = ordineDaSalvare.getId();
 
         OrdineBean bean = controller.getOrdineById(storedId);
@@ -136,8 +136,8 @@ class OrdineControllerTest {
                 Categoria.PIZZE, true);
         Prodotto p2 = new Prodotto(0, "Pasta al Pomodoro", new BigDecimal("7.00"),
                 Categoria.PRIMI, true);
-        prodottoDao.store(p1);
-        prodottoDao.store(p2);
+        prodottoDao.create(p1);
+        prodottoDao.create(p2);
 
         List<ProdottoBean> prodotti = controller.getProdottiByCategoria("PIZZE");
         var filtered = prodotti.stream()

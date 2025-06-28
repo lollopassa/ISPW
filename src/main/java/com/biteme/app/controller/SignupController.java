@@ -17,18 +17,18 @@ public class SignupController {
     public void registerUser(SignupBean signupBean) {
         signupBean.validate(); // <-- ora è la bean a fare la validazione
 
-        if (userDao.load(signupBean.getEmail()).isPresent()) {
+        if (userDao.read(signupBean.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email già registrata");
         }
 
-        if (userDao.load(signupBean.getUsername()).isPresent()) {
+        if (userDao.read(signupBean.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username già registrato");
         }
 
         User user = new User(signupBean.getUsername());
         user.setEmail(signupBean.getEmail());
         user.setPassword(signupBean.getPassword());
-        userDao.store(user);
+        userDao.create(user);
     }
 
         public void navigateToLogin() {

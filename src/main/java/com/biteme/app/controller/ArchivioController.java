@@ -26,7 +26,7 @@ public class ArchivioController {
     }
 
     public void salvaInArchivio(Archivio archivio) {
-        archivioDao.store(archivio);
+        archivioDao.create(archivio);
     }
 
     public void archiviaOrdine(ArchivioBean archivioBean) {

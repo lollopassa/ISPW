@@ -26,7 +26,7 @@ public class DatabaseUserDao implements UserDao {
     }
 
     @Override
-    public Optional<User> load(String identifier) {
+    public Optional<User> read(String identifier) {
                 String query = "SELECT username, email, passwordHash, ruolo, is_google_user FROM user WHERE username = ? OR email = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -55,7 +55,7 @@ public class DatabaseUserDao implements UserDao {
         return Optional.empty();
     }
     @Override
-    public void store(User user) {
+    public void create(User user) {
         try {
             if (existsEmail(user.getEmail())) {
                 throw new SignupException("Email già registrata");

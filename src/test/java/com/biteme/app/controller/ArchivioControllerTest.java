@@ -100,7 +100,7 @@ class ArchivioControllerTest {
         archivio1.setQuantita(Arrays.asList(2, 3));
         archivio1.setTotale(new BigDecimal("25.00"));
         archivio1.setDataArchiviazione(now.minusDays(1));
-        archivioDao.store(archivio1);
+        archivioDao.create(archivio1);
         registerInsertedArchivio(archivio1);
 
 
@@ -110,7 +110,7 @@ class ArchivioControllerTest {
         archivio2.setQuantita(Arrays.asList(1, 4));
         archivio2.setTotale(new BigDecimal("30.00"));
         archivio2.setDataArchiviazione(now.minusDays(2));
-        archivioDao.store(archivio2);
+        archivioDao.create(archivio2);
         registerInsertedArchivio(archivio2);
 
 
@@ -139,7 +139,7 @@ class ArchivioControllerTest {
         archivio.setQuantita(Collections.singletonList(5));
         archivio.setTotale(new BigDecimal("50.00"));
         archivio.setDataArchiviazione(now.minusDays(2));
-        archivioDao.store(archivio);
+        archivioDao.create(archivio);
         registerInsertedArchivio(archivio);
 
 
@@ -218,7 +218,7 @@ class ArchivioControllerTest {
         archivio1.setQuantita(Collections.singletonList(2));
         archivio1.setTotale(new BigDecimal("80.00"));
         archivio1.setDataArchiviazione(monday);
-        archivioDao.store(archivio1);
+        archivioDao.create(archivio1);
         registerInsertedArchivio(archivio1);
 
         Archivio archivio2 = new Archivio();
@@ -227,7 +227,7 @@ class ArchivioControllerTest {
         archivio2.setQuantita(Collections.singletonList(1));
         archivio2.setTotale(new BigDecimal("40.00"));
         archivio2.setDataArchiviazione(monday);
-        archivioDao.store(archivio2);
+        archivioDao.create(archivio2);
         registerInsertedArchivio(archivio2);
 
         Archivio archivio3 = new Archivio();
@@ -236,7 +236,7 @@ class ArchivioControllerTest {
         archivio3.setQuantita(Collections.singletonList(3));
         archivio3.setTotale(new BigDecimal("90.00"));
         archivio3.setDataArchiviazione(tuesday);
-        archivioDao.store(archivio3);
+        archivioDao.create(archivio3);
         registerInsertedArchivio(archivio3);
 
         Map<String, Number> guadagniGiorno = controller.guadagniPerGiorno("trimestre");

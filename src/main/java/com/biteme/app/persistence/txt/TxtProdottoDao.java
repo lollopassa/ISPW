@@ -66,12 +66,12 @@ public class TxtProdottoDao implements ProdottoDao {
     }
 
     @Override
-    public Optional<Prodotto> load(Integer id) {
+    public Optional<Prodotto> read(Integer id) {
         return prodotti.stream().filter(p -> p.getId() == id).findFirst();
     }
 
     @Override
-    public void store(Prodotto prodotto) {
+    public void create(Prodotto prodotto) {
         if (prodotto.getId() > 0) {
             delete(prodotto.getId());
         } else {

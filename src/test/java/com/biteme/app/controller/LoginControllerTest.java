@@ -56,7 +56,7 @@ class LoginControllerTest {
         User user = new User("testuser", "test@example.com", password, UserRole.CAMERIERE);
         user.setGoogleUser(false);
 
-        userDao.store(user);
+        userDao.create(user);
 
     LoginBean loginBean = createLoginBean("test@example.com", password);
 

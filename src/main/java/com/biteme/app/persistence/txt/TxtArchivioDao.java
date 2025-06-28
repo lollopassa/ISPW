@@ -72,7 +72,7 @@ public class TxtArchivioDao implements ArchivioDao {
 
 
     @Override
-    public void store(Archivio archivio) {
+    public void create(Archivio archivio) {
         if (archivio.getIdOrdine() == 0) {
             archivio.setIdOrdine(currentId++);
         } else {
@@ -106,7 +106,7 @@ public class TxtArchivioDao implements ArchivioDao {
     }
 
     @Override
-    public Optional<Archivio> load(Integer id) {
+    public Optional<Archivio> read(Integer id) {
         return archivi.stream()
                 .filter(a -> a.getIdOrdine() == id)
                 .findFirst();

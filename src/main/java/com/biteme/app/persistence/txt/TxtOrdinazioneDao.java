@@ -70,12 +70,12 @@ public class TxtOrdinazioneDao implements OrdinazioneDao {
     }
 
     @Override
-    public Optional<Ordinazione> load(Integer id) {
+    public Optional<Ordinazione> read(Integer id) {
         return ordinazioni.stream().filter(o -> o.getId() == id).findFirst();
     }
 
     @Override
-    public void store(Ordinazione ordinazione) {
+    public void create(Ordinazione ordinazione) {
         if (ordinazione.getId() > 0 && exists(ordinazione.getId())) {
             delete(ordinazione.getId());
         } else if (ordinazione.getId() <= 0) {

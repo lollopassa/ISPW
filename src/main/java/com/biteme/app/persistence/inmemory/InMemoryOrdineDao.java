@@ -12,7 +12,7 @@ public class InMemoryOrdineDao implements OrdineDao {
     private int currentId = 1;
 
     @Override
-    public Optional<Ordine> load(Integer key) {
+    public Optional<Ordine> read(Integer key) {
         return ordini.stream()
                 .filter(o -> o.getId() == key)
                 .findFirst()
@@ -25,7 +25,7 @@ public class InMemoryOrdineDao implements OrdineDao {
     }
 
     @Override
-    public void store(Ordine ordine) {
+    public void create(Ordine ordine) {
         if (ordine.getId() > 0) {
             delete(ordine.getId());
         } else {
@@ -51,6 +51,6 @@ public class InMemoryOrdineDao implements OrdineDao {
 
     @Override
     public Ordine getById(Integer id) {
-        return load(id).orElseThrow(() -> new IllegalArgumentException("Ordine con ID " + id + " non trovato"));
+        return read(id).orElseThrow(() -> new IllegalArgumentException("Ordine con ID " + id + " non trovato"));
     }
 }

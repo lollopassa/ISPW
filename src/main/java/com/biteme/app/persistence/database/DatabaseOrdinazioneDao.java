@@ -27,7 +27,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
     }
 
     @Override
-    public Optional<Ordinazione> load(Integer id) {
+    public Optional<Ordinazione> read(Integer id) {
         String query = "SELECT id, nomeCliente, numeroClienti, tipoOrdine, infoTavolo, statoOrdine, orarioCreazione FROM ordinazione WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
@@ -44,7 +44,7 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
     }
 
     @Override
-    public void store(Ordinazione ordinazione) {
+    public void create(Ordinazione ordinazione) {
         String query = "INSERT INTO ordinazione (nomeCliente, numeroClienti, tipoOrdine, infoTavolo, statoOrdine, orarioCreazione) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, ordinazione.getNomeCliente());
