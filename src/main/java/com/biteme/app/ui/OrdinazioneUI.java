@@ -151,7 +151,7 @@ public class OrdinazioneUI {
 
         try {
             OrdinazioneBoundary.setSelected(sel);
-            SceneLoader.getInstance().loadScene("/com/biteme/app/ordine.fxml", "Modifica Ordine");
+            SceneLoader.getInstance().loadSceneFresh("/com/biteme/app/ordine.fxml", "Modifica Ordine");
         } catch (Exception e) {
             showError("Impossibile aprire la scena di modifica: " + e.getMessage());
         }

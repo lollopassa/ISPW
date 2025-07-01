@@ -8,56 +8,60 @@ import com.biteme.app.util.CLIUtils;
 import java.util.List;
 import java.util.Scanner;
 
-public class OrdineCLI {
+public  class OrdineCLI {
 
     private OrdineCLI() {}
 
-    private static final OrdineBoundary boundary = new OrdineBoundary();
-    private static final Scanner scanner = CLIUtils.getScanner();
+    private static  OrdineBoundary boundary = new OrdineBoundary();
+    private static final Scanner        scanner  = CLIUtils.getScanner();
 
-    public static void start(int orderId) throws OrdineException {
+    public static void start(int ordineId) {
         OrdineBean ordineBean;
         try {
-            ordineBean = boundary.loadOrdine(orderId);
+            ordineBean = boundary.getOrdine(ordineId);       // nuovo metodo
         } catch (OrdineException e) {
             System.out.println("Ordine non trovato: " + e.getMessage());
             return;
         }
 
-        if (ordineBean.getProdotti() == null) {
-            ordineBean.setProdotti(new java.util.ArrayList<>());
-        } else {
-            ordineBean.setProdotti(new java.util.ArrayList<>(ordineBean.getProdotti()));
-        }
-        if (ordineBean.getQuantita() == null) {
-            ordineBean.setQuantita(new java.util.ArrayList<>());
-        } else {
-            ordineBean.setQuantita(new java.util.ArrayList<>(ordineBean.getQuantita()));
-        }
+        /* conversione a liste mutabili */
+        ordineBean.setProdotti(
+                ordineBean.getProdotti() == null ? new java.util.ArrayList<>() :
+                        new java.util.ArrayList<>(ordineBean.getProdotti()));
+        ordineBean.setQuantita(
+                ordineBean.getQuantita() == null ? new java.util.ArrayList<>() :
+                        new java.util.ArrayList<>(ordineBean.getQuantita()));
 
         boolean editing = true;
         while (editing) {
-            System.out.println("----- Modifica Ordine (ID: " + orderId + ") -----");
+            System.out.println("\n----- Modifica Ordine (ID: " + ordineId + ") -----");
             mostraOrdine(ordineBean);
-            System.out.println("Opzioni:");
-            System.out.println("1. Aggiungi prodotto");
-            System.out.println("2. Rimuovi prodotto");
-            System.out.println("3. Modifica quantità");
-            System.out.println("4. Salva modifiche e torna indietro");
-            System.out.println("5. Annulla modifiche e torna indietro");
+            System.out.println("""
+                    Opzioni:
+                    1. Aggiungi prodotto
+                    2. Rimuovi prodotto
+                    3. Modifica quantità
+                    4. Salva modifiche e torna indietro
+                    5. Annulla modifiche e torna indietro""");
             System.out.print("Scegli un'opzione: ");
-            String choice = scanner.nextLine();
+            String choice = scanner.nextLine().trim();
 
             switch (choice) {
                 case "1" -> aggiungiProdotto(ordineBean);
                 case "2" -> rimuoviProdotto(ordineBean);
                 case "3" -> modificaQuantita(ordineBean);
                 case "4" -> {
-                    boundary.salvaOrdineCompleto(orderId,
-                            ordineBean.getProdotti(),
-                            ordineBean.getQuantita(),
-                            ordineBean.getPrezzi());
-                    System.out.println("Modifiche salvate.");
+                    try {
+                        boundary.salvaOrdineCompleto(
+                                ordineId,
+                                ordineBean.getProdotti(),
+                                ordineBean.getQuantita(),
+                                null                     // prezzi: li calcola il controller
+                        );
+                        System.out.println("Modifiche salvate.");
+                    } catch (OrdineException e) {
+                        System.out.println("Errore salvataggio: " + e.getMessage());
+                    }
                     editing = false;
                 }
                 case "5" -> {
@@ -69,76 +73,67 @@ public class OrdineCLI {
         }
     }
 
-    private static void mostraOrdine(OrdineBean ordineBean) {
-        List<String> prodotti = ordineBean.getProdotti();
-        List<Integer> quantita = ordineBean.getQuantita();
-        if (prodotti.isEmpty()) {
+    /* ---------------- helper di visualizzazione ---------------- */
+
+    private static void mostraOrdine(OrdineBean ob) {
+        List<String>  prod = ob.getProdotti();
+        List<Integer> qty  = ob.getQuantita();
+        if (prod == null || prod.isEmpty()) {
             System.out.println("L'ordine è vuoto.");
-        } else {
-            System.out.println("Prodotti attuali:");
-            for (int i = 0; i < prodotti.size(); i++) {
-                String nomeProdotto = prodotti.get(i);
-                int qta = quantita.get(i);
-                System.out.println((i + 1) + ". " + nomeProdotto + " - Quantità: " + qta);
-            }
+            return;
+        }
+        for (int i = 0; i < prod.size(); i++) {
+            System.out.printf("%d. %s - Quantità: %d%n", i + 1, prod.get(i), qty.get(i));
         }
     }
 
-    private static void aggiungiProdotto(OrdineBean ordineBean) {
+    /* ---------------- opzioni di editing ---------------- */
+
+    private static void aggiungiProdotto(OrdineBean ob) {
         System.out.print("Nome prodotto: ");
         String nome = scanner.nextLine().trim();
         System.out.print("Quantità: ");
-        int qty;
+        int q;
         try {
-            qty = Integer.parseInt(scanner.nextLine());
-            if (qty <= 0) {
-                System.out.println("La quantità deve essere >0.");
-                return;
-            }
+            q = Integer.parseInt(scanner.nextLine());
+            if (q <= 0) { System.out.println("La quantità deve essere >0."); return; }
         } catch (NumberFormatException _) {
-            System.out.println("Quantità non valida.");
-            return;
+            System.out.println("Quantità non valida."); return;
         }
-        ordineBean.getProdotti().add(nome);
-        ordineBean.getQuantita().add(qty);
-        System.out.println("Prodotto aggiunto: " + nome + " x" + qty);
+        ob.getProdotti().add(nome);
+        ob.getQuantita().add(q);
+        System.out.println("Aggiunto: " + nome + " x" + q);
     }
 
-    private static void rimuoviProdotto(OrdineBean ordineBean) {
-        if (ordineBean.getProdotti().isEmpty()) {
-            System.out.println("Nessun prodotto da rimuovere.");
-            return;
+    private static void rimuoviProdotto(OrdineBean ob) {
+        if (ob.getProdotti().isEmpty()) {
+            System.out.println("Nessun prodotto da rimuovere."); return;
         }
-        System.out.print("Numero prodotto da rimuovere: ");
+        System.out.print("Indice prodotto da rimuovere: ");
         try {
             int idx = Integer.parseInt(scanner.nextLine()) - 1;
-            if (idx < 0 || idx >= ordineBean.getProdotti().size()) {
-                System.out.println("Indice non valido.");
-                return;
+            if (idx < 0 || idx >= ob.getProdotti().size()) {
+                System.out.println("Indice non valido."); return;
             }
-            String removed = ordineBean.getProdotti().remove(idx);
-            ordineBean.getQuantita().remove(idx);
+            String removed = ob.getProdotti().remove(idx);
+            ob.getQuantita().remove(idx);
             System.out.println("Rimosso: " + removed);
         } catch (NumberFormatException _) {
             System.out.println("Input non valido.");
         }
     }
 
-    private static void modificaQuantita(OrdineBean ordineBean) {
-        if (ordineBean.getProdotti().isEmpty()) {
-            System.out.println("Nessun prodotto da modificare.");
-            return;
+    private static void modificaQuantita(OrdineBean ob) {
+        if (ob.getProdotti().isEmpty()) {
+            System.out.println("Nessun prodotto da modificare."); return;
         }
-        System.out.print("Numero prodotto da modificare: ");
         try {
+            System.out.print("Indice prodotto da modificare: ");
             int idx = Integer.parseInt(scanner.nextLine()) - 1;
             System.out.print("Nuova quantità: ");
-            int newQty = Integer.parseInt(scanner.nextLine());
-            if (newQty < 0) {
-                System.out.println("La quantità non può essere negativa.");
-                return;
-            }
-            ordineBean.getQuantita().set(idx, newQty);
+            int newQ = Integer.parseInt(scanner.nextLine());
+            if (newQ < 0) { System.out.println("Quantità negativa non ammessa."); return; }
+            ob.getQuantita().set(idx, newQ);
             System.out.println("Quantità aggiornata.");
         } catch (Exception _) {
             System.out.println("Input non valido.");

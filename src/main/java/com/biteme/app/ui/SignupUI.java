@@ -2,7 +2,6 @@ package com.biteme.app.ui;
 
 import com.biteme.app.boundary.SignupBoundary;
 import com.biteme.app.controller.SignupController;
-import com.biteme.app.exception.SignupException; // se ne hai uno custom
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;

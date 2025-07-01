@@ -3,54 +3,40 @@ package com.biteme.app.persistence.inmemory;
 import com.biteme.app.entities.Ordine;
 import com.biteme.app.persistence.OrdineDao;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class InMemoryOrdineDao implements OrdineDao {
-    private final List<Ordine> ordini = new ArrayList<>();
-    private int currentId = 1;
+
+    private final List<Ordine> ordini = Storage.getInstance().getOrdini();
+    private final AtomicInteger idGen;
+
+    public InMemoryOrdineDao() {
+        idGen = new AtomicInteger(
+                ordini.stream().mapToInt(Ordine::getId).max().orElse(0) + 1);
+    }
 
     @Override
-    public Optional<Ordine> read(Integer key) {
+    public int create(Ordine o) {
+        int id = (o.getId() > 0) ? o.getId() : idGen.getAndIncrement();
+        ordini.removeIf(ord -> ord.getId() == id);
+        ordini.add(new Ordine(id,
+                new ArrayList<>(o.getProdotti()),
+                new ArrayList<>(o.getQuantita()),
+                new ArrayList<>(o.getPrezzi())));
+        return id;
+    }
+
+    @Override public Optional<Ordine> read(int id) {
         return ordini.stream()
-                .filter(o -> o.getId() == key)
+                .filter(o -> o.getId() == id)
                 .findFirst()
-                .map(o -> new Ordine(
-                        o.getId(),
+                .map(o -> new Ordine(o.getId(),
                         new ArrayList<>(o.getProdotti()),
                         new ArrayList<>(o.getQuantita()),
-                        new ArrayList<>(o.getPrezzi())
-                ));
+                        new ArrayList<>(o.getPrezzi())));
     }
 
-    @Override
-    public void create(Ordine ordine) {
-        if (ordine.getId() > 0) {
-            delete(ordine.getId());
-        } else {
-            ordine.setId(currentId++);
-        }
-        ordini.add(new Ordine(
-                ordine.getId(),
-                new ArrayList<>(ordine.getProdotti()),
-                new ArrayList<>(ordine.getQuantita()),
-                new ArrayList<>(ordine.getPrezzi())
-        ));
-    }
-
-    @Override
-    public void delete(Integer key) {
-        ordini.removeIf(o -> o.getId() == key);
-    }
-
-    @Override
-    public boolean exists(Integer key) {
-        return ordini.stream().anyMatch(o -> o.getId() == key);
-    }
-
-    @Override
-    public Ordine getById(Integer id) {
-        return read(id).orElseThrow(() -> new IllegalArgumentException("Ordine con ID " + id + " non trovato"));
-    }
+    @Override public void delete(int id)        { ordini.removeIf(o -> o.getId() == id); }
+    @Override public List<Ordine> getAll()      { return List.copyOf(ordini); }
 }

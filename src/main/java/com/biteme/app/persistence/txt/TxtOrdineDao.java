@@ -6,128 +6,137 @@ import com.biteme.app.persistence.OrdineDao;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.*;
-import java.util.logging.Level;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class TxtOrdineDao implements OrdineDao {
-    private static final Logger LOGGER = Logger.getLogger(TxtOrdineDao.class.getName());
-    private static final String FILE_PATH = "data/ordini.txt";
-    private static final String DELIM = "\\|";
-    private static final String DELIM_OUT = "|";
-    private static final String EMPTY = "EMPTY";
 
-    private final List<Ordine> ordini;
-    private int currentId;
+    private static final Logger LOG = Logger.getLogger(TxtOrdineDao.class.getName());
 
+    /* file + costanti di serializzazione */
+    private static final Path   FILE     = Path.of("data", "ordini.txt");
+    private static final String SEP      = "\\|";
+    private static final String SEP_OUT  = "|";
+    private static final String EMPTY    = "EMPTY";
+
+    private final List<Ordine>      ordini;
+    private final AtomicInteger     idGen;
+
+    /* ---------- costruttore ---------- */
     public TxtOrdineDao() {
-        ordini = loadFromFile();
-        currentId = ordini.stream().mapToInt(Ordine::getId).max().orElse(0) + 1;
+        this.ordini = load();
+        this.idGen  = new AtomicInteger(
+                ordini.stream().mapToInt(Ordine::getId).max().orElse(0) + 1);
     }
 
-    private List<Ordine> loadFromFile() {
+    /* ---------- CRUD ---------- */
+    @Override
+    public int create(Ordine o) {
+        int id = (o.getId() > 0) ? o.getId() : idGen.getAndIncrement();
+        ordini.removeIf(ord -> ord.getId() == id);
+        ordini.add(new Ordine(id, o.getProdotti(), o.getQuantita(), o.getPrezzi()));
+        save();
+        return id;
+    }
+
+    @Override
+    public Optional<Ordine> read(int id) {
+        return ordini.stream().filter(o -> o.getId() == id).findFirst();
+    }
+
+    @Override
+    public void delete(int id) {
+        ordini.removeIf(o -> o.getId() == id);
+        save();
+    }
+
+    @Override
+    public List<Ordine> getAll() {
+        return new ArrayList<>(ordini);    // copia difensiva
+    }
+
+    /* ---------- I/O ---------- */
+    private List<Ordine> load() {
         List<Ordine> list = new ArrayList<>();
         try {
-            Files.createDirectories(Paths.get("data"));
-            File f = new File(FILE_PATH);
-            if (!f.exists()) return list;
-            try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            Files.createDirectories(FILE.getParent());
+            if (!Files.exists(FILE)) return list;
+
+            try (BufferedReader br = Files.newBufferedReader(FILE)) {
                 String line;
                 while ((line = br.readLine()) != null) {
-                    Ordine o = deserialize(line);
-                    if (o != null) list.add(o);
+                    deserialize(line).ifPresent(list::add);
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Errore file txt ordini", e);
+            LOG.warning(e::getMessage);
         }
         return list;
     }
 
-    private void saveToFile() {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
+    private void save() {
+        try (BufferedWriter bw = Files.newBufferedWriter(FILE)) {
             for (Ordine o : ordini) {
                 bw.write(serialize(o));
                 bw.newLine();
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Errore scrittura file ordini", e);
+            LOG.warning(e::getMessage);
         }
     }
 
-    @Override
-    public Optional<Ordine> read(Integer id) {
-        return ordini.stream().filter(o -> o.getId() == id).findFirst();
-    }
-
-    @Override
-    public void create(Ordine ordine) {
-        if (ordine.getId() > 0) delete(ordine.getId());
-        else ordine.setId(currentId++);
-        ordini.add(ordine);
-        saveToFile();
-    }
-
-    @Override
-    public void delete(Integer id) {
-        ordini.removeIf(o -> o.getId() == id);
-        saveToFile();
-    }
-
-    @Override
-    public boolean exists(Integer id) {
-        return ordini.stream().anyMatch(o -> o.getId() == id);
-    }
-
-    @Override
-    public Ordine getById(Integer id) {
-        return read(id).orElseThrow(() -> new IllegalArgumentException("Ordine con ID " + id + " non trovato"));
-    }
-
+    /* ---------- serializzazione ---------- */
     private String serialize(Ordine o) {
-        String prodStr = o.getProdotti().isEmpty() ? EMPTY : String.join(",", o.getProdotti());
-        String qtyStr = o.getQuantita().isEmpty() ? EMPTY : o.getQuantita().stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(","));
-        String prezStr = o.getPrezzi() == null || o.getPrezzi().isEmpty()
+        String prodStr = o.getProdotti().isEmpty()
+                ? EMPTY
+                : String.join(",", o.getProdotti());
+
+        String qtyStr = o.getQuantita().isEmpty()
+                ? EMPTY
+                : o.getQuantita().toString().replaceAll("[\\[\\] ]", "");
+
+        String priceStr = (o.getPrezzi() == null || o.getPrezzi().isEmpty())
                 ? EMPTY
                 : o.getPrezzi().stream()
                 .map(BigDecimal::toString)
                 .collect(Collectors.joining(","));
-        return o.getId() + DELIM_OUT + prodStr + DELIM_OUT + qtyStr + DELIM_OUT + prezStr;
+
+        return o.getId() + SEP_OUT + prodStr + SEP_OUT + qtyStr + SEP_OUT + priceStr;
     }
 
-    private Ordine deserialize(String line) {
-        try {
-            String[] p = line.split(DELIM);
-            if (p.length != 4) return null;
+    private Optional<Ordine> deserialize(String ln) {
+        String[] p = ln.split(SEP);
+        if (p.length != 4) return Optional.empty();
 
+        try {
             int id = Integer.parseInt(p[0]);
 
             List<String> prod = p[1].equals(EMPTY)
                     ? List.of()
-                    : List.of(p[1].split(","));
+                    : Arrays.asList(p[1].split(","));
 
             List<Integer> qty = p[2].equals(EMPTY)
                     ? List.of()
                     : Arrays.stream(p[2].split(","))
+                    .map(String::trim)
                     .map(Integer::parseInt)
-                    .toList();
+                    .toList();                     // <-- nuovo
 
-            List<BigDecimal> prez = p[3].equals(EMPTY)
+            List<BigDecimal> pr = p[3].equals(EMPTY)
                     ? List.of()
                     : Arrays.stream(p[3].split(","))
+                    .map(String::trim)
                     .map(BigDecimal::new)
-                    .toList();
+                    .toList();                     // <-- nuovo
 
-            return new Ordine(id, prod, qty, prez);
-        } catch (Exception _) {
-            if (LOGGER.isLoggable(Level.WARNING)) {
-                LOGGER.log(Level.WARNING, () -> "Errore deserializza ordine: " + line);
-            }
-            return null;
+            return Optional.of(new Ordine(id, prod, qty, pr));
+
+        } catch (Exception e) {
+            LOG.warning(() -> "Riga non valida: " + ln);
+            return Optional.empty();
         }
     }
 

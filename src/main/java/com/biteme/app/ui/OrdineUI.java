@@ -6,7 +6,6 @@ import com.biteme.app.boundary.OrdineBoundary;
 import com.biteme.app.boundary.OrdinazioneBoundary;
 import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.entities.StatoOrdinazione;
-import com.biteme.app.exception.OrdinazioneException;
 import com.biteme.app.exception.OrdineException;
 import com.biteme.app.util.SceneLoader;
 import javafx.fxml.FXML;
@@ -19,8 +18,11 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class OrdineUI {
+    private static final Logger LOG = Logger.getLogger(OrdineUI.class.getName());
     private static final String ORDINAZIONE_FXML = "/com/biteme/app/ordinazione.fxml";
     private static final String ORDINAZIONE_TITLE = "Torna a Ordinazione";
     @FXML private FlowPane flowPaneProdotti;
@@ -44,27 +46,23 @@ public class OrdineUI {
 
         currentOrdineId = sel.getId();
         nomeTavolo.setText(
-                (sel.getInfoTavolo() == null || sel.getInfoTavolo().isBlank() || sel.getTipoOrdine().equals("Asporto"))
+                (sel.getInfoTavolo() == null || sel.getInfoTavolo().isBlank()
+                        || "Asporto".equals(sel.getTipoOrdine()))
                         ? "Asporto"
                         : "Tavolo: " + sel.getInfoTavolo()
         );
+
         try {
-            OrdineBean ordine = boundary.loadOrdine(currentOrdineId);
+            OrdineBean ordine = boundary.getOrdine(currentOrdineId);
             caricaProdottiNelRiepilogo(ordine);
-        } catch (OrdineException _) {
-            try {
-                boundary.salvaOrdineCompleto(
-                        currentOrdineId,
-                        java.util.Collections.emptyList(),
-                        java.util.Collections.emptyList(),
-                        java.util.Collections.emptyList()
-                );
-            } catch (OrdineException ex) {
-                showAlert(Alert.AlertType.ERROR, "Errore nella creazione del nuovo ordine: " + ex.getMessage());
-                return;
-            }
-            showAlert(Alert.AlertType.INFORMATION, "Nuovo ordine creato per questa ordinazione");
-        }    }
+        } catch (OrdineException e) {
+            // ordine ancora vuoto → semplice informazione di log
+            LOG.log(Level.INFO, "Ordine {0} non ancora salvato ({1})",
+                    new Object[]{currentOrdineId, e.getMessage()});
+        }
+    }
+
+
 
     @FXML
     private void handleCategoriaBevande() {
@@ -104,33 +102,46 @@ public class OrdineUI {
     @FXML
     private void handleSalva() {
         try {
-            var triple = estraiListeDaRiepilogo();
-            boundary.salvaOrdineCompleto(currentOrdineId, triple.prodotti, triple.quantita, triple.prezzi);
+            var t = estraiListeDaRiepilogo();
+            boundary.salvaOrdineCompleto(currentOrdineId,
+                    t.prodotti, t.quantita, t.prezzi);
+
             showAlert(Alert.AlertType.INFORMATION, "Ordine salvato con successo");
-            SceneLoader.getInstance().loadScene(ORDINAZIONE_FXML, ORDINAZIONE_TITLE);
+
+            /*  ⬇️  usa la versione *fresh*  */
+            SceneLoader.getInstance()
+                    .loadSceneFresh(ORDINAZIONE_FXML, ORDINAZIONE_TITLE);
+
         } catch (OrdineException e) {
             showAlert(Alert.AlertType.WARNING, e.getMessage());
         }
     }
 
+
     @FXML
     private void handleCheckout() {
         try {
-            var triple = estraiListeDaRiepilogo();
-            boundary.salvaOrdineCompleto(currentOrdineId, triple.prodotti, triple.quantita, triple.prezzi);
+            var t = estraiListeDaRiepilogo();
+            boundary.salvaOrdineCompleto(currentOrdineId, t.prodotti, t.quantita, t.prezzi);
+
             new OrdinazioneBoundary()
                     .aggiornaStatoOrdinazione(currentOrdineId, StatoOrdinazione.COMPLETATO);
+
             showAlert(Alert.AlertType.INFORMATION, "Checkout completato");
-            SceneLoader.getInstance().loadScene(ORDINAZIONE_FXML, ORDINAZIONE_TITLE);
-        } catch (OrdineException | OrdinazioneException e) {
-            showAlert(Alert.AlertType.WARNING, e.getMessage());
+
+            SceneLoader.getInstance().loadSceneFresh(ORDINAZIONE_FXML, ORDINAZIONE_TITLE); // <—
+
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, e.getMessage());
         }
     }
 
     @FXML
     private void handleIndietro() {
-        SceneLoader.getInstance().loadScene(ORDINAZIONE_FXML, ORDINAZIONE_TITLE);
+        SceneLoader.getInstance().loadSceneFresh(ORDINAZIONE_FXML, ORDINAZIONE_TITLE);     // <—
     }
+
+
 
     private void caricaCategoria(String categoria) {
         flowPaneProdotti.getChildren().clear();

@@ -15,116 +15,153 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Facciata che orchestra l’intero flusso Ordine + Ordinazione + Archivio. */
 public class OrdinazioneBoundary {
 
-    private final OrdinazioneController ordinazioneController = new OrdinazioneController();
-    private final OrdineController ordineController         = new OrdineController();
-    private final ArchivioController archivioController       = new ArchivioController();
-    private final ProdottoController prodottoController = new ProdottoController(); // Aggiungi questo
+    private final OrdinazioneController ordinazioneCtrl = new OrdinazioneController();
+    private final OrdineController      ordineCtrl      = new OrdineController();
+    private final ArchivioController    archivioCtrl    = new ArchivioController();
+    private final ProdottoController    prodottoCtrl    = new ProdottoController();
 
-
-    private static OrdinazioneBean selected;
+    /* -------- CRUD Ordinazione -------- */
 
     public void createOrdinazione(String nome,
                                   String tipoOrdine,
-                                  String orarioCreazione,
-                                  String numeroClienti,
+                                  String orario,
+                                  String nClienti,
                                   String infoTavolo) throws OrdinazioneException {
 
-        OrdinazioneBean bean = new OrdinazioneBean();
-        bean.setNome(nome);
-        bean.setTipoOrdine(tipoOrdine);
-        bean.setOrarioCreazione(orarioCreazione);
-        bean.setNumeroClienti(numeroClienti);
-        bean.setInfoTavolo(infoTavolo);
+        OrdinazioneBean b = new OrdinazioneBean();
+        b.setNome(nome);
+        b.setTipoOrdine(tipoOrdine);
+        b.setOrarioCreazione(orario);
+        b.setNumeroClienti(nClienti);
+        b.setInfoTavolo(infoTavolo);
 
-        bean.validate();                     // validazione lato DTO
-        ordinazioneController.creaOrdine(bean);  // persistenza lato controller
+        b.validate();
+        ordinazioneCtrl.creaOrdine(b);
     }
 
+    public List<OrdinazioneBean> getAll() { return ordinazioneCtrl.getOrdini(); }
 
-    public List<OrdinazioneBean> getAll() {
-        return ordinazioneController.getOrdini();
-    }
+    public void delete(int id) throws OrdinazioneException { ordinazioneCtrl.eliminaOrdinazione(id); }
 
-    public void delete(int id) throws OrdinazioneException {
-        ordinazioneController.eliminaOrdinazione(id);
-    }
-
-    public void aggiornaStatoOrdinazione(int ordineId, StatoOrdinazione nuovoStato)
+    public void aggiornaStatoOrdinazione(int ordineId, StatoOrdinazione nuovo)
             throws OrdinazioneException {
-        ordinazioneController.aggiornaStatoOrdinazione(ordineId, nuovoStato);
+        ordinazioneCtrl.aggiornaStatoOrdinazione(ordineId, nuovo);
     }
 
-    public void archive(OrdinazioneBean bean) throws ArchiviazioneException {
+    /* -------- ARCHIVIAZIONE -------- */
+
+    /* ===== metodo pubblico ===== */
+    public void archive(OrdinazioneBean ordBean) throws ArchiviazioneException {
+
         try {
-            OrdineBean ordine = ordineController.load(bean.getId());
+            /* 1. recupero Ordine (o stub) */
+            OrdineBean ordine = fetchOrdineOrStub(ordBean.getId());
+
+            /* 2. totale */
             BigDecimal totale = calcolaTotaleOrdine(ordine);
 
+            /* 3. righe archivio */
             List<ArchivioRigaBean> righe = new ArrayList<>();
-            List<String> prodotti = ordine.getProdotti();
-            List<Integer> quantita = ordine.getQuantita();
-            for (int i = 0; i < prodotti.size(); i++) {
-                ProdottoBean pbean = prodottoController.getProdottoByNome(prodotti.get(i));
-                ArchivioRigaBean rb = new ArchivioRigaBean();
-                rb.setProdottoBean(pbean);
-                rb.setQuantita(quantita.get(i));
-                righe.add(rb);
+            List<String>  prod   = ordine.getProdotti();
+            List<Integer> quanti = ordine.getQuantita();
+
+            for (int i = 0; i < prod.size(); i++) {
+                BigDecimal prezzoDaOrdine = (ordine.getPrezzi()!=null && ordine.getPrezzi().size()>i)
+                        ? ordine.getPrezzi().get(i)
+                        : BigDecimal.ZERO;
+
+                ArchivioRigaBean r = new ArchivioRigaBean();
+                r.setProdottoBean(ensureProdottoBean(prod.get(i), prezzoDaOrdine));
+                r.setQuantita(quanti.get(i));
+                righe.add(r);
             }
 
+            /* 4. ArchivioBean */
             ArchivioBean av = new ArchivioBean();
-            av.setIdOrdine(ordine.getId());
-            av.setRighe(righe);                    // qui
+            int idOrd = ordBean.getId();
+            av.setIdOrdine(idOrd > 0 ? idOrd : null);
+            av.setRighe(righe);
             av.setTotale(totale);
             av.setDataArchiviazione(LocalDateTime.now());
             av.validate();
 
-            archivioController.archiviaOrdine(av);
-            ordinazioneController.eliminaOrdinazione(bean.getId());
+            /* 5. persistenza */
+            archivioCtrl.archiviaOrdine(av);
+
+            /* 6. cleanup ordinazione */
+            if (idOrd > 0) {
+                ordinazioneCtrl.eliminaOrdinazione(idOrd);
+            }
 
         } catch (OrdineException | OrdinazioneException e) {
             throw new ArchiviazioneException(
-                    "Errore durante l'archiviazione dell'ordine ID=" + bean.getId(), e);
+                    "Errore durante l'archiviazione (ID ordine = " + ordBean.getId() + ")", e);
         }
     }
 
-    private BigDecimal calcolaTotaleOrdine(OrdineBean ordineBean) throws OrdineException {
-        BigDecimal totale = BigDecimal.ZERO;
-        List<String> prodotti = ordineBean.getProdotti();
-        List<Integer> quantita = ordineBean.getQuantita();
-        List<BigDecimal> prezziBean = ordineBean.getPrezzi();
-
-        if (prezziBean != null
-                && prodotti != null
-                && quantita != null
-                && prodotti.size() == quantita.size()
-                && prezziBean.size() == prodotti.size())
-        {
-            for (int i = 0; i < prodotti.size(); i++) {
-                totale = totale.add(
-                        prezziBean.get(i)
-                                .multiply(BigDecimal.valueOf(quantita.get(i)))
-                );
-            }
-            return totale;
+    /* ===== helper estratto ===== */
+    private OrdineBean fetchOrdineOrStub(int ordineId) {
+        try {
+            return ordineCtrl.getOrdineById(ordineId);
+        } catch (OrdineException e) {
+            // nessun ordine salvato: movimento libero
+            OrdineBean stub = new OrdineBean();
+            stub.setId(ordineId);               // può essere 0
+            stub.setProdotti(List.of());
+            stub.setQuantita(List.of());
+            stub.setPrezzi(List.of());
+            return stub;
         }
-
-        if (prodotti != null && quantita != null && prodotti.size() == quantita.size()) {
-            for (int i = 0; i < prodotti.size(); i++) {
-                ProdottoBean prodotto = prodottoController.getProdottoByNome(prodotti.get(i));
-                if (prodotto == null) {
-                    throw new OrdineException("Prodotto non trovato: " + prodotti.get(i));
-                }
-                totale = totale.add(
-                        prodotto.getPrezzo().multiply(BigDecimal.valueOf(quantita.get(i)))
-                );
-            }
-            return totale;
-        }
-
-        throw new OrdineException("Dati ordine non validi per il calcolo del totale.");
     }
 
-    public static void setSelected(OrdinazioneBean o) { selected = o; }
-    public static OrdinazioneBean getSelected()   { return selected; }
+    private ProdottoBean ensureProdottoBean(String nome, BigDecimal prezzoDaOrdine) {
+        ProdottoBean pb = prodottoCtrl.getProdottoByNome(nome);
+        if (pb != null) return pb;                     // esiste in magazzino
+
+        // ---- placeholder solo per l’archivio ----
+        pb = new ProdottoBean();
+        pb.setNome(nome);
+        pb.setCategoria("Extra");                      // o null se preferisci
+        pb.setPrezzo(prezzoDaOrdine != null ? prezzoDaOrdine : BigDecimal.ZERO);
+        return pb;
+    }
+
+
+
+    /* -------- Helper -------- */
+
+    private BigDecimal calcolaTotaleOrdine(OrdineBean ob) throws OrdineException {
+        BigDecimal tot = BigDecimal.ZERO;
+
+        List<String>  prodotti = ob.getProdotti();
+        List<Integer> quanti   = ob.getQuantita();
+        List<BigDecimal> prezzi = ob.getPrezzi(); // può essere null
+
+        if (prodotti == null || quanti == null || prodotti.size() != quanti.size())
+            throw new OrdineException("Prodotti e quantità non congruenti.");
+
+        for (int i = 0; i < prodotti.size(); i++) {
+            BigDecimal prezzo = (prezzi != null && prezzi.size() == prodotti.size())
+                    ? prezzi.get(i)
+                    : null;                               // non fornito dalla UI
+
+            if (prezzo == null) {
+                ProdottoBean pb = prodottoCtrl.getProdottoByNome(prodotti.get(i));
+                if (pb == null)
+                    throw new OrdineException("Prezzo mancante per \"" + prodotti.get(i) + "\"");
+                prezzo = pb.getPrezzo();
+            }
+            tot = tot.add(prezzo.multiply(BigDecimal.valueOf(quanti.get(i))));
+        }
+        return tot;
+    }
+
+
+    /* -------- Selection state (UI helper) -------- */
+    private static OrdinazioneBean selected;
+    public static void   setSelected(OrdinazioneBean o) { selected = o; }
+    public static OrdinazioneBean getSelected()         { return selected; }
 }

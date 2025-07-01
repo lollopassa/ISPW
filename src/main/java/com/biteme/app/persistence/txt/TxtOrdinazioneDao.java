@@ -9,33 +9,78 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TxtOrdinazioneDao implements OrdinazioneDao {
+
     private static final Logger LOGGER = Logger.getLogger(TxtOrdinazioneDao.class.getName());
-    private final List<Ordinazione> ordinazioni;
-    private int currentId;
-    private static final String FILE_PATH = "data/ordinazioni.txt";
-    private static final String DELIMITER = "\\|";
+    private static final String FILE_PATH     = "data/ordinazioni.txt";
+    private static final String DELIMITER_IN  = "\\|";
     private static final String DELIMITER_OUT = "|";
 
+    private final List<Ordinazione> ordinazioni;
+    private final AtomicInteger idGenerator;
+
     public TxtOrdinazioneDao() {
-        ordinazioni = loadFromFile();
-        currentId = calculateCurrentId();
+        this.ordinazioni = loadFromFile();
+        this.idGenerator = new AtomicInteger(
+                ordinazioni.stream().mapToInt(Ordinazione::getId).max().orElse(0) + 1);
     }
 
+    /* -------- CREATE -------- */
+    @Override
+    public int create(Ordinazione o) {
+        int id = (o.getId() > 0) ? o.getId() : idGenerator.getAndIncrement();
 
+        // upsert
+        ordinazioni.removeIf(ord -> ord.getId() == id);
+        Ordinazione copia = new Ordinazione(
+                id,
+                o.getNomeCliente(), o.getNumeroClienti(),
+                o.getTipoOrdine(), o.getInfoTavolo(),
+                o.getStatoOrdine(), o.getOrarioCreazione());
+        ordinazioni.add(copia);
+        saveToFile();
+        return id;
+    }
+
+    /* -------- READ -------- */
+    @Override
+    public Optional<Ordinazione> read(int id) {
+        return ordinazioni.stream().filter(o -> o.getId() == id).findFirst();
+    }
+
+    /* -------- DELETE -------- */
+    @Override
+    public void delete(int id) {
+        ordinazioni.removeIf(o -> o.getId() == id);
+        saveToFile();
+    }
+
+    /* -------- UPDATE STATO -------- */
+    @Override
+    public void aggiornaStato(int id, StatoOrdinazione nuovo) {
+        read(id).ifPresent(o -> o.setStatoOrdine(nuovo));
+        saveToFile();
+    }
+
+    /* -------- LISTA -------- */
+    @Override
+    public List<Ordinazione> getAll() {
+        return new ArrayList<>(ordinazioni);   // copia difensiva
+    }
+
+    /* -------- I/O helper -------- */
     private void saveToFile() {
         try {
             Files.createDirectories(Paths.get("data"));
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Errore nella creazione della directory", e);
-        }
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
-            for (Ordinazione o : ordinazioni) {
-                bw.write(serialize(o));
-                bw.newLine();
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
+                for (Ordinazione o : ordinazioni) {
+                    bw.write(serialize(o));
+                    bw.newLine();
+                }
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Errore durante il salvataggio delle ordinazioni", e);
@@ -45,97 +90,44 @@ public class TxtOrdinazioneDao implements OrdinazioneDao {
     private List<Ordinazione> loadFromFile() {
         List<Ordinazione> list = new ArrayList<>();
         File file = new File(FILE_PATH);
-        if (!file.exists()) {
-            return list;
-        }
+        if (!file.exists()) return list;
+
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
-                Ordinazione o = deserialize(line);
-                if (o != null) {
-                    list.add(o);
-                }
+                Optional.ofNullable(deserialize(line)).ifPresent(list::add);
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Errore durante il caricamento delle ordinazioni", e);
         }
         return list;
     }
-    
-    private int calculateCurrentId() {
-        return ordinazioni.stream()
-                .mapToInt(Ordinazione::getId)
-                .max()
-                .orElse(0) + 1;
-    }
-
-    @Override
-    public Optional<Ordinazione> read(Integer id) {
-        return ordinazioni.stream().filter(o -> o.getId() == id).findFirst();
-    }
-
-    @Override
-    public void create(Ordinazione ordinazione) {
-        if (ordinazione.getId() > 0 && exists(ordinazione.getId())) {
-            delete(ordinazione.getId());
-        } else if (ordinazione.getId() <= 0) {
-            ordinazione.setId(currentId++);
-        }
-        ordinazioni.add(ordinazione);
-        saveToFile();
-    }
-
-    @Override
-    public void delete(Integer id) {
-        ordinazioni.removeIf(o -> o.getId() == id);
-        saveToFile();
-    }
-
-    @Override
-    public boolean exists(Integer id) {
-        return ordinazioni.stream().anyMatch(o -> o.getId() == id);
-    }
-
-    @Override
-    public List<Ordinazione> getAll() {
-        return new ArrayList<>(ordinazioni);
-    }
-
-    @Override
-    public void aggiornaStato(int id, StatoOrdinazione nuovoStato) {
-        ordinazioni.stream()
-                .filter(o -> o.getId() == id)
-                .findFirst()
-                .ifPresent(o -> o.setStatoOrdine(nuovoStato));
-        saveToFile();
-    }
 
     private String serialize(Ordinazione o) {
         return o.getId() + DELIMITER_OUT +
                 o.getNomeCliente() + DELIMITER_OUT +
-                (o.getNumeroClienti() == null ? "" : o.getNumeroClienti()) + DELIMITER_OUT +
+                o.getNumeroClienti() + DELIMITER_OUT +
                 o.getTipoOrdine().name() + DELIMITER_OUT +
                 (o.getInfoTavolo() == null ? "" : o.getInfoTavolo()) + DELIMITER_OUT +
                 o.getStatoOrdine().name() + DELIMITER_OUT +
-                (o.getOrarioCreazione() == null ? "" : o.getOrarioCreazione());
+                o.getOrarioCreazione();
     }
 
     private Ordinazione deserialize(String line) {
-        String[] parts = line.split(DELIMITER);
-        if (parts.length != 7) {
-            return null;
-        }
+        String[] p = line.split(DELIMITER_IN);
+        if (p.length != 7) return null;
         try {
-            int id = Integer.parseInt(parts[0]);
-            String nomeCliente = parts[1];
-            String numeroClienti = parts[2];
-            TipoOrdinazione tipoOrdinazione = TipoOrdinazione.valueOf(parts[3].toUpperCase());
-            String infoTavolo = parts[4];
-            StatoOrdinazione statoOrdinazione = StatoOrdinazione.valueOf(parts[5].toUpperCase());
-            String orarioCreazione = parts[6];
-            return new Ordinazione(id, nomeCliente, numeroClienti, tipoOrdinazione, infoTavolo, statoOrdinazione, orarioCreazione);
-        } catch (Exception _) {
-            LOGGER.log(Level.WARNING, "Errore nella deserializzazione della riga: {0}", line);
+            return new Ordinazione(
+                    Integer.parseInt(p[0]),
+                    p[1],
+                    p[2],
+                    TipoOrdinazione.valueOf(p[3].toUpperCase()),
+                    p[4].isBlank() ? null : p[4],
+                    StatoOrdinazione.valueOf(p[5].toUpperCase()),
+                    p[6]
+            );
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Riga non valida: {0}", line);
             return null;
         }
     }

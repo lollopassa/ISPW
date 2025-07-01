@@ -6,170 +6,149 @@ import com.biteme.app.persistence.OrdineDao;
 
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DatabaseOrdineDao implements OrdineDao {
 
     private static final Logger LOGGER = Logger.getLogger(DatabaseOrdineDao.class.getName());
-    private final Connection connection;
 
-    public DatabaseOrdineDao() {
-        try {
-            this.connection = DatabaseConnection.getConnection();
-        } catch (SQLException e) {
-            throw new DatabaseConfigurationException(
-                    "Impossibile connettersi al database a causa di una configurazione errata", e
-            );
+    /* ---------- CREATE / UPSERT ---------- */
+    @Override
+    public int create(Ordine o) {
+        final String upsertSql =
+                "INSERT INTO ordine (id, prodotti, quantita, prezzi) " +
+                        "VALUES (?, ?, ?, ?) " +
+                        "ON CONFLICT (id) DO UPDATE SET " +
+                        "prodotti = EXCLUDED.prodotti, " +
+                        "quantita = EXCLUDED.quantita, " +
+                        "prezzi   = EXCLUDED.prezzi";
+
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(upsertSql)) {
+
+            int id = (o.getId() > 0) ? o.getId() : nextId(c);
+            ps.setInt   (1, id);
+            ps.setString(2, String.join(",", o.getProdotti()));
+            ps.setString(3, o.getQuantita().toString().replaceAll("[\\[\\] ]", ""));
+            ps.setString(4,
+                    (o.getPrezzi() == null || o.getPrezzi().isEmpty())
+                            ? ""
+                            : o.getPrezzi().stream()
+                            .map(BigDecimal::toString)
+                            .reduce((a, b) -> a + "," + b)
+                            .orElse(""));
+
+            ps.executeUpdate();
+            return id;
+
+        } catch (SQLException ex) {
+            throw new DatabaseConfigurationException("Errore salva/aggiorna ordine", ex);
         }
     }
 
-    @Override
-    public Optional<Ordine> read(Integer id) {
-        String query = "SELECT id, prodotti, quantita, prezzi FROM ordine WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapResultSetToOrdine(rs));
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante il caricamento dell'ordine con ID: " + id);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public void create(Ordine ordine) {
-        String query;
-        boolean exists = ordine.getId() > 0 && exists(ordine.getId());
-        if (exists) {
-            query = "UPDATE ordine SET prodotti = ?, quantita = ?, prezzi = ? WHERE id = ?";
-        } else {
-            query = "INSERT INTO ordine (id, prodotti, quantita, prezzi) VALUES (?, ?, ?, ?)";
-        }
-
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            int i = 1;
-            String prodottiStr = String.join(",", ordine.getProdotti());
-            String quantitaStr = ordine.getQuantita().toString()
-                    .replace("[", "").replace("]", "");
-            String prezziStr = ordine.getPrezzi().stream()
-                    .map(BigDecimal::toString)
-                    .reduce((a, b) -> a + "," + b)
-                    .orElse("");
-
-            if (exists) {
-                stmt.setString(i++, prodottiStr);
-                stmt.setString(i++, quantitaStr);
-                stmt.setString(i++, prezziStr);
-                stmt.setInt(i, ordine.getId());
-            } else {
-                stmt.setInt(i++, ordine.getId());
-                stmt.setString(i++, prodottiStr);
-                stmt.setString(i++, quantitaStr);
-                stmt.setString(i, prezziStr);
-            }
-
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Operazione fallita: nessuna riga modificata.");
-            }
-        } catch (SQLException e) {
-            throw new DatabaseConfigurationException(
-                    "Errore durante il salvataggio/aggiornamento dell'ordine", e
-            );
+    /* ---------- sequenza auto-ID ---------- */
+    private int nextId(Connection c) throws SQLException {
+        try (Statement st = c.createStatement();
+             ResultSet rs = st.executeQuery("SELECT COALESCE(MAX(id),0)+1 FROM ordine")) {
+            rs.next();
+            return rs.getInt(1);
         }
     }
 
+    /* ---------- READ ---------- */
     @Override
-    public void delete(Integer id) {
-        String query = "DELETE FROM ordine WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) {
-                LOGGER.log(Level.WARNING, () -> "Nessun ordine trovato con ID: " + id);
-            } else {
-                LOGGER.log(Level.INFO, () -> "Ordine con ID: " + id + " eliminato con successo");
+    public Optional<Ordine> read(int id) {
+        final String sql = "SELECT id, prodotti, quantita, prezzi FROM ordine WHERE id=?";
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? Optional.of(map(rs)) : Optional.empty();
             }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante l'eliminazione dell'ordine con ID: " + id);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, ex, () -> "Errore load ordine " + id);
+            return Optional.empty();
         }
     }
 
+    /* ---------- DELETE ---------- */
     @Override
-    public boolean exists(Integer id) {
-        String query = "SELECT COUNT(*) FROM ordine WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() && rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore durante la verifica dell'esistenza dell'ordine con ID: " + id);
-            return false;
+    public void delete(int id) {
+        final String sql = "DELETE FROM ordine WHERE id=?";
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            if (ps.executeUpdate() == 0)
+                LOGGER.warning(() -> "Nessun ordine con ID " + id);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, ex, () -> "Errore delete ordine " + id);
         }
     }
 
+    /* ---------- LIST ALL ---------- */
     @Override
-    public Ordine getById(Integer id) {
-        return read(id).orElseThrow(
-                () -> new IllegalArgumentException("Ordine con ID " + id + " non trovato")
+    public List<Ordine> getAll() {
+        final String sql = "SELECT id, prodotti, quantita, prezzi FROM ordine";
+        List<Ordine> list = new ArrayList<>();
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) list.add(map(rs));
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, ex, () -> "Errore lista ordini");
+        }
+        return list;
+    }
+
+    /* ---------- mapper helper ---------- */
+    private Ordine map(ResultSet rs) throws SQLException {
+        return new Ordine(
+                rs.getInt("id"),
+                parseList     (rs.getString("prodotti")),
+                parseIntList  (rs.getString("quantita")),
+                parseBigList  (rs.getString("prezzi"))
         );
     }
 
-    private Ordine mapResultSetToOrdine(ResultSet rs) throws SQLException {
-        int id = rs.getInt("id");
-        List<String> prodotti = parseStringList(rs.getString("prodotti"));
-        List<Integer> quantita = parseIntegerList(rs.getString("quantita"), "quantità");
-        List<BigDecimal> prezzi = parseBigDecimalList(rs.getString("prezzi"), "prezzo");
+    /* ---------- parsing helper ---------- */
 
-        if ((prodotti.size() != quantita.size() || quantita.size() != prezzi.size())
-                && LOGGER.isLoggable(Level.WARNING)) {
-            LOGGER.warning(String.format(
-                    "Disallineamento tra prodotti, quantità e prezzi per l'ordine con ID: %d", id
-            ));
-        }
-        return new Ordine(id, prodotti, quantita, prezzi);
+    private List<String> parseList(String s) {
+        if (s == null || s.trim().isEmpty()) return Collections.emptyList();
+        List<String> list = new ArrayList<>();
+        for (String t : s.split(",")) list.add(t.trim());
+        return list;
     }
 
-    private List<String> parseStringList(String input) {
-        if (input == null || input.trim().isEmpty()) return List.of();
-        return List.of(input.split(","));
-    }
+    private List<Integer> parseIntList(String s) {
+        if (s == null || s.trim().isEmpty()) return Collections.emptyList();
 
-    private List<Integer> parseIntegerList(String input, String fieldName) {
-        List<Integer> result = new ArrayList<>();
-        if (input == null || input.trim().isEmpty()) return result;
-        for (String s : input.split(",\\s*")) {
-            if (!s.isBlank()) {
-                try {
-                    result.add(Integer.parseInt(s.trim()));
-                } catch (NumberFormatException e) {
-                    LOGGER.log(Level.WARNING, e, () -> "Valore non valido trovato nella " + fieldName + ": " + s);
-                }
+        List<Integer> list = new ArrayList<>();
+        for (String token : s.split(",")) {
+            try {
+                list.add(Integer.parseInt(token.trim()));
+            } catch (NumberFormatException ex) {
+                LOGGER.warning("Valore quantità non intero ignorato: '" + token + "'");
             }
         }
-        return result;
+        return list;
     }
 
-    private List<BigDecimal> parseBigDecimalList(String input, String fieldName) {
-        List<BigDecimal> result = new ArrayList<>();
-        if (input == null || input.trim().isEmpty()) return result;
-        for (String s : input.split(",\\s*")) {
-            if (!s.isBlank()) {
-                try {
-                    result.add(new BigDecimal(s.trim()));
-                } catch (NumberFormatException e) {
-                    LOGGER.log(Level.WARNING, e, () -> "Valore non valido trovato nel " + fieldName + ": " + s);
-                }
+    private List<BigDecimal> parseBigList(String s) {
+        if (s == null || s.trim().isEmpty()) return Collections.emptyList();
+
+        List<BigDecimal> list = new ArrayList<>();
+        for (String token : s.split(",")) {
+            try {
+                list.add(new BigDecimal(token.trim()));
+            } catch (NumberFormatException ex) {
+                LOGGER.warning("Valore prezzo non numerico ignorato: '" + token + "'");
             }
         }
-        return result;
+        return list;
     }
 }
