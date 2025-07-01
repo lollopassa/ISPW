@@ -2,37 +2,38 @@ package com.biteme.app.boundary;
 
 import com.biteme.app.controller.ArchivioController;
 import com.biteme.app.exception.ArchiviazioneException;
+
 import java.util.Map;
 
 public class AdminHomeBoundary {
 
-    private static final String ERR_MSG_PERIOD = "Periodo non valido: ";
+    private static final String ERR = "Periodo non valido: ";
+    private final ArchivioController ctrl = new ArchivioController();
 
-    private final ArchivioController archivioController = new ArchivioController();
-
-
-
-    public Map<String, Number> piattiPiuOrdinatiPerPeriodo(String periodo) throws ArchiviazioneException {
+    public Map<String, Number> piattiPiuOrdinatiPerPeriodo(String periodo)
+            throws ArchiviazioneException {
         try {
-            return archivioController.piattiPiuOrdinatiPerPeriodo(periodo);
+            return ctrl.piattiPiuOrdinatiPerPeriodo(periodo);
         } catch (IllegalArgumentException e) {
-            throw new ArchiviazioneException(ERR_MSG_PERIOD + periodo, e);
+            throw new ArchiviazioneException(ERR + periodo, e);
         }
     }
 
-    public Map<String, Number> guadagniPerPeriodo(String periodo) throws ArchiviazioneException {
+    public Map<String, Number> guadagniPerPeriodo(String periodo)
+            throws ArchiviazioneException {
         try {
-            return archivioController.guadagniPerPeriodo(periodo);
+            return ctrl.guadagniPerPeriodo(periodo);
         } catch (IllegalArgumentException e) {
-            throw new ArchiviazioneException(ERR_MSG_PERIOD + periodo, e);
+            throw new ArchiviazioneException(ERR + periodo, e);
         }
     }
 
-    public Map<String, Number> guadagniPerGiorno(String periodo) throws ArchiviazioneException {
+    public Map<String, Number> guadagniPerGiorno(String periodo)
+            throws ArchiviazioneException {
         try {
-            return archivioController.guadagniPerGiorno(periodo);
+            return ctrl.guadagniPerGiorno(periodo);
         } catch (IllegalArgumentException e) {
-            throw new ArchiviazioneException(ERR_MSG_PERIOD + periodo, e);
+            throw new ArchiviazioneException(ERR + periodo, e);
         }
     }
 }

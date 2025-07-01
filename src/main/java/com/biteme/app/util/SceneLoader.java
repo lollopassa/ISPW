@@ -88,4 +88,37 @@ public class SceneLoader {
         alert.setContentText(e.getMessage());
         alert.showAndWait();
     }
+
+    public void loadSceneFresh(String fxmlPath, String title) {
+        Parent root = loadRootFresh(fxmlPath);
+        primaryStage.setTitle(title);
+
+        if (primaryStage.getScene() != null) {
+            primaryStage.getScene().setRoot(root);
+        } else {
+            primaryStage.setScene(new Scene(root));
+        }
+
+        primaryStage.show();
+    }
+
+    private Parent loadRootFresh(String fxmlPath) {
+        if (fxmlPath == null || fxmlPath.isBlank()) {
+            throw new IllegalArgumentException("Percorso FXML non valido.");
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+
+            root.getProperties().put("loader", loader);
+
+            return root;
+        } catch (IOException e) {
+            SceneLoadingException ex = new SceneLoadingException(
+                    "Errore nel caricamento FXML: " + fxmlPath, e);
+            handleSceneLoadingError(ex);
+            throw ex;
+        }
+    }
 }

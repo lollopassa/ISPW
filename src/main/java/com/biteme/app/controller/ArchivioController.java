@@ -2,8 +2,10 @@ package com.biteme.app.controller;
 
 import com.biteme.app.bean.ArchivioBean;
 import com.biteme.app.entities.Archivio;
+import com.biteme.app.entities.ArchivioRiga;
 import com.biteme.app.persistence.ArchivioDao;
 import com.biteme.app.persistence.Configuration;
+import com.biteme.app.util.mapper.BeanEntityMapperFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,151 +13,123 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ArchivioController {
-    private ArchivioDao archivioDao;
 
-    private static final String PERIODO_SETTIMANA = "settimana";
-    private static final String PERIODO_MESE = "mese";
-    private static final String PERIODO_TRIMESTRE = "trimestre";
-    private static final String ERRORE_PERIODO_NON_VALIDO =
+    private final ArchivioDao dao;
+    private final BeanEntityMapperFactory mapper;
+
+    private static final String PERIODO_SETTIMANA  = "settimana";
+    private static final String PERIODO_MESE       = "mese";
+    private static final String PERIODO_TRIMESTRE  = "trimestre";
+    private static final String ERRORE_PERIODO     =
             "Periodo non valido. Deve essere 'settimana', 'mese' o 'trimestre'.";
 
     public ArchivioController() {
-        this.archivioDao = Configuration.getPersistenceProvider()
+        this.dao    = Configuration.getPersistenceProvider()
                 .getDaoFactory()
                 .getArchivioDao();
+        this.mapper = BeanEntityMapperFactory.getInstance();
     }
 
     public void salvaInArchivio(Archivio archivio) {
-        archivioDao.create(archivio);
+        dao.create(archivio);
     }
 
-    public void archiviaOrdine(ArchivioBean archivioBean) {
-        Archivio archivio = new Archivio();
-        archivio.setIdOrdine(archivioBean.getIdOrdine());
-        archivio.setProdotti(archivioBean.getProdotti());
-        archivio.setQuantita(archivioBean.getQuantita());
-        archivio.setTotale(archivioBean.getTotale());
-        archivio.setDataArchiviazione(archivioBean.getDataArchiviazione());
-
-        salvaInArchivio(archivio);
+    public void archiviaOrdine(ArchivioBean bean) {
+        Archivio entity = mapper.toEntity(bean, ArchivioBean.class);
+        salvaInArchivio(entity);
+        bean.setIdOrdine(entity.getIdOrdine());
     }
-
-    public Map<String, Number> piattiPiuOrdinati(LocalDateTime startDate, LocalDateTime endDate) {
-        List<Archivio> archivi = archivioDao.findByDateRange(startDate, endDate);
-
-        Map<String, Integer> conteggioPiatti = new HashMap<>();
-        for (Archivio archivio : archivi) {
-            for (int i = 0; i < archivio.getProdotti().size(); i++) {
-                String prodotto = archivio.getProdotti().get(i);
-                int quantita = archivio.getQuantita().get(i);
-                conteggioPiatti.merge(prodotto, quantita, Integer::sum);
-            }
-        }
-
-        return conteggioPiatti.entrySet().stream()
-                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))                 .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> (Number) e.getValue(),
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
-    }
-
 
     public Map<String, Number> piattiPiuOrdinatiPerPeriodo(String periodo) {
-        LocalDateTime[] dateRange = getDateRange(periodo);
-        LocalDateTime startDate = dateRange[0];
-        LocalDateTime endDate = dateRange[1];
-
-        return piattiPiuOrdinati(startDate, endDate);
+        LocalDateTime[] range = getDateRange(periodo);
+        return piattiPiuOrdinati(range[0], range[1]);
     }
 
+    private Map<String, Number> piattiPiuOrdinati(LocalDateTime start, LocalDateTime end) {
+        List<Archivio> archivi = dao.findByDateRange(start, end);
+        Map<String, Integer> conteggi = new HashMap<>();
 
-
-    private LocalDateTime[] getDateRange(String periodo) {
-        if (periodo == null || periodo.trim().isEmpty()) {
-            throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
-        }
-        LocalDateTime endDate = LocalDateTime.now();
-        LocalDateTime startDate;
-
-        switch (periodo.toLowerCase()) {
-            case PERIODO_SETTIMANA:
-                startDate = endDate.minusWeeks(1);
-                break;
-            case PERIODO_MESE:
-                startDate = endDate.minusMonths(1);
-                break;
-            case PERIODO_TRIMESTRE:
-                startDate = endDate.minusMonths(3);
-                break;
-            default:
-                throw new IllegalArgumentException(ERRORE_PERIODO_NON_VALIDO);
-        }
-
-        return new LocalDateTime[]{ startDate, endDate };
-    }
-
-
-
-    public Map<String, Number> guadagniPerPeriodo(String periodo) {
-        LocalDateTime[] dateRange = getDateRange(periodo);
-        LocalDateTime startDate = dateRange[0];
-        LocalDateTime endDate = dateRange[1];
-
-        List<Archivio> archivi = archivioDao.findByDateRange(startDate, endDate);
-
-        Map<String, BigDecimal> guadagni = new HashMap<>();
-        for (Archivio archivio : archivi) {
-                        for (int i = 0; i < archivio.getProdotti().size(); i++) {
-                String prodotto = archivio.getProdotti().get(i);
-                BigDecimal totale = archivio.getTotale();
-
-                guadagni.merge(prodotto, totale, BigDecimal::add);
+        for (Archivio a : archivi) {
+            for (ArchivioRiga r : a.getRighe()) {
+                String nome = r.getProdotto().getNome();
+                conteggi.merge(nome, r.getQuantita(), Integer::sum);
             }
         }
 
-                return guadagni.entrySet().stream()
+        return conteggi.entrySet().stream()
+                .sorted(Map.Entry.<String,Integer>comparingByValue(Comparator.reverseOrder()))
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        e -> e.getValue().doubleValue(),
-                        (e1, e2) -> e1,
+                        e -> (Number)e.getValue(),
+                        (u,v)->u,
                         LinkedHashMap::new
                 ));
     }
 
+    public Map<String, Number> guadagniPerPeriodo(String periodo) {
+        LocalDateTime[] range = getDateRange(periodo);
+        List<Archivio> archivi = dao.findByDateRange(range[0], range[1]);
 
-    public Map<String, Number> guadagniPerGiorno(String periodo) {
-                LocalDateTime[] dateRange = getDateRange(periodo);
-        LocalDateTime startDate = dateRange[0];
-        LocalDateTime endDate = dateRange[1];
-
-                List<Archivio> archivi = archivioDao.findByDateRange(startDate, endDate);
-
-                Map<String, BigDecimal> guadagniGiorno = new LinkedHashMap<>();
-        String[] giorni = { "Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom" };
-        for (String giorno : giorni) {
-            guadagniGiorno.put(giorno, BigDecimal.ZERO);
+        Map<String, BigDecimal> guadagni = new HashMap<>();
+        for (Archivio a : archivi) {
+            for (ArchivioRiga r : a.getRighe()) {
+                String nome = r.getProdotto().getNome();
+                BigDecimal prezzo = r.getProdotto().getPrezzo()
+                        .multiply(BigDecimal.valueOf(r.getQuantita()));
+                guadagni.merge(nome, prezzo, BigDecimal::add);
+            }
         }
 
-                for (Archivio archivio : archivi) {
-            String giornoAbbreviato = switch (archivio.getDataArchiviazione().getDayOfWeek()) {
-                case MONDAY -> "Lun";
-                case TUESDAY -> "Mar";
-                case WEDNESDAY -> "Mer";
-                case THURSDAY -> "Gio";
-                case FRIDAY -> "Ven";
-                case SATURDAY -> "Sab";
-                case SUNDAY -> "Dom";
-            };
-            BigDecimal totaleGiorno = guadagniGiorno.get(giornoAbbreviato);
-            guadagniGiorno.put(giornoAbbreviato, totaleGiorno.add(archivio.getTotale()));
-        }
-
-                Map<String, Number> result = new LinkedHashMap<>();
-        guadagniGiorno.forEach((g, tot) -> result.put(g, tot.doubleValue()));
-
-        return result;
+        return guadagni.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> (Number)e.getValue().doubleValue(),
+                        (u,v)->u,
+                        LinkedHashMap::new
+                ));
     }
 
+    public Map<String, Number> guadagniPerGiorno(String periodo) {
+        LocalDateTime[] range = getDateRange(periodo);
+        List<Archivio> archivi = dao.findByDateRange(range[0], range[1]);
+
+        List<String> giorni = List.of("Lun","Mar","Mer","Gio","Ven","Sab","Dom");
+        Map<String, BigDecimal> mappa = new LinkedHashMap<>();
+        giorni.forEach(g -> mappa.put(g, BigDecimal.ZERO));
+
+        for (Archivio a : archivi) {
+            String g = switch (a.getDataArchiviazione().getDayOfWeek()) {
+                case MONDAY    -> "Lun";
+                case TUESDAY   -> "Mar";
+                case WEDNESDAY -> "Mer";
+                case THURSDAY  -> "Gio";
+                case FRIDAY    -> "Ven";
+                case SATURDAY  -> "Sab";
+                case SUNDAY    -> "Dom";
+            };
+            mappa.put(g, mappa.get(g).add(a.getTotale()));
+        }
+
+        return mappa.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> (Number)e.getValue().doubleValue(),
+                        (u,v)->u,
+                        LinkedHashMap::new
+                ));
+    }
+
+    private LocalDateTime[] getDateRange(String periodo) {
+        if (periodo == null || periodo.isBlank())
+            throw new IllegalArgumentException(ERRORE_PERIODO);
+
+        LocalDateTime end = LocalDateTime.now();
+        LocalDateTime start = switch(periodo.toLowerCase()) {
+            case PERIODO_SETTIMANA -> end.minusWeeks(1);
+            case PERIODO_MESE      -> end.minusMonths(1);
+            case PERIODO_TRIMESTRE -> end.minusMonths(3);
+            default -> throw new IllegalArgumentException(ERRORE_PERIODO);
+        };
+        return new LocalDateTime[]{start, end};
+    }
 }

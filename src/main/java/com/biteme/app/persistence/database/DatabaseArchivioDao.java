@@ -1,152 +1,138 @@
 package com.biteme.app.persistence.database;
 
 import com.biteme.app.entities.Archivio;
+import com.biteme.app.entities.ArchivioRiga;
+import com.biteme.app.entities.Categoria;
+import com.biteme.app.entities.Prodotto;
 import com.biteme.app.exception.DatabaseConfigurationException;
 import com.biteme.app.persistence.ArchivioDao;
+
+import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.*;
 
 public class DatabaseArchivioDao implements ArchivioDao {
 
-    private static final Logger LOGGER = Logger.getLogger(DatabaseArchivioDao.class.getName());
-    private final Connection connection;
+    private final Connection conn;
 
     public DatabaseArchivioDao() throws DatabaseConfigurationException {
-        try {
-            this.connection = DatabaseConnection.getConnection();
-        } catch (SQLException e) {
-            throw new DatabaseConfigurationException("Errore connessione database", e);
-        }
+        try { this.conn = DatabaseConnection.getConnection(); }
+        catch (SQLException e) { throw new DatabaseConfigurationException(e.getMessage(), e); }
     }
 
     @Override
     public Optional<Archivio> read(Integer id) {
-        String query = "SELECT id, id_ordine, prodotti, quantita, totale, data_archiviazione FROM archivio WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapResultSetToArchivio(rs));
+        String sqlA = "SELECT totale, data_archiviazione FROM archivio WHERE id_ordine=?";
+        String sqlR = "SELECT ar.quantita, p.id, p.nome, p.prezzo, p.categoria, p.disponibile "
+                + "FROM archivio_riga ar JOIN prodotti p ON ar.id_prodotto=p.id "
+                + "WHERE ar.id_ordine=?";
+        try (PreparedStatement psA = conn.prepareStatement(sqlA);
+             PreparedStatement psR = conn.prepareStatement(sqlR)) {
+
+            psA.setInt(1, id);
+            try (ResultSet rsA = psA.executeQuery()) {
+                if (!rsA.next()) return Optional.empty();
+                BigDecimal tot = rsA.getBigDecimal("totale");
+                LocalDateTime dt = rsA.getTimestamp("data_archiviazione").toLocalDateTime();
+
+                psR.setInt(1, id);
+                List<ArchivioRiga> righe = new ArrayList<>();
+                try (ResultSet rsR = psR.executeQuery()) {
+                    while (rsR.next()) {
+                        Prodotto p = new Prodotto(
+                                rsR.getInt("id"),
+                                rsR.getString("nome"),
+                                rsR.getBigDecimal("prezzo"),
+                                Categoria.valueOf(rsR.getString("categoria")),
+                                rsR.getBoolean("disponibile")
+                        );
+                        righe.add(new ArchivioRiga(p, rsR.getInt("quantita")));
+                    }
                 }
+
+                return Optional.of(new Archivio(id, righe, tot, dt));
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> String.format("Errore caricamento archivio ID: %d", id));
+            throw new RuntimeException(e);
         }
-        return Optional.empty();
     }
 
     @Override
-    public void create(Archivio archivio) {
-        String query = "INSERT INTO archivio (id_ordine, prodotti, quantita, totale, data_archiviazione) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setInt(1, archivio.getIdOrdine());
-            stmt.setString(2, convertListToString(archivio.getProdotti()));
-            stmt.setString(3, convertListToString(archivio.getQuantita()));
-            stmt.setBigDecimal(4, archivio.getTotale());
-            stmt.setTimestamp(5, Timestamp.valueOf(archivio.getDataArchiviazione()));
+    public void create(Archivio arch) {
+        String insA = "INSERT INTO archivio (id_ordine, totale, data_archiviazione) VALUES (?,?,?)";
+        String insR = "INSERT INTO archivio_riga (id_ordine,id_prodotto,quantita) VALUES (?,?,?)";
+        try (PreparedStatement psA = conn.prepareStatement(insA);
+             PreparedStatement psR = conn.prepareStatement(insR)) {
 
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Salvataggio fallito");
-            }
+            psA.setInt(1, arch.getIdOrdine());
+            psA.setBigDecimal(2, arch.getTotale());
+            psA.setTimestamp(3, Timestamp.valueOf(arch.getDataArchiviazione()));
+            psA.executeUpdate();
 
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    archivio.setIdOrdine(generatedKeys.getInt(1));
-                }
+            for (ArchivioRiga r : arch.getRighe()) {
+                psR.setInt(1, arch.getIdOrdine());
+                psR.setLong(2, r.getProdotto().getId());
+                psR.setInt(3, r.getQuantita());
+                psR.addBatch();
             }
+            psR.executeBatch();
+
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore salvataggio archivio");
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public void delete(Integer id) {
-        String query = "DELETE FROM archivio WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
+        try (PreparedStatement psR = conn.prepareStatement("DELETE FROM archivio_riga WHERE id_ordine=?");
+             PreparedStatement psA = conn.prepareStatement("DELETE FROM archivio WHERE id_ordine=?")) {
+            psR.setInt(1, id); psR.executeUpdate();
+            psA.setInt(1, id); psA.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> String.format("Errore eliminazione archivio ID: %d", id));
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public boolean exists(Integer id) {
-        String query = "SELECT COUNT(*) FROM archivio WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
+        try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM archivio WHERE id_ordine=?")) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore verifica esistenza archivio");
-            return false;
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public List<Archivio> getAll() {
-        List<Archivio> archivi = new ArrayList<>();
-        String query = "SELECT id, id_ordine, prodotti, quantita, totale, data_archiviazione FROM archivio";
-
-        try (PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-
+        List<Archivio> list = new ArrayList<>();
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery("SELECT id_ordine FROM archivio")) {
             while (rs.next()) {
-                archivi.add(mapResultSetToArchivio(rs));
+                read(rs.getInt("id_ordine")).ifPresent(list::add);
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore recupero archivi");
+            throw new RuntimeException(e);
         }
-        return archivi;
+        return list;
     }
 
     @Override
-    public List<Archivio> findByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
-        List<Archivio> archivi = new ArrayList<>();
-        String query = "SELECT id, id_ordine, prodotti, quantita, totale, data_archiviazione " +
-                "FROM archivio " +
-                "WHERE data_archiviazione BETWEEN ? AND ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setTimestamp(1, Timestamp.valueOf(startDate));
-            stmt.setTimestamp(2, Timestamp.valueOf(endDate));
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    archivi.add(mapResultSetToArchivio(rs));
-                }
+    public List<Archivio> findByDateRange(LocalDateTime s, LocalDateTime e) {
+        List<Archivio> list = new ArrayList<>();
+        String sql = "SELECT id_ordine FROM archivio WHERE data_archiviazione BETWEEN ? AND ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(s));
+            ps.setTimestamp(2, Timestamp.valueOf(e));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) read(rs.getInt("id_ordine")).ifPresent(list::add);
             }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e, () -> "Errore recupero archivi per intervallo di tempo");
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
         }
-        return archivi;
-    }
-
-    private Archivio mapResultSetToArchivio(ResultSet rs) throws SQLException {
-        return new Archivio(
-                rs.getInt("id_ordine"),
-                convertStringToList(rs.getString("prodotti")),
-                convertStringToIntegerList(rs.getString("quantita")),
-                rs.getBigDecimal("totale"),
-                rs.getTimestamp("data_archiviazione").toLocalDateTime()
-        );
-    }
-
-    private List<Integer> convertStringToIntegerList(String str) {
-        return List.of(str.split(",")).stream().map(Integer::parseInt).toList();
-    }
-
-    private String convertListToString(List<?> list) {
-        return String.join(",", list.stream().map(Object::toString).toList());
-    }
-
-    private List<String> convertStringToList(String str) {
-        return List.of(str.split(","));
+        return list;
     }
 }

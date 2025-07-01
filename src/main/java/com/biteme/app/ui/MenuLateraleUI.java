@@ -28,9 +28,6 @@ public class MenuLateraleUI {
     private StackPane ordiniButton;
 
     @FXML
-    private StackPane cucinaButton;
-
-    @FXML
     private StackPane magazzinoButton;
 
     @FXML
@@ -58,7 +55,7 @@ public class MenuLateraleUI {
         }
 
         prenotazioniButton.setOnMouseClicked(_ -> SceneLoader.getInstance().loadScene("/com/biteme/app/prenotazione.fxml", "Prenotazioni"));
-        ordiniButton.setOnMouseClicked(_ -> SceneLoader.getInstance().loadScene("/com/biteme/app/ordinazione.fxml", "Ordini"));
+        ordiniButton.setOnMouseClicked(_ -> SceneLoader.getInstance().loadSceneFresh("/com/biteme/app/ordinazione.fxml", "Ordini"));
         magazzinoButton.setOnMouseClicked(_ -> SceneLoader.getInstance().loadScene("/com/biteme/app/prodotto.fxml", "Magazzino"));
         logoutButton.setOnMouseClicked(_ -> onLogout());
     }

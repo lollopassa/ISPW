@@ -8,13 +8,13 @@ import java.time.LocalTime;
 
 public class OrdinazioneBean {
 
-    private int    id;               // PK
-    private String nome;             // nome cliente
-    private String numeroClienti;    // coperti (stringa per validazione UI)
-    private String tipoOrdine;       // "Al Tavolo" / "Asporto"
-    private String infoTavolo;       // numero tavolo
-    private String statoOrdine;      // stato in testo
-    private String orarioCreazione;  // HH:mm
+    private int    id;
+    private String nome;
+    private String numeroClienti;
+    private String tipoOrdine;
+    private String infoTavolo;
+    private String statoOrdine;
+    private String orarioCreazione;
 
     public void validate() throws OrdinazioneException {
         if (nome == null || nome.trim().isEmpty())            throw new OrdinazioneException("Il campo Nome Cliente deve essere compilato.");

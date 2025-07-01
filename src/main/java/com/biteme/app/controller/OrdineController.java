@@ -8,6 +8,8 @@ import com.biteme.app.entities.Prodotto;
 import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.persistence.Configuration;
+import com.biteme.app.util.mapper.BeanEntityMapperFactory;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +18,8 @@ public class OrdineController {
 
     private final ProdottoDao prodottoDao;
     private final OrdineDao   ordineDao;
-
+    private final BeanEntityMapperFactory mapperFactory = BeanEntityMapperFactory.getInstance();
+    
     public OrdineController() {
         this.prodottoDao = Configuration.getPersistenceProvider()
                 .getDaoFactory()
@@ -59,10 +62,9 @@ public class OrdineController {
     public List<ProdottoBean> getProdottiByCategoria(String categoria) {
         return prodottoDao.getByCategoria(categoria)
                 .stream()
-                .map(ProdottoBean::fromEntity)
+                .map(entity -> mapperFactory.toBean(entity, ProdottoBean.class))
                 .toList();
     }
-
     public OrdineBean getOrdineById(int id) throws OrdineException { return load(id); }
 
     public OrdineBean load(int idOrdine) throws OrdineException {

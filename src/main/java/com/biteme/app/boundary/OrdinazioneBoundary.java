@@ -1,9 +1,6 @@
 package com.biteme.app.boundary;
 
-import com.biteme.app.bean.ArchivioBean;
-import com.biteme.app.bean.OrdineBean;
-import com.biteme.app.bean.OrdinazioneBean;
-import com.biteme.app.bean.ProdottoBean;
+import com.biteme.app.bean.*;
 import com.biteme.app.controller.ArchivioController;
 import com.biteme.app.controller.OrdinazioneController;
 import com.biteme.app.controller.OrdineController;
@@ -15,6 +12,7 @@ import com.biteme.app.exception.OrdineException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrdinazioneBoundary {
@@ -61,13 +59,22 @@ public class OrdinazioneBoundary {
     public void archive(OrdinazioneBean bean) throws ArchiviazioneException {
         try {
             OrdineBean ordine = ordineController.load(bean.getId());
-
             BigDecimal totale = calcolaTotaleOrdine(ordine);
+
+            List<ArchivioRigaBean> righe = new ArrayList<>();
+            List<String> prodotti = ordine.getProdotti();
+            List<Integer> quantita = ordine.getQuantita();
+            for (int i = 0; i < prodotti.size(); i++) {
+                ProdottoBean pbean = prodottoController.getProdottoByNome(prodotti.get(i));
+                ArchivioRigaBean rb = new ArchivioRigaBean();
+                rb.setProdottoBean(pbean);
+                rb.setQuantita(quantita.get(i));
+                righe.add(rb);
+            }
 
             ArchivioBean av = new ArchivioBean();
             av.setIdOrdine(ordine.getId());
-            av.setProdotti(ordine.getProdotti());
-            av.setQuantita(ordine.getQuantita());
+            av.setRighe(righe);                    // qui
             av.setTotale(totale);
             av.setDataArchiviazione(LocalDateTime.now());
             av.validate();

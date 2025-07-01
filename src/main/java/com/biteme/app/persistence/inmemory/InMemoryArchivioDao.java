@@ -4,56 +4,47 @@ import com.biteme.app.entities.Archivio;
 import com.biteme.app.persistence.ArchivioDao;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class InMemoryArchivioDao implements ArchivioDao {
 
-    private final List<Archivio> archivi = Storage.getInstance().getArchivi();
-    private int currentId = 1;
+    private final List<Archivio> storage = new CopyOnWriteArrayList<>();
 
     @Override
     public Optional<Archivio> read(Integer id) {
-        return archivi.stream()
-                .filter(a -> a.getIdOrdine() == id)
-                .findFirst();
+        return storage.stream().filter(a -> a.getIdOrdine() == id).findFirst();
     }
 
     @Override
-    public void create(Archivio archivio) {
-        if (archivio.getIdOrdine() == 0) {
-            archivio.setIdOrdine(currentId++);
-        } else {
-            delete(archivio.getIdOrdine());
-        }
-        archivi.add(archivio);
+    public void create(Archivio a) {
+        // elimina eventuale esistente con stesso id
+        storage.removeIf(x -> x.getIdOrdine() == a.getIdOrdine());
+        storage.add(a);
     }
 
     @Override
     public void delete(Integer id) {
-        archivi.removeIf(a -> a.getIdOrdine() == id);
+        storage.removeIf(a -> a.getIdOrdine() == id);
     }
 
     @Override
     public boolean exists(Integer id) {
-        return archivi.stream().anyMatch(a -> a.getIdOrdine() == id);
+        return storage.stream().anyMatch(a -> a.getIdOrdine() == id);
     }
 
     @Override
     public List<Archivio> getAll() {
-        return new ArrayList<>(archivi);
+        return new ArrayList<>(storage);
     }
 
     @Override
-    public List<Archivio> findByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
-        List<Archivio> filteredArchivi = new ArrayList<>();
-        for (Archivio archivio : archivi) {
-            if (!archivio.getDataArchiviazione().isBefore(startDate) &&
-                    !archivio.getDataArchiviazione().isAfter(endDate)) {
-                filteredArchivi.add(archivio);
-            }
+    public List<Archivio> findByDateRange(LocalDateTime s, LocalDateTime e) {
+        List<Archivio> out = new ArrayList<>();
+        for (Archivio a : storage) {
+            LocalDateTime d = a.getDataArchiviazione();
+            if (!d.isBefore(s) && !d.isAfter(e)) out.add(a);
         }
-        return filteredArchivi;
+        return out;
     }
 }

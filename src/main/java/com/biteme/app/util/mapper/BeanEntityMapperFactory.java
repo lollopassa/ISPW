@@ -18,6 +18,14 @@ public class BeanEntityMapperFactory {
         registerMapper(com.biteme.app.bean.ProdottoBean.class,
                 com.biteme.app.entities.Prodotto.class,
                 new ProdottoMapper());
+
+        registerMapper(com.biteme.app.bean.ArchivioBean.class,
+                com.biteme.app.entities.Archivio.class,
+                new ArchivioMapper());
+
+        registerMapper(com.biteme.app.bean.ArchivioRigaBean.class,
+                com.biteme.app.entities.ArchivioRiga.class,
+                new ArchivioRigaMapper());
     }
 
     public static synchronized BeanEntityMapperFactory getInstance() {
