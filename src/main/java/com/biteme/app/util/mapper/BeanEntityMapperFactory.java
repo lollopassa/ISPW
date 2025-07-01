@@ -3,12 +3,15 @@ package com.biteme.app.util.mapper;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Central registry of all Bean ↔ Entity mappers.
+ */
 public class BeanEntityMapperFactory {
 
     private static BeanEntityMapperFactory instance = null;
 
-    private final Map<Class<?>, BeanEntityMapper<?, ?>> beanToEntityMappers = new HashMap<>();
-    private final Map<Class<?>, BeanEntityMapper<?, ?>> entityToBeanMappers = new HashMap<>();
+    private final Map<Class<?>, BeanEntityMapper<?, ?>> beanToEntityMappers   = new HashMap<>();
+    private final Map<Class<?>, BeanEntityMapper<?, ?>> entityToBeanMappers   = new HashMap<>();
 
     private BeanEntityMapperFactory() {
         registerMapper(com.biteme.app.bean.PrenotazioneBean.class,
@@ -43,6 +46,7 @@ public class BeanEntityMapperFactory {
         return instance;
     }
 
+
     public <B, E> void registerMapper(Class<B> beanClass,
                                       Class<E> entityClass,
                                       BeanEntityMapper<B, E> mapper) {
@@ -50,22 +54,26 @@ public class BeanEntityMapperFactory {
         entityToBeanMappers.put(entityClass, mapper);
     }
 
+
     @SuppressWarnings("unchecked")
     public <B, E> E toEntity(B bean, Class<B> beanClass) {
         BeanEntityMapper<B, E> mapper =
                 (BeanEntityMapper<B, E>) beanToEntityMappers.get(beanClass);
         if (mapper == null) {
-            throw new IllegalArgumentException("Nessun mapper registrato per il Bean: " + beanClass);
+            throw new IllegalArgumentException(
+                    "No mapper registered for Bean class: " + beanClass.getName());
         }
         return mapper.toEntity(bean);
     }
 
+
     @SuppressWarnings("unchecked")
     public <B, E> B toBean(E entity, Class<B> beanClass) {
         BeanEntityMapper<B, E> mapper =
-                (BeanEntityMapper<B, E>) entityToBeanMappers.get(entity.getClass());
+                (BeanEntityMapper<B, E>) beanToEntityMappers.get(beanClass);
         if (mapper == null) {
-            throw new IllegalArgumentException("Nessun mapper registrato per l'Entity: " + entity.getClass());
+            throw new IllegalArgumentException(
+                    "No mapper registered for Bean class: " + beanClass.getName());
         }
         return mapper.toBean(entity);
     }

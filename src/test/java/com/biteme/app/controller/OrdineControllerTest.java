@@ -1,18 +1,19 @@
+// src/test/java/com/biteme/app/controller/OrdineControllerTest.java
+
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.OrdineBean;
 import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.entities.Ordine;
-import com.biteme.app.entities.Ordinazione;
 import com.biteme.app.entities.Prodotto;
 import com.biteme.app.entities.Categoria;
 import com.biteme.app.entities.StatoOrdinazione;
 import com.biteme.app.entities.TipoOrdinazione;
 import com.biteme.app.exception.OrdineException;
+import com.biteme.app.persistence.Configuration;
 import com.biteme.app.persistence.OrdineDao;
 import com.biteme.app.persistence.ProdottoDao;
 import com.biteme.app.persistence.OrdinazioneDao;
-import com.biteme.app.persistence.Configuration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,14 +39,15 @@ class OrdineControllerTest {
     void setUp() throws Exception {
         controller = new OrdineController();
 
-        ordineDao     = Configuration.getPersistenceProvider().getDaoFactory().getOrdineDao();
-        prodottoDao   = Configuration.getPersistenceProvider().getDaoFactory().getProdottoDao();
-        ordinazioneDao= Configuration.getPersistenceProvider().getDaoFactory().getOrdinazioneDao();
+        ordineDao      = Configuration.getPersistenceProvider().getDaoFactory().getOrdineDao();
+        prodottoDao    = Configuration.getPersistenceProvider().getDaoFactory().getProdottoDao();
+        ordinazioneDao = Configuration.getPersistenceProvider().getDaoFactory().getOrdinazioneDao();
 
         injectDao("ordineDao",    ordineDao);
         injectDao("prodottoDao",  prodottoDao);
 
-        Ordinazione dummy = new Ordinazione(
+        // Prepariamo un'ordinazione padre
+        com.biteme.app.entities.Ordinazione dummy = new com.biteme.app.entities.Ordinazione(
                 0,
                 "Alberto Verdi",
                 "1",
@@ -54,8 +56,7 @@ class OrdineControllerTest {
                 StatoOrdinazione.NUOVO,
                 "12:00"
         );
-        ordinazioneDao.create(dummy);
-        parentId = dummy.getId();
+        parentId = ordinazioneDao.create(dummy);
 
         removeProdottoIfExists("Pizza Margherita");
         removeProdottoIfExists("Pasta al Pomodoro");
@@ -63,12 +64,9 @@ class OrdineControllerTest {
 
     @AfterEach
     void tearDown() {
-        if (ordineDao.exists(parentId)) {
-            ordineDao.delete(parentId);
-        }
-        if (ordinazioneDao.exists(parentId)) {
-            ordinazioneDao.delete(parentId);
-        }
+        // Pulizia
+        if (ordineDao.exists(parentId))     ordineDao.delete(parentId);
+        if (ordinazioneDao.exists(parentId))ordinazioneDao.delete(parentId);
         removeProdottoIfExists("Pizza Margherita");
         removeProdottoIfExists("Pasta al Pomodoro");
     }
@@ -90,45 +88,35 @@ class OrdineControllerTest {
         OrdineBean ordineBean = new OrdineBean();
         ordineBean.setProdotti(List.of("Pizza Margherita", "Coca Cola"));
         ordineBean.setQuantita(List.of(2, 1));
-
-
-        ordineBean.setPrezzi(List.of(
-                new BigDecimal("8.50"),
-                new BigDecimal("3.00")
-        ));
+        ordineBean.setPrezzi(List.of(new BigDecimal("8.50"), new BigDecimal("3.00")));
 
         controller.salvaOrdine(ordineBean, parentId);
 
-        Ordine ordine = ordineDao.getById(parentId);
+        Ordine ordine = ordineDao.read(parentId).orElse(null);
         assertNotNull(ordine, "L'ordine non dovrebbe essere null");
-        assertEquals(parentId, ordine.getId(),
-                "L'ID dell'ordine deve essere uguale all'id del record padre");
-        assertEquals(List.of("Pizza Margherita", "Coca Cola"),
-                ordine.getProdotti(),  "I prodotti non coincidono");
-        assertEquals(List.of(2, 1),
-                ordine.getQuantita(),  "Le quantitÃ  non coincidono");
-
-        assertEquals(List.of(new BigDecimal("8.50"), new BigDecimal("3.00")),
-                ordine.getPrezzi(), "I prezzi non coincidono");
+        assertEquals(parentId, ordine.getId());
+        assertEquals(List.of("Pizza Margherita", "Coca Cola"), ordine.getProdotti());
+        assertEquals(List.of(2, 1), ordine.getQuantita());
+        assertEquals(List.of(new BigDecimal("8.50"), new BigDecimal("3.00")), ordine.getPrezzi());
     }
-
 
     @Test
     void testGetOrdineByIdEsistente() throws OrdineException {
-        Ordine ordineDaSalvare = new Ordine(parentId,
+        Ordine ordineDaSalvare = new Ordine(
+                parentId,
                 List.of("Pizza Margherita"),
                 List.of(2),
-                List.of(new BigDecimal("8.50")));
+                List.of(new BigDecimal("8.50"))
+        );
         ordineDao.create(ordineDaSalvare);
-        int storedId = ordineDaSalvare.getId();
+        int storedId = ordineDao.read(parentId).orElseThrow().getId();
 
         OrdineBean bean = controller.getOrdineById(storedId);
-        assertNotNull(bean, "L'ordine deve essere presente.");
+        assertNotNull(bean);
         assertEquals(storedId, bean.getId());
         assertEquals("Pizza Margherita", bean.getProdotti().get(0));
         assertEquals(2, bean.getQuantita().get(0));
     }
-
 
     @Test
     void testGetProdottiByCategoria() {
@@ -140,13 +128,13 @@ class OrdineControllerTest {
         prodottoDao.create(p2);
 
         List<ProdottoBean> prodotti = controller.getProdottiByCategoria("PIZZE");
-        var filtered = prodotti.stream()
+        List<ProdottoBean> filtered = prodotti.stream()
                 .filter(b -> "Pizza Margherita".equals(b.getNome()))
                 .toList();
-        assertEquals(1, filtered.size(),
-                "Dovrebbe esserci un solo prodotto nella categoria PIZZE.");
+
+        assertEquals(1, filtered.size());
         ProdottoBean bean = filtered.get(0);
         assertEquals("Pizza Margherita", bean.getNome());
-        assertEquals("8.50", bean.getPrezzo().toString());
+        assertEquals("8.50", bean.getPrezzo().toPlainString());
     }
 }

@@ -29,38 +29,40 @@ public class OrdineController {
                 .getOrdineDao();
     }
 
-    /* ---------- creazione ---------- */
-
+    /* ---------- creazione / update ---------- */
     public void salvaOrdine(OrdineBean bean, int idOrdine) throws OrdineException {
         try {
             bean.setId(idOrdine);
 
-            if (!bean.isPrezziPresenti()) {
-                bean.setPrezzi(prezziPer(bean.getProdotti()));
-            }
+            /* ① calcoliamo/integriamo SEMPRE la lista prezzi */
+            bean.setPrezzi( complettaPrezzi(bean) );
 
             Ordine entity = mapperFactory.toEntity(bean, OrdineBean.class);
             ordineDao.create(entity);
 
         } catch (Exception e) {
-            throw new OrdineException("Errore nel salvataggio dell'ordine: " + e.getMessage(), e);
+            throw new OrdineException(
+                    "Errore nel salvataggio dell'ordine: " + e.getMessage(), e);
         }
     }
 
-
     /* ---------- lettura ---------- */
-
     public OrdineBean getOrdineById(int id) throws OrdineException {
         try {
             Ordine ord = ordineDao.getById(id);
-            return (ord != null)
-                    ? mapperFactory.toBean(ord, OrdineBean.class)
-                    : new OrdineBean();
+            if (ord == null) {                       // ← ❶
+                throw new OrdineException(
+                        "Ordine con ID " + id + " non trovato.");
+            }
+            return mapperFactory.toBean(ord, OrdineBean.class);
+        } catch (OrdineException e) {                // già lanciata sopra
+            throw e;
         } catch (Exception e) {
             throw new OrdineException(
                     "Errore caricando l'ordine con ID " + id + ": " + e.getMessage(), e);
         }
     }
+
 
     public List<ProdottoBean> getProdottiByCategoria(String categoria) {
         return prodottoDao.getByCategoria(categoria).stream()
@@ -70,13 +72,32 @@ public class OrdineController {
 
     /* ---------- helper ---------- */
 
-    private List<BigDecimal> prezziPer(List<String> nomiProdotti) {
-        List<BigDecimal> list = new ArrayList<>();
-        for (String nome : nomiProdotti) {
-            Prodotto p = prodottoDao.findByNome(nome.trim());
-            list.add( (p != null) ? p.getPrezzo() : BigDecimal.ZERO );
-        }
-        return list;
-    }
+    /** Restituisce una lista di prezzi lunga quanto {@code bean.getProdotti()},
+     *  completando/normalizzando quella eventualmente già presente.                     */
+    private List<BigDecimal> complettaPrezzi(OrdineBean bean) {
 
+        List<String>      prodottiUI = bean.getProdotti();
+        List<BigDecimal>  prezziUI   = bean.getPrezzi();        // può essere null
+
+        List<BigDecimal> out = new ArrayList<>(prodottiUI.size());
+
+        for (int i = 0; i < prodottiUI.size(); i++) {
+
+            /* a) se la UI ha già fornito il prezzo in quella posizione lo ri-uso */
+            if (prezziUI != null && prezziUI.size() > i) {
+                out.add(prezziUI.get(i));
+                continue;
+            }
+
+            /* b) provo a leggerlo dal magazzino */
+            Prodotto p = prodottoDao.findByNome(prodottiUI.get(i).trim());
+            if (p != null) {
+                out.add(p.getPrezzo());
+            } else {
+                /* c) articolo “extra” → fallback 0 €           */
+                out.add(BigDecimal.ZERO);
+            }
+        }
+        return out;
+    }
 }

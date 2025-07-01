@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
-import java.util.logging.Level;
 
 public class OrdineUI {
     private static final Logger LOG = Logger.getLogger(OrdineUI.class.getName());
@@ -39,28 +38,32 @@ public class OrdineUI {
     @FXML
     public void initialize() {
         OrdinazioneBean sel = OrdinazioneBoundary.getSelected();
-        if (sel == null) {
-            showAlert(Alert.AlertType.ERROR, "Nessuna ordinazione selezionata.");
-            return;
-        }
+        if (sel == null) { showAlert(Alert.AlertType.ERROR,"Nessuna ordinazione selezionata."); return; }
 
         currentOrdineId = sel.getId();
         nomeTavolo.setText(
-                (sel.getInfoTavolo() == null || sel.getInfoTavolo().isBlank()
-                        || "Asporto".equals(sel.getTipoOrdine()))
+                (sel.getInfoTavolo()==null || sel.getInfoTavolo().isBlank() || "Asporto".equals(sel.getTipoOrdine()))
                         ? "Asporto"
-                        : "Tavolo: " + sel.getInfoTavolo()
-        );
+                        : "Tavolo: " + sel.getInfoTavolo());
 
         try {
-            OrdineBean ordine = boundary.getOrdine(currentOrdineId);
+            OrdineBean ordine = boundary.getOrdine(currentOrdineId);   // ← ora lancia davvero se non c’è
             caricaProdottiNelRiepilogo(ordine);
-        } catch (OrdineException e) {
-            // ordine ancora vuoto → semplice informazione di log
-            LOG.log(Level.INFO, "Ordine {0} non ancora salvato ({1})",
-                    new Object[]{currentOrdineId, e.getMessage()});
+
+        } catch (OrdineException notFound) {           // ❷ crea stub + inserisce in DB
+            try {
+                boundary.salvaOrdineCompleto(
+                        currentOrdineId,
+                        java.util.Collections.emptyList(),
+                        java.util.Collections.emptyList(),
+                        java.util.Collections.emptyList());
+                LOG.info(() -> "Creato nuovo ordine vuoto con ID " + currentOrdineId);
+            } catch (OrdineException err) {
+                showAlert(Alert.AlertType.ERROR, "Impossibile creare l’ordine: " + err.getMessage());
+            }
         }
     }
+
 
 
 

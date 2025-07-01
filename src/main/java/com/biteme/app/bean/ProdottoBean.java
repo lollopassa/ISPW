@@ -44,16 +44,28 @@ public class ProdottoBean {
     }
 
     public void validate() {
+
         if (nome == null || nome.trim().isEmpty()) {
-            throw new ProdottoException("Il nome del prodotto non puo' essere vuoto.");
+            throw new ProdottoException("Il nome del prodotto non può essere vuoto.");
         }
-        if (categoria == null || categoria.trim().isEmpty()) {
-            throw new ProdottoException("Seleziona una categoria valida.");
-        }
-        if (prezzo == null || prezzo.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ProdottoException("Inserisci un valore numerico valido per il prezzo maggiore di zero.");
+
+        /* vincoli solo per prodotti a catalogo */
+        if (Boolean.TRUE.equals(disponibile)) {
+
+            if (categoria == null || categoria.trim().isEmpty()) {
+                throw new ProdottoException("Seleziona una categoria valida.");
+            }
+            if (prezzo == null || prezzo.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new ProdottoException("Il prezzo deve essere maggiore di zero.");
+            }
+
+        } else {   // placeholder / non catalogo
+            /* nessun vincolo su categoria; se prezzo nullo lo forzo a 0 */
+            if (prezzo == null) prezzo = BigDecimal.ZERO;
         }
     }
+
+
 
     public static ProdottoBean fromEntity(Prodotto p) {
         ProdottoBean b = new ProdottoBean();

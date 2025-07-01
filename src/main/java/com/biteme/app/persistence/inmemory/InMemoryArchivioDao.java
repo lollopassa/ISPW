@@ -13,37 +13,52 @@ public class InMemoryArchivioDao implements ArchivioDao {
 
     @Override
     public Optional<Archivio> read(Integer id) {
-        return storage.stream().filter(a -> a.getIdOrdine() == id).findFirst();
+        return storage.stream()
+                .filter(a -> a.getIdOrdine().equals(id))
+                .findFirst();
     }
 
     @Override
     public void create(Archivio a) {
-        // elimina eventuale esistente con stesso id
-        storage.removeIf(x -> x.getIdOrdine() == a.getIdOrdine());
-        storage.add(a);
+        // Rimuovo l’eventuale archivio precedente
+        storage.removeIf(x -> x.getIdOrdine().equals(a.getIdOrdine()));
+
+        // Filtro solo le righe con prodotto.id > 0
+        var righeValide = a.getRighe().stream()
+                .filter(r -> r.getProdotto().getId() > 0)
+                .toList();
+
+        storage.add(new Archivio(
+                a.getIdOrdine(),
+                righeValide,
+                a.getTotale(),
+                a.getDataArchiviazione()
+        ));
     }
 
     @Override
     public void delete(Integer id) {
-        storage.removeIf(a -> a.getIdOrdine() == id);
+        storage.removeIf(a -> a.getIdOrdine().equals(id));
     }
 
     @Override
     public boolean exists(Integer id) {
-        return storage.stream().anyMatch(a -> a.getIdOrdine() == id);
+        return storage.stream().anyMatch(a -> a.getIdOrdine().equals(id));
     }
 
     @Override
     public List<Archivio> getAll() {
-        return new ArrayList<>(storage);
+        return List.copyOf(storage);
     }
 
     @Override
     public List<Archivio> findByDateRange(LocalDateTime s, LocalDateTime e) {
-        List<Archivio> out = new ArrayList<>();
-        for (Archivio a : storage) {
-            LocalDateTime d = a.getDataArchiviazione();
-            if (!d.isBefore(s) && !d.isAfter(e)) out.add(a);
+        var out = new ArrayList<Archivio>();
+        for (var a : storage) {
+            var d = a.getDataArchiviazione();
+            if (!d.isBefore(s) && !d.isAfter(e)) {
+                out.add(a);
+            }
         }
         return out;
     }

@@ -59,4 +59,12 @@ public class ProdottoController {
         }
         return mapperFactory.toBean(entity, ProdottoBean.class);
     }
+
+    public ProdottoBean findProdottoSeEsiste(String nome) {
+        if (nome == null || nome.isBlank()) return null;
+        Prodotto entity = prodottoDao.findByNome(nome);
+        return (entity != null) ? mapperFactory.toBean(entity, ProdottoBean.class)
+                : null;
+    }
+
 }

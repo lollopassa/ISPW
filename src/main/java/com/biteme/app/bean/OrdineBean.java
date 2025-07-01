@@ -8,48 +8,62 @@ import java.util.List;
 /** DTO usato dalla UI per creare / visualizzare un Ordine. */
 public class OrdineBean {
 
-    private int id;                          // PK = id ordinazione
-    private List<String>    prodotti;        // nomi
-    private List<Integer>   quantita;        // relative quantità
-    private List<BigDecimal> prezzi;         // unitari (opz.)
+    /* ---------- campi ---------- */
+    private int                 id;          // = id dell’ordinazione
+    private List<String>        prodotti;    // nomi
+    private List<Integer>       quantita;    // quantità corrispondenti
+    private List<BigDecimal>    prezzi;      // prezzi unitari (sempre presenti – 0 € per gli “extra”)
 
     /* ---------- getter / setter ---------- */
-    public int getId() { return id; }                     public void setId(int id) { this.id = id; }
-    public List<String> getProdotti() { return prodotti; }public void setProdotti(List<String> p) { this.prodotti = p; }
-    public List<Integer> getQuantita() { return quantita; }public void setQuantita(List<Integer> q) { this.quantita = q; }
-    public List<BigDecimal> getPrezzi() { return prezzi; }public void setPrezzi(List<BigDecimal> pr) { this.prezzi = pr; }
+    public int              getId()                { return id; }
+    public void             setId(int id)          { this.id = id; }
+
+    public List<String>     getProdotti()          { return prodotti; }
+    public void             setProdotti(List<String> prodotti) { this.prodotti = prodotti; }
+
+    public List<Integer>    getQuantita()          { return quantita; }
+    public void             setQuantita(List<Integer> quantita) { this.quantita = quantita; }
+
+    public List<BigDecimal> getPrezzi()            { return prezzi; }
+    public void             setPrezzi(List<BigDecimal> prezzi)  { this.prezzi = prezzi; }
 
     /* ---------- validazione ---------- */
     public void validate() throws OrdineException {
-        validateNotNull();
-        validateSizes();
-        validateQuantities();
-        validatePricesIfPresent();
-    }
-    private void validateNotNull() throws OrdineException {
-        if (prodotti == null || quantita == null)
-            throw new OrdineException("Prodotti e quantità non possono essere null.");
-    }
-    private void validateSizes() throws OrdineException {
-        int n = prodotti.size();
-        if (n != quantita.size())
-            throw new OrdineException("Prodotti e quantità non corrispondono.");
-        if (prezzi != null && n != prezzi.size())
-            throw new OrdineException("Numero prezzi non allineato ai prodotti.");
-    }
-    private void validateQuantities() throws OrdineException {
-        for (Integer q : quantita)
-            if (q == null || q < 0)
-                throw new OrdineException("Ogni quantità dev’essere ≥ 0.");
-    }
-    private void validatePricesIfPresent() throws OrdineException {
-        if (prezzi == null) return;                // prezzi facoltativi
-        for (BigDecimal p : prezzi)
-            if (p == null || p.compareTo(BigDecimal.ZERO) < 0)
-                throw new OrdineException("Ogni prezzo dev’essere ≥ 0.");
+        assureNotNull();
+        assureSameSize();
+        assureQuantitiesPositive();
+        assurePricesPositive();
     }
 
-    /* utility */
+    /* --- step 1: mai liste null --- */
+    private void assureNotNull() throws OrdineException {
+        if (prodotti == null || quantita == null || prezzi == null)
+            throw new OrdineException("Prodotti, quantità e prezzi non possono essere null.");
+    }
+
+    /* --- step 2: lunghezze allineate --- */
+    private void assureSameSize() throws OrdineException {
+        int n = prodotti.size();
+        if (n != quantita.size() || n != prezzi.size())
+            throw new OrdineException("Prodotti, quantità e prezzi devono avere la stessa cardinalità.");
+    }
+
+    /* --- step 3: quantità > 0 --- */
+    private void assureQuantitiesPositive() throws OrdineException {
+        for (Integer q : quantita)
+            if (q == null || q <= 0)
+                throw new OrdineException("Ogni quantità deve essere maggiore di zero.");
+    }
+
+    /* --- step 4: prezzi ≥ 0 --- */
+    private void assurePricesPositive() throws OrdineException {
+        for (BigDecimal p : prezzi)
+            if (p == null || p.compareTo(BigDecimal.ZERO) < 0)
+                throw new OrdineException("Ogni prezzo deve essere ≥ 0.");
+    }
+
+    /* ---------- utilità ---------- */
+    /** Serve eventualmente alla UI per capire se i prezzi sono già stati popolati. */
     public boolean isPrezziPresenti() {
         return prezzi != null && !prezzi.isEmpty();
     }

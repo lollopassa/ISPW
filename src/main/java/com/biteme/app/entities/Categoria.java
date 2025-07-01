@@ -7,7 +7,8 @@ public enum Categoria {
     PIZZE("Pizze"),
     CONTORNI("Contorni"),
     BEVANDE("Bevande"),
-    DOLCI("Dolci");
+    DOLCI("Dolci"),
+    EXTRA("Extra");
 
     private final String displayName;
 

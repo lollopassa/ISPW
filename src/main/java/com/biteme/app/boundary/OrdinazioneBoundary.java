@@ -96,7 +96,7 @@ public class OrdinazioneBoundary {
                 ordinazioneCtrl.eliminaOrdinazione(idOrd);
             }
 
-        } catch (OrdineException | OrdinazioneException e) {
+        } catch (OrdinazioneException e) {
             throw new ArchiviazioneException(
                     "Errore durante l'archiviazione (ID ordine = " + ordBean.getId() + ")", e);
         }
@@ -117,47 +117,57 @@ public class OrdinazioneBoundary {
         }
     }
 
+    /* ------- helper per generare/recuperare il ProdottoBean -------- */
     private ProdottoBean ensureProdottoBean(String nome, BigDecimal prezzoDaOrdine) {
-        ProdottoBean pb = prodottoCtrl.getProdottoByNome(nome);
-        if (pb != null) return pb;                     // esiste in magazzino
 
-        // ---- placeholder solo per l’archivio ----
+        // ▸ lookup che NON solleva eccezioni
+        ProdottoBean pb = prodottoCtrl.findProdottoSeEsiste(nome);
+        if (pb != null) {
+            return pb;          // prodotto presente nel magazzino
+        }
+
+        // ▸ placeholder solo per archivio
         pb = new ProdottoBean();
         pb.setNome(nome);
-        pb.setCategoria("Extra");                      // o null se preferisci
-        pb.setPrezzo(prezzoDaOrdine != null ? prezzoDaOrdine : BigDecimal.ZERO);
+        pb.setCategoria(null);          // nessuna categoria catalogo
+        pb.setDisponibile(false);       // non è un articolo in vendita
+        pb.setPrezzo(
+                prezzoDaOrdine != null ? prezzoDaOrdine : BigDecimal.ZERO
+        );
         return pb;
     }
 
 
 
+
+
+
+
+
     /* -------- Helper -------- */
 
-    private BigDecimal calcolaTotaleOrdine(OrdineBean ob) throws OrdineException {
+    /* OrdinazioneBoundary (solo la parte incriminata) */
+    private BigDecimal calcolaTotaleOrdine(OrdineBean ob) {
         BigDecimal tot = BigDecimal.ZERO;
 
-        List<String>  prodotti = ob.getProdotti();
-        List<Integer> quanti   = ob.getQuantita();
-        List<BigDecimal> prezzi = ob.getPrezzi(); // può essere null
+        List<String>      prodotti = ob.getProdotti();
+        List<Integer>     quanti   = ob.getQuantita();
+        List<BigDecimal>  prezzi   = ob.getPrezzi();          // può mancare / essere incompleto
 
-        if (prodotti == null || quanti == null || prodotti.size() != quanti.size())
-            throw new OrdineException("Prodotti e quantità non congruenti.");
 
         for (int i = 0; i < prodotti.size(); i++) {
-            BigDecimal prezzo = (prezzi != null && prezzi.size() == prodotti.size())
-                    ? prezzi.get(i)
-                    : null;                               // non fornito dalla UI
+            BigDecimal prezzo = (prezzi != null && prezzi.size() > i) ? prezzi.get(i) : null;
 
-            if (prezzo == null) {
-                ProdottoBean pb = prodottoCtrl.getProdottoByNome(prodotti.get(i));
-                if (pb == null)
-                    throw new OrdineException("Prezzo mancante per \"" + prodotti.get(i) + "\"");
-                prezzo = pb.getPrezzo();
+            if (prezzo == null) {                    // prezzo non salvato nell’ordine
+                ProdottoBean pb = prodottoCtrl.findProdottoSeEsiste(prodotti.get(i));
+                prezzo = (pb != null) ? pb.getPrezzo() : BigDecimal.ZERO;   // fallback a 0 €
             }
+
             tot = tot.add(prezzo.multiply(BigDecimal.valueOf(quanti.get(i))));
         }
         return tot;
     }
+
 
 
     /* -------- Selection state (UI helper) -------- */

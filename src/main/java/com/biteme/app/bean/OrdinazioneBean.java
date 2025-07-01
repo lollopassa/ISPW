@@ -44,9 +44,7 @@ public class OrdinazioneBean {
             throw new OrdinazioneException("Il campo Orario deve essere compilato per Asporto.");
         if (!orarioCreazione.matches("([01]\\d|2[0-3]):([0-5]\\d)"))
             throw new OrdinazioneException("Il campo 'Orario' deve essere nel formato HH:mm (es. '12:20').");
-        /* campi non rilevanti */
-        numeroClienti = "";
-        infoTavolo    = "";
+        // ** NON azzeriamo più numeroClienti e infoTavolo **
     }
 
     /*------------- getter / setter compact -------------*/

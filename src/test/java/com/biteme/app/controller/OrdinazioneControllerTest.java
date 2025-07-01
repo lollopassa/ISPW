@@ -1,3 +1,5 @@
+// src/test/java/com/biteme/app/controller/OrdinazioneControllerTest.java
+
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.OrdinazioneBean;
@@ -11,14 +13,13 @@ import org.junit.jupiter.api.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-//@author Lorenzo Passacantilli
 
+//@author Lorenzo Passacantilli
 
 class OrdinazioneControllerTest {
 
     private OrdinazioneController controller;
     private OrdinazioneDao ordinazioneDao;
-
 
     @BeforeEach
     void setUp() {
@@ -30,21 +31,17 @@ class OrdinazioneControllerTest {
     }
 
     @AfterEach
-    void tearDown() {
-        clearStorage();
-    }
-
+    void tearDown() { clearStorage(); }
 
     private void clearStorage() {
-        // In‑memory
-        if (Configuration.getPersistenceProvider().getDaoFactory() instanceof com.biteme.app.persistence.inmemory.InMemoryDaoFactory) {
+        // In-memory
+        if (Configuration.getPersistenceProvider().getDaoFactory()
+                instanceof com.biteme.app.persistence.inmemory.InMemoryDaoFactory) {
             Storage.getInstance().getOrdinazioni().clear();
         }
         // Generico (DB / altri impl.)
         ordinazioneDao.getAll().forEach(o -> ordinazioneDao.delete(o.getId()));
     }
-
-
 
     @Test
     void getOrdini_returnsMappedBeans() throws Exception {
@@ -69,15 +66,15 @@ class OrdinazioneControllerTest {
         assertEquals(1, found.size(), "L'ordine appena creato deve essere presente esattamente una volta");
         OrdinazioneBean b = found.get(0);
 
-        assertEquals(bean.getId(), b.getId());
-        assertEquals("Anna Verdi", b.getNome());
-        assertEquals("3",          b.getNumeroClienti());
-        assertEquals("Asporto",    b.getTipoOrdine());
-        assertEquals("Nessuna",    b.getInfoTavolo());
-        assertEquals("Nuovo",      b.getStatoOrdine());
-        assertEquals("19:00",      b.getOrarioCreazione());
+        assertEquals(bean.getId(),       b.getId());
+        assertEquals("Anna Verdi",       b.getNome());
+        assertEquals("3",                b.getNumeroClienti());
+        assertEquals("Asporto",          b.getTipoOrdine());
+        assertEquals("Nessuna",          b.getInfoTavolo());
+        // Ora controlliamo il name() dell'enum
+        assertEquals("NUOVO",            b.getStatoOrdine());
+        assertEquals("19:00",            b.getOrarioCreazione());
     }
-
 
     @Test
     void eliminaOrdinazione_rimuoveDalDao() throws Exception {
@@ -107,8 +104,6 @@ class OrdinazioneControllerTest {
         assertEquals("L'ordinazione con ID 999 non esiste.", ex.getMessage());
     }
 
-
-
     @Test
     void aggiornaStatoOrdinazione_modificaValue() throws Exception {
         // Arrange
@@ -124,17 +119,17 @@ class OrdinazioneControllerTest {
         // Act
         controller.aggiornaStatoOrdinazione(id, StatoOrdinazione.IN_CORSO);
 
-        // Assert – verifichiamo via controller (mapper già validato)
+        // Assert – verifichiamo via controller (il mapper ora usa name())
         OrdinazioneBean updated = controller.getOrdini().stream()
                 .filter(b -> b.getId() == id)
                 .findFirst()
                 .orElseThrow();
-        assertEquals("In corso", updated.getStatoOrdine());
+        assertEquals("IN_CORSO", updated.getStatoOrdine());
     }
 
     @Test
     void aggiornaStatoOrdinazione_ordIdNonEsistente_nonLanciaEccezione() {
-        // Il DAO (e quindi il controller) ignora l'update se l'ID non esiste
+        // Il DAO ignora l'update se l'ID non esiste
         assertDoesNotThrow(() -> controller.aggiornaStatoOrdinazione(999, StatoOrdinazione.IN_CORSO));
         assertFalse(ordinazioneDao.exists(999));
     }

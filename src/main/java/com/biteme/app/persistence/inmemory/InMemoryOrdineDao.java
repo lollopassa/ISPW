@@ -1,3 +1,5 @@
+// com/biteme/app/persistence/inmemory/InMemoryOrdineDao.java
+
 package com.biteme.app.persistence.inmemory;
 
 import com.biteme.app.entities.Ordine;
@@ -12,31 +14,59 @@ public class InMemoryOrdineDao implements OrdineDao {
     private final AtomicInteger idGen;
 
     public InMemoryOrdineDao() {
-        idGen = new AtomicInteger(
-                ordini.stream().mapToInt(Ordine::getId).max().orElse(0) + 1);
+        this.idGen = new AtomicInteger(
+                ordini.stream().mapToInt(Ordine::getId).max().orElse(0) + 1
+        );
     }
 
     @Override
     public int create(Ordine o) {
         int id = (o.getId() > 0) ? o.getId() : idGen.getAndIncrement();
-        ordini.removeIf(ord -> ord.getId() == id);
-        ordini.add(new Ordine(id,
+
+        // rimuovo eventuale vecchio
+        ordini.removeIf(x -> x.getId() == id);
+
+        // deep‐copy delle liste
+        Ordine copy = new Ordine(
+                id,
                 new ArrayList<>(o.getProdotti()),
                 new ArrayList<>(o.getQuantita()),
-                new ArrayList<>(o.getPrezzi())));
+                new ArrayList<>(o.getPrezzi())
+        );
+        ordini.add(copy);
         return id;
     }
 
-    @Override public Optional<Ordine> read(int id) {
+    @Override
+    public Optional<Ordine> read(int id) {
         return ordini.stream()
-                .filter(o -> o.getId() == id)
+                .filter(x -> x.getId() == id)
                 .findFirst()
-                .map(o -> new Ordine(o.getId(),
-                        new ArrayList<>(o.getProdotti()),
-                        new ArrayList<>(o.getQuantita()),
-                        new ArrayList<>(o.getPrezzi())));
+                .map(x -> new Ordine(
+                        x.getId(),
+                        new ArrayList<>(x.getProdotti()),
+                        new ArrayList<>(x.getQuantita()),
+                        new ArrayList<>(x.getPrezzi())
+                ));
     }
 
-    @Override public void delete(int id)        { ordini.removeIf(o -> o.getId() == id); }
-    @Override public List<Ordine> getAll()      { return List.copyOf(ordini); }
+    @Override
+    public void delete(int id) {
+        ordini.removeIf(x -> x.getId() == id);
+    }
+
+    @Override
+    public List<Ordine> getAll() {
+        // copia difensiva
+        List<Ordine> out = new ArrayList<>();
+        for (Ordine x : ordini) {
+            out.add(new Ordine(
+                    x.getId(),
+                    new ArrayList<>(x.getProdotti()),
+                    new ArrayList<>(x.getQuantita()),
+                    new ArrayList<>(x.getPrezzi())
+            ));
+        }
+        return out;
+    }
 }
