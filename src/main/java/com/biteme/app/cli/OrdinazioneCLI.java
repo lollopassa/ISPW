@@ -7,7 +7,6 @@ import com.biteme.app.bean.OrdinazioneBean;
 import com.biteme.app.boundary.OrdinazioneBoundary;
 import com.biteme.app.exception.ArchiviazioneException;
 import com.biteme.app.exception.OrdinazioneException;
-import com.biteme.app.exception.OrdineException;
 import com.biteme.app.util.CLIUtils;
 
 public class OrdinazioneCLI {
@@ -15,9 +14,9 @@ public class OrdinazioneCLI {
     private static final Scanner SCANNER = CLIUtils.getScanner();
 
     private static final String INVALID_ID_MESSAGE = "ID non valido.";
-    private static final String NO_ORDERS_MESSAGE = "Nessun ordine disponibile.";
-    private static final String ORDER_HEADER = "========== Ordinazione CLI ==========";
-    private static final String[] MENU_OPTIONS = {
+    private static final String NO_ORDERS_MESSAGE   = "Nessun ordine disponibile.";
+    private static final String ORDER_HEADER        = "========== Ordinazione CLI ==========";
+    private static final String[] MENU_OPTIONS      = {
             "1. Crea Ordine",
             "2. Modifica Ordine",
             "3. Elimina Ordine",
@@ -26,15 +25,13 @@ public class OrdinazioneCLI {
             "6. Torna al Menu"
     };
 
-    private OrdinazioneCLI() {
-    }
+    private OrdinazioneCLI() { }
 
-    public static void start() throws OrdineException {
+    public static void start() {
         boolean exit = false;
         while (!exit) {
             printMenu();
             String choice = SCANNER.nextLine();
-
             switch (choice) {
                 case "1" -> handleCreateOrder();
                 case "2" -> handleModifyOrder();
@@ -42,7 +39,7 @@ public class OrdinazioneCLI {
                 case "4" -> handleArchiveOrder();
                 case "5" -> listOrders();
                 case "6" -> exit = true;
-                default -> System.out.println("Opzione non valida.");
+                default  -> System.out.println("Opzione non valida.");
             }
         }
     }
@@ -71,6 +68,7 @@ public class OrdinazioneCLI {
 
             System.out.print("Info Tavolo (se applicabile): ");
             String tavolo = SCANNER.nextLine().trim();
+
             boundary.createOrdinazione(nome, tipo, orario, coperti, tavolo);
             System.out.println("Ordine creato con successo per " + nome + ".");
         } catch (OrdinazioneException e) {
@@ -79,7 +77,8 @@ public class OrdinazioneCLI {
             System.err.println("Errore imprevisto: " + e.getMessage());
         }
     }
-    private static void handleModifyOrder() throws OrdineException {
+
+    private static void handleModifyOrder() {
         List<OrdinazioneBean> orders = boundary.getAll();
         if (showOrderList(orders)) return;
 
@@ -90,6 +89,7 @@ public class OrdinazioneCLI {
                     .findFirst()
                     .orElse(null);
             if (selected != null) {
+                // Ora OrdineCLI.start non lancia più OrdineException
                 OrdineCLI.start(id);
             } else {
                 System.out.println("Ordine non trovato.");
@@ -130,7 +130,7 @@ public class OrdinazioneCLI {
                 boundary.archive(selected);
                 System.out.println("Ordine archiviato con successo.");
             } catch (ArchiviazioneException e) {
-                System.out.println("Errore durante l'archiviazione: " + e.getMessage());
+                System.err.println("Errore durante l'archiviazione: " + e.getMessage());
             }
         }
     }
@@ -148,8 +148,8 @@ public class OrdinazioneCLI {
     private static int promptForOrderId() {
         System.out.print("Inserisci l'ID dell'ordine: ");
         try {
-            return Integer.parseInt(SCANNER.nextLine());
-        } catch (NumberFormatException _) {
+            return Integer.parseInt(SCANNER.nextLine().trim());
+        } catch (NumberFormatException e) {
             System.out.println(INVALID_ID_MESSAGE);
             return -1;
         }
@@ -161,10 +161,9 @@ public class OrdinazioneCLI {
             System.out.println(NO_ORDERS_MESSAGE);
             return;
         }
-
         System.out.println("Lista Ordini:");
-        orders.forEach(o -> System.out.println(
-                o.getId() + " - " + o.getNome() + " (" + o.getTipoOrdine() + ")"
-        ));
+        orders.forEach(o ->
+                System.out.println(o.getId() + " - " + o.getNome() + " (" + o.getTipoOrdine() + ")")
+        );
     }
 }
