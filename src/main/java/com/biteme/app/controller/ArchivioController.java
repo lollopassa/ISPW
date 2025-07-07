@@ -123,11 +123,22 @@ public class ArchivioController {
         LocalDateTime[] dateRange = getDateRange(periodo);
         List<Archivio> archivi = dao.findByDateRange(dateRange[0], dateRange[1]);
 
+        // prepariamo la mappa con tutti i giorni a zero
         List<String> giorni = List.of("Lun","Mar","Mer","Gio","Ven","Sab","Dom");
         Map<String, BigDecimal> mappa = new LinkedHashMap<>();
         giorni.forEach(g -> mappa.put(g, BigDecimal.ZERO));
 
+        // per ogni archivio sommo gli incassi delle righe
         for (Archivio a : archivi) {
+            // calcolo l’incasso totale di questo archivio, sulla base delle righe
+            BigDecimal totaleGiorno = BigDecimal.ZERO;
+            for (ArchivioRiga r : a.getRighe()) {
+                BigDecimal incassoRiga = r.getProdotto()
+                        .getPrezzo()
+                        .multiply(BigDecimal.valueOf(r.getQuantita()));
+                totaleGiorno = totaleGiorno.add(incassoRiga);
+            }
+
             String chiave = switch (a.getDataArchiviazione().getDayOfWeek()) {
                 case MONDAY    -> "Lun";
                 case TUESDAY   -> "Mar";
@@ -137,9 +148,10 @@ public class ArchivioController {
                 case SATURDAY  -> "Sab";
                 case SUNDAY    -> "Dom";
             };
-            mappa.put(chiave, mappa.get(chiave).add(a.getTotale()));
+            mappa.put(chiave, mappa.get(chiave).add(totaleGiorno));
         }
 
+        // trasformo in Map<String, Number> con valori double
         return mappa.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
