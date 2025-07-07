@@ -5,7 +5,6 @@ import com.biteme.app.exception.OrdineException;
 import java.math.BigDecimal;
 import java.util.List;
 
-/** DTO usato dalla UI per creare / visualizzare un Ordine. */
 public class OrdineBean {
 
     /* ---------- campi ---------- */

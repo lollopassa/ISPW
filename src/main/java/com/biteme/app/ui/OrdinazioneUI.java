@@ -1,7 +1,7 @@
 package com.biteme.app.ui;
 
 import com.biteme.app.bean.OrdinazioneBean;
-import com.biteme.app.boundary.OrdinazioneBoundary;
+import com.biteme.app.boundary.GestioneOrdiniBoundary;
 import com.biteme.app.exception.OrdinazioneException;
 import com.biteme.app.util.SceneLoader;
 import javafx.collections.FXCollections;
@@ -35,7 +35,8 @@ public class OrdinazioneUI {
     @FXML private Button eliminaButton;
     @FXML private Button archiviaButton;
 
-    private final OrdinazioneBoundary boundary = new OrdinazioneBoundary();
+    // ora usiamo direttamente GestioneOrdiniBoundary
+    private final GestioneOrdiniBoundary boundary = new GestioneOrdiniBoundary();
 
     @FXML
     public void initialize() {
@@ -108,7 +109,7 @@ public class OrdinazioneUI {
         }
 
         try {
-            boundary.createOrdinazione(nome, tipo, orario, coperti, tavolo); // i controlli di coerenza sono nel bean
+            boundary.createOrdinazione(nome, tipo, orario, coperti, tavolo);
             showInfo("Ordine creato per “" + nome + "”");
             clearForm();
             refreshTable();
@@ -116,8 +117,6 @@ public class OrdinazioneUI {
             showWarning(ex.getMessage());
         }
     }
-
-
 
     @FXML
     private void eliminaOrdine() {
@@ -150,13 +149,13 @@ public class OrdinazioneUI {
         }
 
         try {
-            OrdinazioneBoundary.setSelected(sel);
+            // imposta la selection‐state sulla nuova boundary
+            GestioneOrdiniBoundary.setSelected(sel);
             SceneLoader.getInstance().loadSceneFresh("/com/biteme/app/ordine.fxml", "Modifica Ordine");
         } catch (Exception e) {
             showError("Impossibile aprire la scena di modifica: " + e.getMessage());
         }
     }
-
 
     private void refreshTable() {
         List<OrdinazioneBean> list = boundary.getAll();
@@ -171,7 +170,7 @@ public class OrdinazioneUI {
         tipoOrdineComboBox.getSelectionModel().clearSelection();
     }
 
-    private void showInfo(String msg)    { new Alert(Alert.AlertType.INFORMATION, msg,    ButtonType.OK).showAndWait(); }
-    private void showWarning(String msg) { new Alert(Alert.AlertType.WARNING,     msg,    ButtonType.OK).showAndWait(); }
-    private void showError(String msg)   { new Alert(Alert.AlertType.ERROR,       msg,    ButtonType.OK).showAndWait(); }
+    private void showInfo(String msg)    { new Alert(Alert.AlertType.INFORMATION, msg, ButtonType.OK).showAndWait(); }
+    private void showWarning(String msg) { new Alert(Alert.AlertType.WARNING,     msg, ButtonType.OK).showAndWait(); }
+    private void showError(String msg)   { new Alert(Alert.AlertType.ERROR,       msg, ButtonType.OK).showAndWait(); }
 }

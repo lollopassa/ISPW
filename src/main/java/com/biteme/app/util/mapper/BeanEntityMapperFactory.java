@@ -26,9 +26,7 @@ public class BeanEntityMapperFactory {
                 com.biteme.app.entities.Archivio.class,
                 new ArchivioMapper());
 
-        registerMapper(com.biteme.app.bean.ArchivioRigaBean.class,
-                com.biteme.app.entities.ArchivioRiga.class,
-                new ArchivioRigaMapper());
+
 
         registerMapper(com.biteme.app.bean.OrdinazioneBean.class,
                 com.biteme.app.entities.Ordinazione.class,

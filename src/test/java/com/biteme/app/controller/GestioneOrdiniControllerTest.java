@@ -1,5 +1,3 @@
-// src/test/java/com/biteme/app/controller/OrdinazioneControllerTest.java
-
 package com.biteme.app.controller;
 
 import com.biteme.app.bean.OrdinazioneBean;
@@ -16,14 +14,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 //@author Lorenzo Passacantilli
 
-class OrdinazioneControllerTest {
+class GestioneOrdiniControllerTest {
 
-    private OrdinazioneController controller;
+    private GestioneOrdiniController controller;
     private OrdinazioneDao ordinazioneDao;
 
     @BeforeEach
     void setUp() {
-        controller     = new OrdinazioneController();
+        controller     = new GestioneOrdiniController();
         ordinazioneDao = Configuration.getPersistenceProvider()
                 .getDaoFactory()
                 .getOrdinazioneDao();
@@ -31,7 +29,9 @@ class OrdinazioneControllerTest {
     }
 
     @AfterEach
-    void tearDown() { clearStorage(); }
+    void tearDown() {
+        clearStorage();
+    }
 
     private void clearStorage() {
         // In-memory
@@ -39,53 +39,51 @@ class OrdinazioneControllerTest {
                 instanceof com.biteme.app.persistence.inmemory.InMemoryDaoFactory) {
             Storage.getInstance().getOrdinazioni().clear();
         }
-        // Generico (DB / altri impl.)
+        // Generic DAO
         ordinazioneDao.getAll().forEach(o -> ordinazioneDao.delete(o.getId()));
     }
 
     @Test
-    void getOrdini_returnsMappedBeans() throws Exception {
-        // Arrange – creiamo un ordine tramite controller per avere un ID valido
+    void getOrdinazioni_returnsMappedBeans() throws Exception {
+        // Arrange – creo una nuova ordinazione
         OrdinazioneBean bean = new OrdinazioneBean();
         bean.setNome("Anna Verdi");
         bean.setNumeroClienti("3");
         bean.setTipoOrdine("Asporto");
         bean.setInfoTavolo("Nessuna");
         bean.setOrarioCreazione("19:00");
-        controller.creaOrdine(bean);
+        controller.creaOrdinazione(bean);
 
         // Act
-        List<OrdinazioneBean> ordini = controller.getOrdini();
+        List<OrdinazioneBean> ordini = controller.getOrdinazioni();
 
-        // Cerchiamo l'ordine appena creato
+        // Cerco l'ordine creato
         List<OrdinazioneBean> found = ordini.stream()
                 .filter(b -> b.getId() == bean.getId())
                 .toList();
 
         // Assert
-        assertEquals(1, found.size(), "L'ordine appena creato deve essere presente esattamente una volta");
+        assertEquals(1, found.size(), "L'ordinazione appena creata deve essere presente esattamente una volta");
         OrdinazioneBean b = found.get(0);
-
-        assertEquals(bean.getId(),       b.getId());
-        assertEquals("Anna Verdi",       b.getNome());
-        assertEquals("3",                b.getNumeroClienti());
-        assertEquals("Asporto",          b.getTipoOrdine());
-        assertEquals("Nessuna",          b.getInfoTavolo());
-        // Ora controlliamo il name() dell'enum
-        assertEquals("NUOVO",            b.getStatoOrdine());
-        assertEquals("19:00",            b.getOrarioCreazione());
+        assertEquals(bean.getId(), b.getId());
+        assertEquals("Anna Verdi", b.getNome());
+        assertEquals("3", b.getNumeroClienti());
+        assertEquals("Asporto", b.getTipoOrdine());
+        assertEquals("Nessuna", b.getInfoTavolo());
+        assertEquals("NUOVO", b.getStatoOrdine());
+        assertEquals("19:00", b.getOrarioCreazione());
     }
 
     @Test
     void eliminaOrdinazione_rimuoveDalDao() throws Exception {
-        // Arrange – creiamo ordine tramite controller per avere ID certo
+        // Arrange – creo ordinazione per ottenere un ID
         OrdinazioneBean bean = new OrdinazioneBean();
         bean.setNome("Mario Rossi");
         bean.setNumeroClienti("4");
         bean.setTipoOrdine("Al Tavolo");
         bean.setInfoTavolo("5");
         bean.setOrarioCreazione("20:00");
-        controller.creaOrdine(bean);
+        controller.creaOrdinazione(bean);
         int idDaEliminare = bean.getId();
 
         // Act
@@ -100,7 +98,8 @@ class OrdinazioneControllerTest {
         // Act & Assert
         OrdinazioneException ex = assertThrows(
                 OrdinazioneException.class,
-                () -> controller.eliminaOrdinazione(999));
+                () -> controller.eliminaOrdinazione(999)
+        );
         assertEquals("L'ordinazione con ID 999 non esiste.", ex.getMessage());
     }
 
@@ -113,14 +112,14 @@ class OrdinazioneControllerTest {
         bean.setTipoOrdine("Asporto");
         bean.setInfoTavolo("Nessuna");
         bean.setOrarioCreazione("18:00");
-        controller.creaOrdine(bean);
+        controller.creaOrdinazione(bean);
         int id = bean.getId();
 
         // Act
         controller.aggiornaStatoOrdinazione(id, StatoOrdinazione.IN_CORSO);
 
-        // Assert – verifichiamo via controller (il mapper ora usa name())
-        OrdinazioneBean updated = controller.getOrdini().stream()
+        // Assert – verifichiamo lo stato aggiornato
+        OrdinazioneBean updated = controller.getOrdinazioni().stream()
                 .filter(b -> b.getId() == id)
                 .findFirst()
                 .orElseThrow();

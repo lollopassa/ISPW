@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.biteme.app.bean.OrdinazioneBean;
-import com.biteme.app.boundary.OrdinazioneBoundary;
+import com.biteme.app.boundary.GestioneOrdiniBoundary;
 import com.biteme.app.exception.ArchiviazioneException;
 import com.biteme.app.exception.OrdinazioneException;
 import com.biteme.app.util.CLIUtils;
 
 public class OrdinazioneCLI {
-    private static final OrdinazioneBoundary boundary = new OrdinazioneBoundary();
+    private static final GestioneOrdiniBoundary boundary = new GestioneOrdiniBoundary();
     private static final Scanner SCANNER = CLIUtils.getScanner();
 
     private static final String INVALID_ID_MESSAGE = "ID non valido.";
@@ -89,7 +89,7 @@ public class OrdinazioneCLI {
                     .findFirst()
                     .orElse(null);
             if (selected != null) {
-                // Ora OrdineCLI.start non lancia più OrdineException
+                // Passa il controllo a OrdineCLI con l'ID selezionato
                 OrdineCLI.start(id);
             } else {
                 System.out.println("Ordine non trovato.");

@@ -4,44 +4,52 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 public class ArchivioBean {
 
-    /** può essere {@code null} quando si archivia un movimento “libero” */
     private Integer idOrdine;
-
-    private List<ArchivioRigaBean> righe;
-    private BigDecimal             totale;
-    private LocalDateTime          dataArchiviazione;
+    private List<ProdottoBean> prodotti;
+    private List<Integer> quantita;
+    private BigDecimal totale;
+    private LocalDateTime dataArchiviazione;
 
     /* ===== getter / setter ===== */
-    public Integer getIdOrdine()                            { return idOrdine; }
-    public void    setIdOrdine(Integer idOrdine)            { this.idOrdine = idOrdine; }
+    public Integer getIdOrdine() { return idOrdine; }
+    public void setIdOrdine(Integer idOrdine) { this.idOrdine = idOrdine; }
 
-    public List<ArchivioRigaBean> getRighe()                { return righe; }
-    public void setRighe(List<ArchivioRigaBean> righe)      { this.righe = righe; }
+    public List<ProdottoBean> getProdotti() { return prodotti; }
+    public void setProdotti(List<ProdottoBean> prodotti) { this.prodotti = prodotti; }
 
-    public BigDecimal getTotale()                           { return totale; }
-    public void setTotale(BigDecimal totale)                { this.totale = totale; }
+    public List<Integer> getQuantita() { return quantita; }
+    public void setQuantita(List<Integer> quantita) { this.quantita = quantita; }
 
-    public LocalDateTime getDataArchiviazione()             { return dataArchiviazione; }
-    public void setDataArchiviazione(LocalDateTime data)    { this.dataArchiviazione = data; }
+    public BigDecimal getTotale() { return totale; }
+    public void setTotale(BigDecimal totale) { this.totale = totale; }
+
+    public LocalDateTime getDataArchiviazione() { return dataArchiviazione; }
+    public void setDataArchiviazione(LocalDateTime dataArchiviazione) {
+        this.dataArchiviazione = dataArchiviazione;
+    }
 
     /* ===== validazione ===== */
     public void validate() {
+        if (prodotti == null || quantita == null ||
+                prodotti.isEmpty() || prodotti.size() != quantita.size())
+        {
+            throw new IllegalArgumentException("Liste prodotti/quantità non valide.");
+        }
 
-        if (righe == null || righe.isEmpty())
-            throw new IllegalArgumentException("Deve esserci almeno una riga d'archivio.");
-
-        for (ArchivioRigaBean r : righe) {
-            if (r.getProdottoBean() == null ||
-                    r.getQuantita()    == null ||
-                    r.getQuantita()    <= 0)
-                throw new IllegalArgumentException("Riga non valida in archivio.");
+        for (int i = 0; i < prodotti.size(); i++) {
+            if (prodotti.get(i) == null ||
+                    quantita.get(i) == null ||
+                    quantita.get(i) <= 0)
+            {
+                throw new IllegalArgumentException("Riga d'archivio non valida all'indice " + i);
+            }
         }
 
         if (totale == null || totale.signum() < 0)
             throw new IllegalArgumentException("Totale non valido.");
-
         if (dataArchiviazione == null)
             throw new IllegalArgumentException("Data archiviazione mancante.");
     }
