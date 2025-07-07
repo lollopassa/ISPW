@@ -33,13 +33,12 @@ public class OrdineUI {
     @FXML private TextField txtPrezzo;
     @FXML private TextField txtQuantita;
 
-    // unico boundary ora
     private final GestioneOrdiniBoundary boundary = new GestioneOrdiniBoundary();
     private int currentOrdineId;
 
     @FXML
     public void initialize() {
-        // usa la selection‐state statica di GestioneOrdiniBoundary
+
         OrdinazioneBean sel = GestioneOrdiniBoundary.getSelected();
         if (sel == null) {
             showAlert(Alert.AlertType.ERROR, "Nessuna ordinazione selezionata.");
@@ -60,7 +59,7 @@ public class OrdineUI {
             caricaProdottiNelRiepilogo(ordine);
 
         } catch (OrdineException notFound) {
-            // se non esiste, crealo vuoto
+
             try {
                 boundary.salvaOrdineCompleto(
                         currentOrdineId,
@@ -75,7 +74,6 @@ public class OrdineUI {
         }
     }
 
-    /* ===== Category Handlers ===== */
     @FXML private void handleCategoriaBevande()      { caricaCategoria("Bevande"); }
     @FXML private void handleCategoriaAntipasti()    { caricaCategoria("Antipasti"); }
     @FXML private void handleCategoriaPizze()        { caricaCategoria("Pizze"); }
@@ -106,7 +104,7 @@ public class OrdineUI {
             boundary.salvaOrdineCompleto(
                     currentOrdineId, t.prodotti, t.quantita, t.prezzi
             );
-            // aggiorna lo stato via lo stesso boundary
+
             boundary.aggiornaStatoOrdinazione(
                     currentOrdineId, StatoOrdinazione.COMPLETATO
             );
@@ -124,7 +122,6 @@ public class OrdineUI {
                 .loadSceneFresh(ORDINAZIONE_FXML, ORDINAZIONE_TITLE);
     }
 
-    /* ===== Helpers UI ===== */
     private void caricaCategoria(String categoria) {
         flowPaneProdotti.getChildren().clear();
         List<ProdottoBean> list = boundary.getProdottiByCategoria(categoria);
@@ -305,7 +302,7 @@ public class OrdineUI {
 
         for (Node node : riepilogoContenuto.getChildren()) {
             if (node instanceof HBox h) {
-                String label = ((Label)h.getChildren().get(0)).getText(); // "Nome x Q"
+                String label = ((Label)h.getChildren().get(0)).getText();
                 String[] parts = label.split(" x ");
                 String n = parts[0].trim();
                 int q = Integer.parseInt(parts[1].trim());

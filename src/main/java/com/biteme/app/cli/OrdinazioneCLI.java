@@ -89,7 +89,7 @@ public class OrdinazioneCLI {
                     .findFirst()
                     .orElse(null);
             if (selected != null) {
-                // Passa il controllo a OrdineCLI con l'ID selezionato
+
                 OrdineCLI.start(id);
             } else {
                 System.out.println("Ordine non trovato.");

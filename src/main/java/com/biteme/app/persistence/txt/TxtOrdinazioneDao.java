@@ -29,12 +29,10 @@ public class TxtOrdinazioneDao implements OrdinazioneDao {
                 ordinazioni.stream().mapToInt(Ordinazione::getId).max().orElse(0) + 1);
     }
 
-    /* -------- CREATE -------- */
     @Override
     public int create(Ordinazione o) {
         int id = (o.getId() > 0) ? o.getId() : idGenerator.getAndIncrement();
 
-        // upsert
         ordinazioni.removeIf(ord -> ord.getId() == id);
         Ordinazione copia = new Ordinazione(
                 id,
@@ -46,33 +44,28 @@ public class TxtOrdinazioneDao implements OrdinazioneDao {
         return id;
     }
 
-    /* -------- READ -------- */
     @Override
     public Optional<Ordinazione> read(int id) {
         return ordinazioni.stream().filter(o -> o.getId() == id).findFirst();
     }
 
-    /* -------- DELETE -------- */
     @Override
     public void delete(int id) {
         ordinazioni.removeIf(o -> o.getId() == id);
         saveToFile();
     }
 
-    /* -------- UPDATE STATO -------- */
     @Override
     public void aggiornaStato(int id, StatoOrdinazione nuovo) {
         read(id).ifPresent(o -> o.setStatoOrdine(nuovo));
         saveToFile();
     }
 
-    /* -------- LISTA -------- */
     @Override
     public List<Ordinazione> getAll() {
-        return new ArrayList<>(ordinazioni);   // copia difensiva
+        return new ArrayList<>(ordinazioni);
     }
 
-    /* -------- I/O helper -------- */
     private void saveToFile() {
         try {
             Files.createDirectories(Paths.get("data"));

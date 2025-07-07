@@ -4,18 +4,16 @@ import com.biteme.app.exception.OrdinazioneException;
 
 import java.time.LocalTime;
 
-/** DTO per i form di creazione/aggiornamento ordini. */
 public class OrdinazioneBean {
 
     private int    id;
     private String nome;
-    private String numeroClienti;   // testo proveniente dal form
-    private String tipoOrdine;      // "Al Tavolo" / "Asporto"
+    private String numeroClienti;
+    private String tipoOrdine;
     private String infoTavolo;
-    private String statoOrdine;     // opzionale, impostato dal server
-    private String orarioCreazione; // HH:mm
+    private String statoOrdine;
+    private String orarioCreazione;
 
-    /*------------- VALIDAZIONE -------------*/
     public void validate() throws OrdinazioneException {
         if (nome == null || nome.trim().isEmpty())
             throw new OrdinazioneException("Il campo Nome Cliente deve essere compilato.");
@@ -44,10 +42,8 @@ public class OrdinazioneBean {
             throw new OrdinazioneException("Il campo Orario deve essere compilato per Asporto.");
         if (!orarioCreazione.matches("([01]\\d|2[0-3]):([0-5]\\d)"))
             throw new OrdinazioneException("Il campo 'Orario' deve essere nel formato HH:mm (es. '12:20').");
-        // ** NON azzeriamo più numeroClienti e infoTavolo **
     }
 
-    /*------------- getter / setter compact -------------*/
     public int getId() { return id; }            public void setId(int id) { this.id = id; }
     public String getNome() { return nome; }     public void setNome(String nome) { this.nome = nome; }
     public String getNumeroClienti() { return numeroClienti; } public void setNumeroClienti(String n) { this.numeroClienti = n; }

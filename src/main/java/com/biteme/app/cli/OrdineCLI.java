@@ -13,21 +13,18 @@ public class OrdineCLI {
 
     private OrdineCLI() {}
 
-    // usa la facciata unificata
     private static final GestioneOrdiniBoundary boundary = new GestioneOrdiniBoundary();
     private static final Scanner scanner = CLIUtils.getScanner();
 
     public static void start(int ordineId) {
         OrdineBean ordineBean;
         try {
-            // ora chiama il metodo della boundary unificata
             ordineBean = boundary.getOrdine(ordineId);
         } catch (OrdineException e) {
             System.out.println("Ordine non trovato: " + e.getMessage());
             return;
         }
 
-        // converto a liste mutabili
         ordineBean.setProdotti(
                 ordineBean.getProdotti() == null
                         ? new java.util.ArrayList<>()
@@ -59,7 +56,7 @@ public class OrdineCLI {
                 case "3" -> modificaQuantita(ordineBean);
                 case "4" -> {
                     try {
-                        // passo liste e una lista prezzi vuota
+
                         boundary.salvaOrdineCompleto(
                                 ordineId,
                                 ordineBean.getProdotti(),
@@ -81,7 +78,6 @@ public class OrdineCLI {
         }
     }
 
-    /* ---------------- helper di visualizzazione ---------------- */
     private static void mostraOrdine(OrdineBean ob) {
         List<String>  prod = ob.getProdotti();
         List<Integer> qty  = ob.getQuantita();
@@ -94,7 +90,6 @@ public class OrdineCLI {
         }
     }
 
-    /* ---------------- opzioni di editing ---------------- */
     private static void aggiungiProdotto(OrdineBean ob) {
         System.out.print("Nome prodotto: ");
         String nome = scanner.nextLine().trim();

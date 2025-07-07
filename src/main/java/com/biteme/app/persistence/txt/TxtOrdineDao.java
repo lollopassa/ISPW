@@ -1,4 +1,3 @@
-// com/biteme/app/persistence/txt/TxtOrdineDao.java
 
 package com.biteme.app.persistence.txt;
 

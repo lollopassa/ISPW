@@ -1,5 +1,3 @@
-// com/biteme/app/persistence/inmemory/InMemoryOrdineDao.java
-
 package com.biteme.app.persistence.inmemory;
 
 import com.biteme.app.entities.Ordine;
@@ -23,10 +21,8 @@ public class InMemoryOrdineDao implements OrdineDao {
     public int create(Ordine o) {
         int id = (o.getId() > 0) ? o.getId() : idGen.getAndIncrement();
 
-        // rimuovo eventuale vecchio
         ordini.removeIf(x -> x.getId() == id);
 
-        // deep‐copy delle liste
         Ordine copy = new Ordine(
                 id,
                 new ArrayList<>(o.getProdotti()),
@@ -57,7 +53,7 @@ public class InMemoryOrdineDao implements OrdineDao {
 
     @Override
     public List<Ordine> getAll() {
-        // copia difensiva
+
         List<Ordine> out = new ArrayList<>();
         for (Ordine x : ordini) {
             out.add(new Ordine(

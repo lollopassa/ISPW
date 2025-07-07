@@ -59,8 +59,7 @@ public class ProdottoBean {
                 throw new ProdottoException("Il prezzo deve essere maggiore di zero.");
             }
 
-        } else {   // placeholder / non catalogo
-            /* nessun vincolo su categoria; se prezzo nullo lo forzo a 0 */
+        } else {
             if (prezzo == null) prezzo = BigDecimal.ZERO;
         }
     }

@@ -16,12 +16,10 @@ public class InMemoryOrdinazioneDao implements OrdinazioneDao {
     private final AtomicInteger idGenerator = new AtomicInteger(
             ordinazioni.stream().mapToInt(Ordinazione::getId).max().orElse(0) + 1);
 
-    /* -------- CREATE -------- */
     @Override
     public int create(Ordinazione o) {
         int id = (o.getId() > 0) ? o.getId() : idGenerator.getAndIncrement();
 
-        // upsert
         ordinazioni.removeIf(ord -> ord.getId() == id);
         Ordinazione copia = new Ordinazione(
                 id,
@@ -32,30 +30,25 @@ public class InMemoryOrdinazioneDao implements OrdinazioneDao {
         return id;
     }
 
-    /* -------- READ -------- */
     @Override
     public Optional<Ordinazione> read(int id) {
         return ordinazioni.stream().filter(o -> o.getId() == id).findFirst();
     }
 
-    /* -------- DELETE -------- */
     @Override
     public void delete(int id) {
-        ordini.removeIf (o -> o.getId() == id);   // tavolo Ordine correlato
+        ordini.removeIf (o -> o.getId() == id);
         ordinazioni.removeIf(o -> o.getId() == id);
     }
 
-    /* -------- UPDATE STATO -------- */
     @Override
     public void aggiornaStato(int id, StatoOrdinazione nuovo) {
         read(id).ifPresent(o -> o.setStatoOrdine(nuovo));
     }
 
-    /* -------- LISTA -------- */
     @Override
     public List<Ordinazione> getAll() {
-        return ordinazioni;            // già lista live in memoria
+        return ordinazioni;
     }
 
-    /* exists() eredita l’implementazione di default dal DAO */
 }

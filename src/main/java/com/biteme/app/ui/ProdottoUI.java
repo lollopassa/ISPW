@@ -82,7 +82,6 @@ public class ProdottoUI {
             String categoria = categoriaComboBox.getValue();
             BigDecimal prezzo = parsePrezzo(prezzoField.getText().trim());
 
-            // Chiamata al boundary: UI non conosce ProdottoBean
             boundary.aggiungiProdotto(nome, categoria, prezzo);
 
             showAlert(Alert.AlertType.INFORMATION, ALERT_INFORMATION, "Prodotto aggiunto correttamente!");

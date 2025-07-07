@@ -25,7 +25,6 @@ public class ArchivioMapper implements BeanEntityMapper<ArchivioBean, Archivio> 
             ProdottoBean pb = prodottoBeans.get(i);
             Integer qty = quantitaList.get(i);
 
-            // converte ProdottoBean → Prodotto entity
             Prodotto prodEntity = toEntity(pb);
             righe.add(new ArchivioRiga(prodEntity, qty));
         });
@@ -47,7 +46,7 @@ public class ArchivioMapper implements BeanEntityMapper<ArchivioBean, Archivio> 
         List<Integer> quantitaList = new ArrayList<>();
 
         for (ArchivioRiga r : entity.getRighe()) {
-            // converte Prodotto entity → ProdottoBean
+
             prodottoBeans.add(ProdottoBean.fromEntity(r.getProdotto()));
             quantitaList.add(r.getQuantita());
         }
@@ -59,11 +58,10 @@ public class ArchivioMapper implements BeanEntityMapper<ArchivioBean, Archivio> 
         return bean;
     }
 
-    // Helper per convertire ProdottoBean → Prodotto entity, gestendo correttamente Categoria
     private Prodotto toEntity(ProdottoBean pb) {
         Categoria cat = null;
         if (pb.getCategoria() != null) {
-            // cerca l'enum il cui toString (displayName) corrisponde alla stringa nel bean
+
             for (Categoria c : Categoria.values()) {
                 if (c.toString().equalsIgnoreCase(pb.getCategoria())) {
                     cat = c;

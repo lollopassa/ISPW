@@ -29,7 +29,6 @@ public class SignupCLI {
         String confirmPassword = scanner.nextLine();
 
         try {
-            // CLI non costruisce più la bean
             boundary.register(username, email, password, confirmPassword);
             System.out.println("Registrazione completata con successo!");
             System.out.println("Prosegui con il login...");

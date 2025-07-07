@@ -15,7 +15,7 @@ public class SignupController {
     }
 
     public void registerUser(SignupBean signupBean) {
-        signupBean.validate(); // <-- ora è la bean a fare la validazione
+        signupBean.validate();
 
         if (userDao.read(signupBean.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email già registrata");

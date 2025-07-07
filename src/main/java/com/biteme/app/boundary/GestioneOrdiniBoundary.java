@@ -17,14 +17,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class GestioneOrdiniBoundary {
 
     private final GestioneOrdiniController gestCtrl = new GestioneOrdiniController();
     private final ArchivioController       archivioCtrl = new ArchivioController();
     private final ProdottoController       prodottoCtrl  = new ProdottoController();
 
-    /* ===== CRUD ORDINAZIONE ===== */
     public void createOrdinazione(String nome,
                                   String tipoOrdine,
                                   String orario,
@@ -52,7 +50,6 @@ public class GestioneOrdiniBoundary {
         gestCtrl.aggiornaStatoOrdinazione(ordineId, nuovo);
     }
 
-    /* ===== CRUD ORDINE ===== */
     public OrdineBean getOrdine(int ordineId) throws OrdineException {
         return gestCtrl.getOrdineById(ordineId);
     }
@@ -75,19 +72,14 @@ public class GestioneOrdiniBoundary {
         gestCtrl.salvaOrdine(bean, ordineId);
     }
 
-    /* ===== ARCHIVIAZIONE ===== */
     public void archive(OrdinazioneBean ordBean) throws ArchiviazioneException {
         try {
-            // 1. recupera (o stub) l'Ordine associato
             OrdineBean ordine = fetchOrdineOrStub(ordBean.getId());
 
-            // 2. calcola totale
             BigDecimal totale = calcolaTotaleOrdine(ordine);
 
-            // 3. estrai liste prodotti e quantità
             List<String> prodNames = ordine.getProdotti();
             List<Integer> qtys      = ordine.getQuantita();
-            // per sicurezza, costruisco nuove liste
             List<ProdottoBean> prodotti = new ArrayList<>(prodNames.size());
             List<Integer>      quantita = new ArrayList<>(qtys.size());
 
@@ -98,10 +90,9 @@ public class GestioneOrdiniBoundary {
                                 ? ordine.getPrezzi().get(i)
                                 : BigDecimal.ZERO;
 
-                // lookup prodotto
                 ProdottoBean pb = prodottoCtrl.findProdottoSeEsiste(nomeProd);
                 if (pb == null) {
-                    // placeholder
+
                     pb = new ProdottoBean();
                     pb.setNome(nomeProd);
                     pb.setCategoria(null);
@@ -112,7 +103,6 @@ public class GestioneOrdiniBoundary {
                 quantita.add(qtys.get(i));
             }
 
-            // 4. prepara ArchivioBean
             ArchivioBean av = new ArchivioBean();
             av.setIdOrdine(ordBean.getId() > 0 ? ordBean.getId() : null);
             av.setProdotti(prodotti);
@@ -121,10 +111,8 @@ public class GestioneOrdiniBoundary {
             av.setDataArchiviazione(LocalDateTime.now());
             av.validate();
 
-            // 5. persisti
             archivioCtrl.archiviaOrdine(av);
 
-            // 6. elimina l’ordinazione
             if (ordBean.getId() > 0) {
                 gestCtrl.eliminaOrdinazione(ordBean.getId());
             }
@@ -136,7 +124,6 @@ public class GestioneOrdiniBoundary {
         }
     }
 
-    /* ===== HELPERS ===== */
     private OrdineBean fetchOrdineOrStub(int id) {
         try {
             return gestCtrl.getOrdineById(id);
@@ -149,8 +136,6 @@ public class GestioneOrdiniBoundary {
             return stub;
         }
     }
-
-
 
     private BigDecimal calcolaTotaleOrdine(OrdineBean ob) {
         BigDecimal tot = BigDecimal.ZERO;
@@ -168,7 +153,6 @@ public class GestioneOrdiniBoundary {
         return tot;
     }
 
-    /* ===== UI SELECTION STATE ===== */
     private static OrdinazioneBean selected;
     public static void setSelected(OrdinazioneBean o) { selected = o; }
     public static OrdinazioneBean getSelected() { return selected; }

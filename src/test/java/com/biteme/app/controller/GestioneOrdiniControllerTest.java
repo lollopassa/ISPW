@@ -34,18 +34,18 @@ class GestioneOrdiniControllerTest {
     }
 
     private void clearStorage() {
-        // In-memory
+
         if (Configuration.getPersistenceProvider().getDaoFactory()
                 instanceof com.biteme.app.persistence.inmemory.InMemoryDaoFactory) {
             Storage.getInstance().getOrdinazioni().clear();
         }
-        // Generic DAO
+
         ordinazioneDao.getAll().forEach(o -> ordinazioneDao.delete(o.getId()));
     }
 
     @Test
     void getOrdinazioni_returnsMappedBeans() throws Exception {
-        // Arrange – creo una nuova ordinazione
+
         OrdinazioneBean bean = new OrdinazioneBean();
         bean.setNome("Anna Verdi");
         bean.setNumeroClienti("3");
@@ -54,15 +54,12 @@ class GestioneOrdiniControllerTest {
         bean.setOrarioCreazione("19:00");
         controller.creaOrdinazione(bean);
 
-        // Act
         List<OrdinazioneBean> ordini = controller.getOrdinazioni();
 
-        // Cerco l'ordine creato
         List<OrdinazioneBean> found = ordini.stream()
                 .filter(b -> b.getId() == bean.getId())
                 .toList();
 
-        // Assert
         assertEquals(1, found.size(), "L'ordinazione appena creata deve essere presente esattamente una volta");
         OrdinazioneBean b = found.get(0);
         assertEquals(bean.getId(), b.getId());
@@ -76,7 +73,7 @@ class GestioneOrdiniControllerTest {
 
     @Test
     void eliminaOrdinazione_rimuoveDalDao() throws Exception {
-        // Arrange – creo ordinazione per ottenere un ID
+
         OrdinazioneBean bean = new OrdinazioneBean();
         bean.setNome("Mario Rossi");
         bean.setNumeroClienti("4");
@@ -86,16 +83,14 @@ class GestioneOrdiniControllerTest {
         controller.creaOrdinazione(bean);
         int idDaEliminare = bean.getId();
 
-        // Act
         controller.eliminaOrdinazione(idDaEliminare);
 
-        // Assert
         assertFalse(ordinazioneDao.exists(idDaEliminare));
     }
 
     @Test
     void eliminaOrdinazione_ordIdNonEsistente_lanciaEccezione() {
-        // Act & Assert
+
         OrdinazioneException ex = assertThrows(
                 OrdinazioneException.class,
                 () -> controller.eliminaOrdinazione(999)
@@ -105,7 +100,7 @@ class GestioneOrdiniControllerTest {
 
     @Test
     void aggiornaStatoOrdinazione_modificaValue() throws Exception {
-        // Arrange
+
         OrdinazioneBean bean = new OrdinazioneBean();
         bean.setNome("Giovanna Bianchi");
         bean.setNumeroClienti("2");
@@ -115,10 +110,8 @@ class GestioneOrdiniControllerTest {
         controller.creaOrdinazione(bean);
         int id = bean.getId();
 
-        // Act
         controller.aggiornaStatoOrdinazione(id, StatoOrdinazione.IN_CORSO);
 
-        // Assert – verifichiamo lo stato aggiornato
         OrdinazioneBean updated = controller.getOrdinazioni().stream()
                 .filter(b -> b.getId() == id)
                 .findFirst()
@@ -128,7 +121,7 @@ class GestioneOrdiniControllerTest {
 
     @Test
     void aggiornaStatoOrdinazione_ordIdNonEsistente_nonLanciaEccezione() {
-        // Il DAO ignora l'update se l'ID non esiste
+
         assertDoesNotThrow(() -> controller.aggiornaStatoOrdinazione(999, StatoOrdinazione.IN_CORSO));
         assertFalse(ordinazioneDao.exists(999));
     }

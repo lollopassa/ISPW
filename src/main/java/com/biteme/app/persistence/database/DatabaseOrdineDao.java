@@ -13,7 +13,6 @@ public class DatabaseOrdineDao implements OrdineDao {
 
     @Override
     public int create(Ordine o) {
-        // MySQL upsert syntax
         final String upsertSql =
                 "INSERT INTO ordine (id, prodotti, quantita, prezzi) VALUES (?, ?, ?, ?) " +
                         "ON DUPLICATE KEY UPDATE " +
@@ -27,7 +26,6 @@ public class DatabaseOrdineDao implements OrdineDao {
             int id = (o.getId() > 0) ? o.getId() : nextId(c);
             ps.setInt(1, id);
 
-            // CSV for prodotti, quantita, prezzi
             ps.setString(2, String.join(",", o.getProdotti()));
             ps.setString(3, o.getQuantita().stream()
                     .map(String::valueOf)
@@ -40,7 +38,6 @@ public class DatabaseOrdineDao implements OrdineDao {
             return id;
 
         } catch (SQLException ex) {
-            // rethrow with context, do not both log and rethrow
             throw new DatabaseConfigurationException(
                     "Errore salva/aggiorna ordine (id=" + o.getId() + "): " + ex.getMessage(),
                     ex

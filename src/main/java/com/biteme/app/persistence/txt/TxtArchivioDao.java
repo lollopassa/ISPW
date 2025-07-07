@@ -44,7 +44,7 @@ public class TxtArchivioDao implements ArchivioDao {
                             String nm = f[1].trim();
                             BigDecimal pr = new BigDecimal(f[2].trim());
                             int qt = Integer.parseInt(f[3].trim());
-                            // placeholder getId <= 0 verrà filtrato in create()
+
                             righe.add(new ArchivioRiga(new Prodotto(pid, nm, pr, null, true), qt));
                         }
                     }
@@ -65,7 +65,6 @@ public class TxtArchivioDao implements ArchivioDao {
                         .append(a.getDataArchiviazione().format(fmt)).append("|")
                         .append(a.getTotale()).append("|");
 
-                // ** Solo righe con id > 0 **
                 String rows = a.getRighe().stream()
                         .filter(r -> r.getProdotto().getId() > 0)
                         .map(r -> {
@@ -95,10 +94,9 @@ public class TxtArchivioDao implements ArchivioDao {
 
     @Override
     public void create(Archivio a) {
-        // Rimuovo esistenti
+
         storage.removeIf(x -> x.getIdOrdine().equals(a.getIdOrdine()));
 
-        // Filtro righe placeholder
         var righeValide = a.getRighe().stream()
                 .filter(r -> r.getProdotto().getId() > 0)
                 .toList();

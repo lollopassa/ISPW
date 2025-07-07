@@ -35,7 +35,6 @@ public class OrdinazioneUI {
     @FXML private Button eliminaButton;
     @FXML private Button archiviaButton;
 
-    // ora usiamo direttamente GestioneOrdiniBoundary
     private final GestioneOrdiniBoundary boundary = new GestioneOrdiniBoundary();
 
     @FXML
@@ -149,7 +148,7 @@ public class OrdinazioneUI {
         }
 
         try {
-            // imposta la selection‐state sulla nuova boundary
+
             GestioneOrdiniBoundary.setSelected(sel);
             SceneLoader.getInstance().loadSceneFresh("/com/biteme/app/ordine.fxml", "Modifica Ordine");
         } catch (Exception e) {

@@ -20,10 +20,8 @@ public class InMemoryArchivioDao implements ArchivioDao {
 
     @Override
     public void create(Archivio a) {
-        // Rimuovo l’eventuale archivio precedente
         storage.removeIf(x -> x.getIdOrdine().equals(a.getIdOrdine()));
 
-        // Filtro solo le righe con prodotto.id > 0
         var righeValide = a.getRighe().stream()
                 .filter(r -> r.getProdotto().getId() > 0)
                 .toList();

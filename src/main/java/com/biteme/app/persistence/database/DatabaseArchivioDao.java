@@ -74,7 +74,6 @@ public class DatabaseArchivioDao implements ArchivioDao {
         try (Connection conn = DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
 
-            // 1) Upsert header
             try (PreparedStatement psA = conn.prepareStatement(upsertA)) {
                 psA.setInt(1, arch.getIdOrdine());
                 psA.setBigDecimal(2, arch.getTotale());
@@ -82,13 +81,11 @@ public class DatabaseArchivioDao implements ArchivioDao {
                 psA.executeUpdate();
             }
 
-            // 2) Delete existing rows
             try (PreparedStatement psD = conn.prepareStatement(deleteR)) {
                 psD.setInt(1, arch.getIdOrdine());
                 psD.executeUpdate();
             }
 
-            // 3) Insert new rows (only real products)
             try (PreparedStatement psR = conn.prepareStatement(insR)) {
                 for (var r : arch.getRighe()) {
                     int pid = r.getProdotto().getId();

@@ -10,14 +10,12 @@ public class OrdinazioneMapper implements BeanEntityMapper<OrdinazioneBean, Ordi
 
     @Override
     public Ordinazione toEntity(OrdinazioneBean bean) {
-        // ---> intercetto la checked exception e la trasformo in unchecked
         try {
             bean.validate();
         } catch (OrdinazioneException ex) {
             throw new IllegalArgumentException("Dati ordinazione non validi: " + ex.getMessage(), ex);
         }
 
-        /* String -> enum / int */
         TipoOrdinazione tipo = "Al Tavolo".equalsIgnoreCase(bean.getTipoOrdine())
                 ? TipoOrdinazione.AL_TAVOLO
                 : TipoOrdinazione.ASPORTO;

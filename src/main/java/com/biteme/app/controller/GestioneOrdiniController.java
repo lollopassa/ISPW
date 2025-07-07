@@ -19,7 +19,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class GestioneOrdiniController {
 
     private final ProdottoDao prodottoDao;
@@ -33,8 +32,6 @@ public class GestioneOrdiniController {
         this.ordineDao = factory.getOrdineDao();
         this.ordinazioneDao = factory.getOrdinazioneDao();
     }
-
-    /* ---------- Ordine ---------- */
 
     public void salvaOrdine(OrdineBean bean, int idOrdine) throws OrdineException {
         try {
@@ -66,8 +63,6 @@ public class GestioneOrdiniController {
                 .map(p -> mapper.toBean(p, ProdottoBean.class))
                 .toList();
     }
-
-    /* ---------- Ordinazione ---------- */
 
     public void creaOrdinazione(OrdinazioneBean bean) throws OrdinazioneException {
         try {
@@ -103,8 +98,6 @@ public class GestioneOrdiniController {
             throw new OrdinazioneException("Errore nell'aggiornamento dello stato dell'ordinazione: " + e.getMessage(), e);
         }
     }
-
-    /* ---------- Helper ---------- */
 
     private List<BigDecimal> completaPrezzi(OrdineBean bean) {
         List<String> prodottiUI = bean.getProdotti();

@@ -17,7 +17,6 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
 
     private static final Logger LOGGER = Logger.getLogger(DatabaseOrdinazioneDao.class.getName());
 
-    /* ============ CREATE ============ */
     @Override
     public int create(Ordinazione o) {
         final String sql = """
@@ -51,7 +50,6 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
         }
     }
 
-    /* ============ READ ============ */
     @Override
     public Optional<Ordinazione> read(int id) {
         final String sql = """
@@ -75,7 +73,6 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
         }
     }
 
-    /* ============ DELETE ============ */
     @Override
     public void delete(int id) {
         try (Connection c = DatabaseConnection.getConnection()) {
@@ -103,9 +100,6 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
         }
     }
 
-    /* ============ EXISTS: eredita default ============ */
-
-    /* ============ LISTA COMPLETA ============ */
     @Override
     public List<Ordinazione> getAll() {
         final String sql = """
@@ -126,7 +120,6 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
         return list;
     }
 
-    /* ============ UPDATE STATO ============ */
     @Override
     public void aggiornaStato(int id, StatoOrdinazione nuovo) {
         final String sql = "UPDATE ordinazione SET statoOrdine=? WHERE id=?";
@@ -143,7 +136,6 @@ public class DatabaseOrdinazioneDao implements OrdinazioneDao {
         }
     }
 
-    /* ============ mapper helper ============ */
     private Ordinazione map(ResultSet rs) throws SQLException {
         return new Ordinazione(
                 rs.getInt("id"),

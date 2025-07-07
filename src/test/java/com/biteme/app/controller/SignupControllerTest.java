@@ -9,6 +9,8 @@ import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+//@author Lorenzo Passacantilli
+
 class SignupControllerTest {
 
     private SignupController controller;
@@ -46,7 +48,7 @@ class SignupControllerTest {
         assertDoesNotThrow(() -> controller.registerUser(bean));
 
         User u = userDao.read("user1").orElseThrow();
-        // Password is stored as SHA-256 hex
+
         String expectedHash = "2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b";
         assertEquals(expectedHash, u.getPassword());
     }

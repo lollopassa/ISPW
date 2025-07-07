@@ -4,34 +4,31 @@ import com.biteme.app.bean.ProdottoBean;
 import com.biteme.app.entities.Categoria;
 import com.biteme.app.entities.Prodotto;
 
-
 public class ProdottoMapper implements BeanEntityMapper<ProdottoBean, Prodotto> {
 
     @Override
     public Prodotto toEntity(ProdottoBean bean) {
-        /* 1. Validazione di base (consente categoria vuota se placeholder) */
+
         bean.validate();
 
-        /* 2. Categoria “safe”: fallback a EXTRA se nulla o non riconosciuta */
         Categoria categoria;
         String catStr = bean.getCategoria();
         if (catStr == null || catStr.isBlank()) {
-            categoria = Categoria.EXTRA;                               // ← fallback
+            categoria = Categoria.EXTRA;
         } else {
             try {
                 categoria = Categoria.valueOf(catStr.trim().toUpperCase());
             } catch (IllegalArgumentException ex) {
-                categoria = Categoria.EXTRA;                           // ← fallback
+                categoria = Categoria.EXTRA;
             }
         }
 
-        /* 3. Costruzione dell’entità persistente */
         return new Prodotto(
                 bean.getId() != null ? bean.getId() : 0,
                 bean.getNome(),
                 bean.getPrezzo(),
                 categoria,
-                Boolean.TRUE.equals(bean.getDisponibile())             // null → false
+                Boolean.TRUE.equals(bean.getDisponibile())
         );
     }
 

@@ -5,7 +5,6 @@ import com.biteme.app.util.CLIUtils;
 
 public class MenuCLI {
 
-    // Costruttore privato per nascondere quello pubblico implicito
     private MenuCLI() {
         throw new AssertionError("Non istanziare MenuCLI");
     }
